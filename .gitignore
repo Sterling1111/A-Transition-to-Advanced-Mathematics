@@ -21,7 +21,9 @@ Makefile.d
 # Ignore hidden files and directories (except .gitignore itself)
 .*[a-zA-Z_0-9]*
 !/.gitignore
-Fibonacci/#Fib.v#
 
 # Coqpilot auxiliary files
 *_cp_aux.v
+
+# Ignore the specific PDF file
+A\ Transition\ to\ Advanced\ Mathematics.pdf
