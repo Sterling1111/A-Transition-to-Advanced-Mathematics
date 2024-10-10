@@ -1,0 +1,442 @@
+DIGEST 73958b475e44b4aa34d53a542bdc4d32
+FFibonacci
+R15:19 Coq.Reals.Reals <> <> lib
+R21:23 Coq.micromega.Lra <> <> lib
+R25:27 Coq.micromega.Lia <> <> lib
+def 61:73 <> fibonacci_nat
+R80:82 Coq.Init.Datatypes <> nat ind
+binder 76:76 <> n:1
+R87:89 Coq.Init.Datatypes <> nat ind
+R100:100 Fibonacci <> n:1 var
+R109:109 Coq.Init.Datatypes <> O constr
+R118:118 Coq.Init.Datatypes <> S constr
+R152:152 Coq.Init.Datatypes <> O constr
+R171:171 Coq.Init.Datatypes <> S constr
+R197:199 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R180:192 Fibonacci <> fibonacci_nat:2 def
+R200:212 Fibonacci <> fibonacci_nat:2 def
+def 248:258 <> fibonacci_R
+R265:267 Coq.Init.Datatypes <> nat ind
+binder 261:261 <> n:5
+R272:272 Coq.Reals.Rdefinitions RbaseSymbolsImpl R defax
+R283:283 Fibonacci <> n:5 var
+R292:292 Coq.Init.Datatypes <> O constr
+R301:301 Coq.Init.Datatypes <> S constr
+R335:335 Coq.Init.Datatypes <> O constr
+R354:354 Coq.Init.Datatypes <> S constr
+R378:380 Coq.Reals.Rdefinitions <> ::R_scope:x_'+'_x not
+R363:373 Fibonacci <> fibonacci_R:6 def
+R381:391 Fibonacci <> fibonacci_R:6 def
+abbrev 433:433 <> F
+R438:448 Fibonacci <> fibonacci_R def
+prf 458:466 <> fib_S_S_n
+R481:483 Coq.Init.Datatypes <> nat ind
+binder 477:477 <> n:9
+R497:499 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R486:486 Fibonacci <> F abbrev
+R489:489 Coq.Init.Datatypes <> S constr
+R492:492 Coq.Init.Datatypes <> S constr
+R494:494 Fibonacci <> n:9 var
+R507:509 Coq.Reals.Rdefinitions <> ::R_scope:x_'+'_x not
+R500:500 Fibonacci <> F abbrev
+R503:503 Coq.Init.Datatypes <> S constr
+R505:505 Fibonacci <> n:9 var
+R510:510 Fibonacci <> F abbrev
+R512:512 Fibonacci <> n:9 var
+prf 549:560 <> fib_n_plus_2
+R575:577 Coq.Init.Datatypes <> nat ind
+binder 571:571 <> n:10
+R586:588 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R580:580 Fibonacci <> F abbrev
+R583:583 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R582:582 Fibonacci <> n:10 var
+R595:597 Coq.Reals.Rdefinitions <> ::R_scope:x_'+'_x not
+R589:589 Fibonacci <> F abbrev
+R592:592 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R591:591 Fibonacci <> n:10 var
+R598:598 Fibonacci <> F abbrev
+R600:600 Fibonacci <> n:10 var
+R637:639 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R656:656 Coq.Init.Datatypes <> S constr
+R637:639 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R656:656 Coq.Init.Datatypes <> S constr
+R688:690 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R707:707 Coq.Init.Datatypes <> S constr
+R710:710 Coq.Init.Datatypes <> S constr
+R688:690 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R707:707 Coq.Init.Datatypes <> S constr
+R710:710 Coq.Init.Datatypes <> S constr
+R737:745 Fibonacci <> fib_S_S_n thm
+R737:745 Fibonacci <> fib_S_S_n thm
+prf 760:771 <> fib_n_plus_1
+R786:788 Coq.Init.Datatypes <> nat ind
+binder 782:782 <> n:11
+R802:805 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R793:795 Coq.Init.Peano <> ::nat_scope:x_'>'_x not
+R792:792 Fibonacci <> n:11 var
+R812:814 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R806:806 Fibonacci <> F abbrev
+R809:809 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R808:808 Fibonacci <> n:11 var
+R819:821 Coq.Reals.Rdefinitions <> ::R_scope:x_'+'_x not
+R815:815 Fibonacci <> F abbrev
+R817:817 Fibonacci <> n:11 var
+R822:822 Fibonacci <> F abbrev
+R825:825 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R824:824 Fibonacci <> n:11 var
+R908:920 Coq.Arith.PeanoNat Nat lt_irrefl thm
+R908:920 Coq.Arith.PeanoNat Nat lt_irrefl thm
+R955:955 Coq.Init.Datatypes <> S constr
+R973:975 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R955:955 Coq.Init.Datatypes <> S constr
+R973:975 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R1009:1021 Coq.Arith.PeanoNat Nat add_assoc thm
+R1009:1021 Coq.Arith.PeanoNat Nat add_assoc thm
+R1009:1021 Coq.Arith.PeanoNat Nat add_assoc thm
+R1052:1054 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R1048:1050 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R1052:1054 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R1048:1050 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R1094:1105 Fibonacci <> fib_n_plus_2 thm
+R1094:1105 Fibonacci <> fib_n_plus_2 thm
+prf 1120:1131 <> fib_n_plus_3
+R1146:1148 Coq.Init.Datatypes <> nat ind
+binder 1142:1142 <> n:12
+R1157:1159 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R1151:1151 Fibonacci <> F abbrev
+R1154:1154 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R1153:1153 Fibonacci <> n:12 var
+R1166:1168 Coq.Reals.Rdefinitions <> ::R_scope:x_'+'_x not
+R1160:1160 Fibonacci <> F abbrev
+R1163:1163 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R1162:1162 Fibonacci <> n:12 var
+R1169:1169 Fibonacci <> F abbrev
+R1172:1172 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R1171:1171 Fibonacci <> n:12 var
+R1210:1212 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R1235:1237 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R1231:1233 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R1210:1212 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R1235:1237 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R1231:1233 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R1269:1271 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R1294:1296 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R1290:1292 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R1269:1271 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R1294:1296 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R1290:1292 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R1322:1333 Fibonacci <> fib_n_plus_2 thm
+R1322:1333 Fibonacci <> fib_n_plus_2 thm
+prf 1348:1352 <> fib_n
+binder 1363:1363 <> n:13
+R1380:1383 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1371:1373 Coq.Init.Peano <> ::nat_scope:x_'>'_x not
+R1370:1370 Fibonacci <> n:13 var
+R1387:1389 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R1384:1384 Fibonacci <> F abbrev
+R1386:1386 Fibonacci <> n:13 var
+R1399:1401 Coq.Reals.Rdefinitions <> ::R_scope:x_'+'_x not
+R1390:1390 Fibonacci <> F abbrev
+R1394:1396 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R1393:1393 Fibonacci <> n:13 var
+R1402:1402 Fibonacci <> F abbrev
+R1406:1408 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R1405:1405 Fibonacci <> n:13 var
+R1451:1451 Coq.Init.Datatypes <> S constr
+R1454:1454 Coq.Init.Datatypes <> S constr
+R1458:1460 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R1451:1451 Coq.Init.Datatypes <> S constr
+R1454:1454 Coq.Init.Datatypes <> S constr
+R1458:1460 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R1492:1494 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R1508:1508 Coq.Init.Datatypes <> S constr
+R1512:1514 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R1492:1494 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R1508:1508 Coq.Init.Datatypes <> S constr
+R1512:1514 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R1533:1541 Fibonacci <> fib_S_S_n thm
+R1533:1541 Fibonacci <> fib_S_S_n thm
+prf 1579:1594 <> strong_induction
+R1614:1617 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1611:1613 Coq.Init.Datatypes <> nat ind
+binder 1607:1607 <> P:14
+R1626:1626 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1674:1680 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+binder 1634:1634 <> m:15
+R1637:1637 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1666:1670 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1649:1651 Coq.Init.Datatypes <> nat ind
+binder 1645:1645 <> k:16
+R1659:1662 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1655:1657 Coq.Init.Peano <> ::nat_scope:x_'<'_x not
+R1654:1654 Fibonacci <> k:16 var
+R1658:1658 Fibonacci <> m:15 var
+R1663:1663 Fibonacci <> P:14 var
+R1665:1665 Fibonacci <> k:16 var
+R1671:1671 Fibonacci <> P:14 var
+R1673:1673 Fibonacci <> m:15 var
+binder 1688:1688 <> n:17
+R1691:1691 Fibonacci <> P:14 var
+R1693:1693 Fibonacci <> n:17 var
+binder 1739:1739 <> k:18
+R1748:1751 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1743:1746 Coq.Init.Peano <> ::nat_scope:x_'<='_x not
+R1742:1742 Fibonacci <> k:18 var
+R1754:1754 Fibonacci <> k:18 var
+binder 1739:1739 <> k:19
+R1748:1751 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1743:1746 Coq.Init.Peano <> ::nat_scope:x_'<='_x not
+R1742:1742 Fibonacci <> k:19 var
+R1754:1754 Fibonacci <> k:19 var
+prf 1965:1974 <> fib_n_ge_1
+binder 1985:1985 <> n:20
+R1991:1994 Coq.Reals.Rdefinitions <> ::R_scope:x_'>='_x not
+R1988:1988 Fibonacci <> F abbrev
+R1990:1990 Fibonacci <> n:20 var
+R2013:2028 Fibonacci <> strong_induction thm
+R2013:2028 Fibonacci <> strong_induction thm
+R2175:2178 Coq.Reals.Rdefinitions <> ::R_scope:x_'>='_x not
+R2166:2166 Fibonacci <> F abbrev
+R2169:2169 Coq.Init.Datatypes <> S constr
+R2175:2178 Coq.Reals.Rdefinitions <> ::R_scope:x_'>='_x not
+R2166:2166 Fibonacci <> F abbrev
+R2169:2169 Coq.Init.Datatypes <> S constr
+R2226:2229 Coq.Reals.Rdefinitions <> ::R_scope:x_'>='_x not
+R2221:2221 Fibonacci <> F abbrev
+R2226:2229 Coq.Reals.Rdefinitions <> ::R_scope:x_'>='_x not
+R2221:2221 Fibonacci <> F abbrev
+R2267:2275 Fibonacci <> fib_S_S_n thm
+R2267:2275 Fibonacci <> fib_S_S_n thm
+R2267:2275 Fibonacci <> fib_S_S_n thm
+prf 2301:2310 <> fib_n_gt_0
+binder 2321:2321 <> n:21
+R2327:2329 Coq.Reals.Rdefinitions <> ::R_scope:x_'>'_x not
+R2324:2324 Fibonacci <> F abbrev
+R2326:2326 Fibonacci <> n:21 var
+R2368:2371 Coq.Reals.Rdefinitions <> ::R_scope:x_'>='_x not
+R2365:2365 Fibonacci <> F abbrev
+R2384:2393 Fibonacci <> fib_n_ge_1 thm
+R2368:2371 Coq.Reals.Rdefinitions <> ::R_scope:x_'>='_x not
+R2365:2365 Fibonacci <> F abbrev
+R2384:2393 Fibonacci <> fib_n_ge_1 thm
+prf 2413:2427 <> fib_Sn_ge_fib_n
+R2442:2444 Coq.Init.Datatypes <> nat ind
+binder 2438:2438 <> n:22
+R2456:2459 Coq.Reals.Rdefinitions <> ::R_scope:x_'>='_x not
+R2449:2449 Fibonacci <> F abbrev
+R2452:2452 Coq.Init.Datatypes <> S constr
+R2454:2454 Fibonacci <> n:22 var
+R2460:2460 Fibonacci <> F abbrev
+R2462:2462 Fibonacci <> n:22 var
+R2530:2538 Fibonacci <> fib_S_S_n thm
+R2530:2538 Fibonacci <> fib_S_S_n thm
+R2530:2538 Fibonacci <> fib_S_S_n thm
+R2567:2569 Coq.Reals.Rdefinitions <> ::R_scope:x_'>'_x not
+R2560:2560 Fibonacci <> F abbrev
+R2563:2563 Coq.Init.Datatypes <> S constr
+R2582:2591 Fibonacci <> fib_n_gt_0 thm
+R2567:2569 Coq.Reals.Rdefinitions <> ::R_scope:x_'>'_x not
+R2560:2560 Fibonacci <> F abbrev
+R2563:2563 Coq.Init.Datatypes <> S constr
+R2582:2591 Fibonacci <> fib_n_gt_0 thm
+R2614:2616 Coq.Reals.Rdefinitions <> ::R_scope:x_'>'_x not
+R2611:2611 Fibonacci <> F abbrev
+R2629:2638 Fibonacci <> fib_n_gt_0 thm
+R2614:2616 Coq.Reals.Rdefinitions <> ::R_scope:x_'>'_x not
+R2611:2611 Fibonacci <> F abbrev
+R2629:2638 Fibonacci <> fib_n_gt_0 thm
+prf 2662:2687 <> n_ge_1_imp_fib_Sn_gt_fib_n
+R2702:2704 Coq.Init.Datatypes <> nat ind
+binder 2698:2698 <> n:23
+R2721:2724 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2711:2714 Coq.Init.Peano <> ::nat_scope:x_'>='_x not
+R2710:2710 Fibonacci <> n:23 var
+R2732:2734 Coq.Reals.Rdefinitions <> ::R_scope:x_'>'_x not
+R2725:2725 Fibonacci <> F abbrev
+R2728:2728 Coq.Init.Datatypes <> S constr
+R2730:2730 Fibonacci <> n:23 var
+R2735:2735 Fibonacci <> F abbrev
+R2737:2737 Fibonacci <> n:23 var
+R2814:2822 Fibonacci <> fib_S_S_n thm
+R2814:2822 Fibonacci <> fib_S_S_n thm
+R2814:2822 Fibonacci <> fib_S_S_n thm
+R2851:2853 Coq.Reals.Rdefinitions <> ::R_scope:x_'>'_x not
+R2843:2843 Fibonacci <> F abbrev
+R2846:2846 Coq.Init.Datatypes <> S constr
+R2866:2875 Fibonacci <> fib_n_gt_0 thm
+R2851:2853 Coq.Reals.Rdefinitions <> ::R_scope:x_'>'_x not
+R2843:2843 Fibonacci <> F abbrev
+R2846:2846 Coq.Init.Datatypes <> S constr
+R2866:2875 Fibonacci <> fib_n_gt_0 thm
+R2899:2901 Coq.Reals.Rdefinitions <> ::R_scope:x_'>'_x not
+R2895:2895 Fibonacci <> F abbrev
+R2914:2923 Fibonacci <> fib_n_gt_0 thm
+R2899:2901 Coq.Reals.Rdefinitions <> ::R_scope:x_'>'_x not
+R2895:2895 Fibonacci <> F abbrev
+R2914:2923 Fibonacci <> fib_n_gt_0 thm
+prf 2947:2975 <> n1_ge_n2_imp_fib_n1_ge_fib_n2
+R2995:2997 Coq.Init.Datatypes <> nat ind
+binder 2987:2988 <> n1:24
+binder 2990:2991 <> n2:25
+R3017:3020 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R3006:3009 Coq.Init.Peano <> ::nat_scope:x_'>='_x not
+R3004:3005 Fibonacci <> n1:24 var
+R3010:3011 Fibonacci <> n2:25 var
+R3025:3028 Coq.Reals.Rdefinitions <> ::R_scope:x_'>='_x not
+R3021:3021 Fibonacci <> F abbrev
+R3023:3024 Fibonacci <> n1:24 var
+R3029:3029 Fibonacci <> F abbrev
+R3031:3032 Fibonacci <> n2:25 var
+R3108:3111 Coq.Reals.Rdefinitions <> ::R_scope:x_'>='_x not
+R3101:3101 Fibonacci <> F abbrev
+R3104:3104 Coq.Init.Datatypes <> S constr
+R3112:3112 Fibonacci <> F abbrev
+R3127:3141 Fibonacci <> fib_Sn_ge_fib_n thm
+R3108:3111 Coq.Reals.Rdefinitions <> ::R_scope:x_'>='_x not
+R3101:3101 Fibonacci <> F abbrev
+R3104:3104 Coq.Init.Datatypes <> S constr
+R3112:3112 Fibonacci <> F abbrev
+R3127:3141 Fibonacci <> fib_Sn_ge_fib_n thm
+prf 3165:3174 <> fib_n_ge_n
+R3189:3191 Coq.Init.Datatypes <> nat ind
+binder 3185:3185 <> n:26
+R3199:3202 Coq.Reals.Rdefinitions <> ::R_scope:x_'>='_x not
+R3196:3196 Fibonacci <> F abbrev
+R3198:3198 Fibonacci <> n:26 var
+R3203:3205 Coq.Reals.Raxioms <> INR def
+R3207:3207 Fibonacci <> n:26 var
+R3275:3275 Coq.Init.Datatypes <> S constr
+R3291:3293 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R3275:3275 Coq.Init.Datatypes <> S constr
+R3291:3293 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R3378:3389 Fibonacci <> fib_n_plus_1 thm
+R3378:3389 Fibonacci <> fib_n_plus_1 thm
+R3378:3389 Fibonacci <> fib_n_plus_1 thm
+R3378:3389 Fibonacci <> fib_n_plus_1 thm
+R3410:3417 Coq.Reals.RIneq <> plus_INR thm
+R3410:3417 Coq.Reals.RIneq <> plus_INR thm
+R3410:3417 Coq.Reals.RIneq <> plus_INR thm
+R3456:3459 Coq.Reals.Rdefinitions <> ::R_scope:x_'>='_x not
+R3444:3444 Fibonacci <> F abbrev
+R3451:3453 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R3447:3447 Coq.Init.Datatypes <> S constr
+R3472:3481 Fibonacci <> fib_n_ge_1 thm
+R3456:3459 Coq.Reals.Rdefinitions <> ::R_scope:x_'>='_x not
+R3444:3444 Fibonacci <> F abbrev
+R3451:3453 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R3447:3447 Coq.Init.Datatypes <> S constr
+R3472:3481 Fibonacci <> fib_n_ge_1 thm
+R3505:3507 Coq.Reals.Raxioms <> INR def
+R3505:3507 Coq.Reals.Raxioms <> INR def
+prf 3580:3594 <> fib_2n_ge_fib_n
+R3609:3611 Coq.Init.Datatypes <> nat ind
+binder 3605:3605 <> n:27
+R3625:3628 Coq.Reals.Rdefinitions <> ::R_scope:x_'>='_x not
+R3616:3616 Fibonacci <> F abbrev
+R3620:3622 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R3623:3623 Fibonacci <> n:27 var
+R3629:3629 Fibonacci <> F abbrev
+R3631:3631 Fibonacci <> n:27 var
+R3671:3674 Coq.Init.Peano <> ::nat_scope:x_'>='_x not
+R3667:3669 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R3671:3674 Coq.Init.Peano <> ::nat_scope:x_'>='_x not
+R3667:3669 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R3699:3727 Fibonacci <> n1_ge_n2_imp_fib_n1_ge_fib_n2 thm
+R3699:3727 Fibonacci <> n1_ge_n2_imp_fib_n1_ge_fib_n2 thm
+prf 3751:3773 <> fib_2n_times_fib_n_ge_n
+R3788:3790 Coq.Init.Datatypes <> nat ind
+binder 3784:3784 <> n:28
+R3820:3823 Coq.Reals.Rdefinitions <> ::R_scope:x_'>='_x not
+R3804:3806 Coq.Reals.Rdefinitions <> ::R_scope:x_'*'_x not
+R3795:3795 Fibonacci <> F abbrev
+R3799:3801 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R3802:3802 Fibonacci <> n:28 var
+R3807:3807 Fibonacci <> F abbrev
+R3815:3817 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R3811:3813 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R3814:3814 Fibonacci <> n:28 var
+R3824:3824 Fibonacci <> F abbrev
+R3826:3826 Fibonacci <> n:28 var
+R3875:3877 Coq.Reals.Rdefinitions <> ::R_scope:x_'>'_x not
+R3860:3860 Fibonacci <> F abbrev
+R3865:3867 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R3890:3899 Fibonacci <> fib_n_gt_0 thm
+R3875:3877 Coq.Reals.Rdefinitions <> ::R_scope:x_'>'_x not
+R3860:3860 Fibonacci <> F abbrev
+R3865:3867 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R3890:3899 Fibonacci <> fib_n_gt_0 thm
+R3936:3939 Coq.Reals.Rdefinitions <> ::R_scope:x_'>='_x not
+R3917:3917 Fibonacci <> F abbrev
+R3926:3928 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R3922:3924 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R3952:3961 Fibonacci <> fib_n_ge_1 thm
+R3936:3939 Coq.Reals.Rdefinitions <> ::R_scope:x_'>='_x not
+R3917:3917 Fibonacci <> F abbrev
+R3926:3928 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R3922:3924 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R3952:3961 Fibonacci <> fib_n_ge_1 thm
+R3994:3997 Coq.Reals.Rdefinitions <> ::R_scope:x_'>='_x not
+R3979:3979 Fibonacci <> F abbrev
+R3984:3986 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R3998:3998 Fibonacci <> F abbrev
+R4012:4026 Fibonacci <> fib_2n_ge_fib_n thm
+R3994:3997 Coq.Reals.Rdefinitions <> ::R_scope:x_'>='_x not
+R3979:3979 Fibonacci <> F abbrev
+R3984:3986 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R3998:3998 Fibonacci <> F abbrev
+R4012:4026 Fibonacci <> fib_2n_ge_fib_n thm
+R4066:4066 Fibonacci <> F abbrev
+R4070:4072 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R4037:4053 Coq.Reals.RIneq <> Rmult_ge_compat_l thm
+R4066:4066 Fibonacci <> F abbrev
+R4070:4072 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R4037:4053 Coq.Reals.RIneq <> Rmult_ge_compat_l thm
+R4100:4108 Coq.Reals.RIneq <> Rmult_1_r thm
+R4100:4108 Coq.Reals.RIneq <> Rmult_1_r thm
+R4100:4108 Coq.Reals.RIneq <> Rmult_1_r thm
+R4132:4137 Coq.Reals.RIneq <> Rgt_ge thm
+R4132:4137 Coq.Reals.RIneq <> Rgt_ge thm
+prf 4163:4175 <> fib_prod_ge_n
+R4191:4193 Coq.Init.Datatypes <> nat ind
+binder 4187:4187 <> n:29
+R4224:4227 Coq.Reals.Rdefinitions <> ::R_scope:x_'>='_x not
+R4208:4210 Coq.Reals.Rdefinitions <> ::R_scope:x_'*'_x not
+R4199:4199 Fibonacci <> F abbrev
+R4203:4205 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R4206:4206 Fibonacci <> n:29 var
+R4211:4211 Fibonacci <> F abbrev
+R4219:4221 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R4215:4217 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R4218:4218 Fibonacci <> n:29 var
+R4228:4230 Coq.Reals.Raxioms <> INR def
+R4232:4232 Fibonacci <> n:29 var
+R4295:4298 Coq.Reals.Rdefinitions <> ::R_scope:x_'>='_x not
+R4279:4281 Coq.Reals.Rdefinitions <> ::R_scope:x_'*'_x not
+R4270:4270 Fibonacci <> F abbrev
+R4274:4276 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R4282:4282 Fibonacci <> F abbrev
+R4290:4292 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R4286:4288 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R4299:4299 Fibonacci <> F abbrev
+R4313:4335 Fibonacci <> fib_2n_times_fib_n_ge_n thm
+R4295:4298 Coq.Reals.Rdefinitions <> ::R_scope:x_'>='_x not
+R4279:4281 Coq.Reals.Rdefinitions <> ::R_scope:x_'*'_x not
+R4270:4270 Fibonacci <> F abbrev
+R4274:4276 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R4282:4282 Fibonacci <> F abbrev
+R4290:4292 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R4286:4288 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R4299:4299 Fibonacci <> F abbrev
+R4313:4335 Fibonacci <> fib_2n_times_fib_n_ge_n thm
+R4356:4359 Coq.Reals.Rdefinitions <> ::R_scope:x_'>='_x not
+R4353:4353 Fibonacci <> F abbrev
+R4360:4362 Coq.Reals.Raxioms <> INR def
+R4376:4385 Fibonacci <> fib_n_ge_n thm
+R4356:4359 Coq.Reals.Rdefinitions <> ::R_scope:x_'>='_x not
+R4353:4353 Fibonacci <> F abbrev
+R4360:4362 Coq.Reals.Raxioms <> INR def
+R4376:4385 Fibonacci <> fib_n_ge_n thm
+R4418:4420 Coq.Reals.Raxioms <> INR def
+R4396:4404 Coq.Reals.RIneq <> Rge_trans thm
+R4418:4420 Coq.Reals.Raxioms <> INR def
+R4396:4404 Coq.Reals.RIneq <> Rge_trans thm

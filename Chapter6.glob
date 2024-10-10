@@ -1,0 +1,716 @@
+DIGEST eadae60e20c8bc349a70a154fc34ae74
+FChapter6
+R15:19 Coq.Reals.Reals <> <> lib
+R21:23 Coq.micromega.Lra <> <> lib
+R25:27 Coq.micromega.Lia <> <> lib
+R29:37 Coq.Logic.Classical <> <> lib
+R39:45 Complex <> <> lib
+prf 76:86 <> lemma_6_1_a
+R101:101 Coq.Reals.Rdefinitions RbaseSymbolsImpl R defax
+binder 97:97 <> x:1
+R110:113 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R105:108 Coq.Init.Logic <> ::type_scope:x_'<>'_x not
+R104:104 Chapter6 <> x:1 var
+R128:131 Coq.Init.Logic <> ::type_scope:x_'<>'_x not
+R125:126 Coq.Reals.Rdefinitions <> ::R_scope:x_'+'_x not
+R117:119 Coq.Reals.Rdefinitions <> ::R_scope:x_'-'_x not
+R115:115 Coq.Reals.Rfunctions <> ::R_scope:x_'^'_x not
+R114:114 Chapter6 <> x:1 var
+R121:123 Coq.Reals.Rdefinitions <> ::R_scope:x_'*'_x not
+R124:124 Chapter6 <> x:1 var
+R182:184 Coq.Reals.Rdefinitions <> ::R_scope:x_'+'_x not
+R174:176 Coq.Reals.Rdefinitions <> ::R_scope:x_'-'_x not
+R172:172 Coq.Reals.Rfunctions <> ::R_scope:x_'^'_x not
+R178:180 Coq.Reals.Rdefinitions <> ::R_scope:x_'*'_x not
+R203:205 Coq.Reals.Rdefinitions <> ::R_scope:x_'+'_x not
+R194:194 Coq.Reals.Rfunctions <> ::R_scope:x_'^'_x not
+R200:201 Coq.Reals.Rfunctions <> ::R_scope:x_'^'_x not
+R196:198 Coq.Reals.Rdefinitions <> ::R_scope:x_'-'_x not
+R182:184 Coq.Reals.Rdefinitions <> ::R_scope:x_'+'_x not
+R174:176 Coq.Reals.Rdefinitions <> ::R_scope:x_'-'_x not
+R172:172 Coq.Reals.Rfunctions <> ::R_scope:x_'^'_x not
+R178:180 Coq.Reals.Rdefinitions <> ::R_scope:x_'*'_x not
+R203:205 Coq.Reals.Rdefinitions <> ::R_scope:x_'+'_x not
+R194:194 Coq.Reals.Rfunctions <> ::R_scope:x_'^'_x not
+R200:201 Coq.Reals.Rfunctions <> ::R_scope:x_'^'_x not
+R196:198 Coq.Reals.Rdefinitions <> ::R_scope:x_'-'_x not
+R233:249 Coq.Reals.RIneq <> Rplus_eq_compat_r thm
+R233:249 Coq.Reals.RIneq <> Rplus_eq_compat_r thm
+R281:291 Coq.Reals.Raxioms <> Rplus_assoc thm
+R281:291 Coq.Reals.Raxioms <> Rplus_assoc thm
+R281:291 Coq.Reals.Raxioms <> Rplus_assoc thm
+R312:322 Coq.Reals.Raxioms <> Rplus_opp_r thm
+R312:322 Coq.Reals.Raxioms <> Rplus_opp_r thm
+R312:322 Coq.Reals.Raxioms <> Rplus_opp_r thm
+R339:347 Coq.Reals.RIneq <> Rplus_0_r thm
+R350:358 Coq.Reals.Raxioms <> Rplus_0_l thm
+R339:347 Coq.Reals.RIneq <> Rplus_0_r thm
+R339:347 Coq.Reals.RIneq <> Rplus_0_r thm
+R350:358 Coq.Reals.Raxioms <> Rplus_0_l thm
+R350:358 Coq.Reals.Raxioms <> Rplus_0_l thm
+R379:387 Coq.Reals.Ratan <> pow2_ge_0 thm
+R391:393 Coq.Reals.Rdefinitions <> ::R_scope:x_'-'_x not
+R379:387 Coq.Reals.Ratan <> pow2_ge_0 thm
+R391:393 Coq.Reals.Rdefinitions <> ::R_scope:x_'-'_x not
+prf 443:453 <> lemma_6_1_b
+R457:457 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R502:506 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R469:469 Complex <> C def
+binder 465:465 <> x:2
+R478:481 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R473:476 Coq.Init.Logic <> ::type_scope:x_'<>'_x not
+R472:472 Chapter6 <> x:2 var
+R497:500 Coq.Init.Logic <> ::type_scope:x_'<>'_x not
+R493:495 Complex <> ::C_scope:x_'+'_x not
+R485:487 Complex <> ::C_scope:x_'-'_x not
+R483:483 Complex <> ::C_scope:x_'^'_x not
+R482:482 Chapter6 <> x:2 var
+R489:491 Complex <> ::C_scope:x_'*'_x not
+R492:492 Chapter6 <> x:2 var
+R507:511 Coq.Init.Logic <> False ind
+R545:547 Complex <> ::C_scope:x_'+'_x not
+R554:556 Complex <> ::C_scope:x_'*'_x not
+R548:551 Coq.Reals.R_sqrt <> sqrt def
+R557:558 Complex <> Ci def
+R545:547 Complex <> ::C_scope:x_'+'_x not
+R554:556 Complex <> ::C_scope:x_'*'_x not
+R548:551 Coq.Reals.R_sqrt <> sqrt def
+R557:558 Complex <> Ci def
+R576:579 Coq.Init.Logic <> ::type_scope:x_'<>'_x not
+R576:579 Coq.Init.Logic <> ::type_scope:x_'<>'_x not
+R604:616 Complex <> c_proj_eq_inv thm
+R604:616 Complex <> c_proj_eq_inv thm
+R686:688 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R682:684 Complex <> ::C_scope:x_'+'_x not
+R674:676 Complex <> ::C_scope:x_'-'_x not
+R672:672 Complex <> ::C_scope:x_'^'_x not
+R678:680 Complex <> ::C_scope:x_'*'_x not
+R686:688 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R682:684 Complex <> ::C_scope:x_'+'_x not
+R674:676 Complex <> ::C_scope:x_'-'_x not
+R672:672 Complex <> ::C_scope:x_'^'_x not
+R678:680 Complex <> ::C_scope:x_'*'_x not
+R726:734 Complex <> Cmult_1_r thm
+R726:734 Complex <> Cmult_1_r thm
+R726:734 Complex <> Cmult_1_r thm
+R743:751 Complex <> c_proj_eq thm
+R743:751 Complex <> c_proj_eq thm
+R767:769 Coq.Init.Datatypes <> fst def
+R833:835 Complex <> ::C_scope:x_'+'_x not
+R809:811 Complex <> ::C_scope:x_'-'_x not
+R772:772 Complex <> ::C_scope:x_'*'_x not
+R788:792 Complex <> ::C_scope:x_'*'_x not
+R808:808 Complex <> ::C_scope:x_'*'_x not
+R774:776 Complex <> ::C_scope:x_'+'_x not
+R783:785 Complex <> ::C_scope:x_'*'_x not
+R777:780 Coq.Reals.R_sqrt <> sqrt def
+R786:787 Complex <> Ci def
+R794:796 Complex <> ::C_scope:x_'+'_x not
+R803:805 Complex <> ::C_scope:x_'*'_x not
+R797:800 Coq.Reals.R_sqrt <> sqrt def
+R806:807 Complex <> Ci def
+R813:816 Complex <> ::C_scope:x_'*'_x not
+R832:832 Complex <> ::C_scope:x_'*'_x not
+R818:820 Complex <> ::C_scope:x_'+'_x not
+R827:829 Complex <> ::C_scope:x_'*'_x not
+R821:824 Coq.Reals.R_sqrt <> sqrt def
+R830:831 Complex <> Ci def
+R866:868 Coq.Reals.Rdefinitions <> ::R_scope:x_'+'_x not
+R847:849 Coq.Reals.Rdefinitions <> ::R_scope:'-'_x not
+R865:865 Coq.Reals.Rdefinitions <> ::R_scope:'-'_x not
+R856:858 Coq.Reals.Rdefinitions <> ::R_scope:x_'*'_x not
+R850:853 Coq.Reals.R_sqrt <> sqrt def
+R859:862 Coq.Reals.R_sqrt <> sqrt def
+R767:769 Coq.Init.Datatypes <> fst def
+R833:835 Complex <> ::C_scope:x_'+'_x not
+R809:811 Complex <> ::C_scope:x_'-'_x not
+R772:772 Complex <> ::C_scope:x_'*'_x not
+R788:792 Complex <> ::C_scope:x_'*'_x not
+R808:808 Complex <> ::C_scope:x_'*'_x not
+R774:776 Complex <> ::C_scope:x_'+'_x not
+R783:785 Complex <> ::C_scope:x_'*'_x not
+R777:780 Coq.Reals.R_sqrt <> sqrt def
+R786:787 Complex <> Ci def
+R794:796 Complex <> ::C_scope:x_'+'_x not
+R803:805 Complex <> ::C_scope:x_'*'_x not
+R797:800 Coq.Reals.R_sqrt <> sqrt def
+R806:807 Complex <> Ci def
+R813:816 Complex <> ::C_scope:x_'*'_x not
+R832:832 Complex <> ::C_scope:x_'*'_x not
+R818:820 Complex <> ::C_scope:x_'+'_x not
+R827:829 Complex <> ::C_scope:x_'*'_x not
+R821:824 Coq.Reals.R_sqrt <> sqrt def
+R830:831 Complex <> Ci def
+R866:868 Coq.Reals.Rdefinitions <> ::R_scope:x_'+'_x not
+R847:849 Coq.Reals.Rdefinitions <> ::R_scope:'-'_x not
+R865:865 Coq.Reals.Rdefinitions <> ::R_scope:'-'_x not
+R856:858 Coq.Reals.Rdefinitions <> ::R_scope:x_'*'_x not
+R850:853 Coq.Reals.R_sqrt <> sqrt def
+R859:862 Coq.Reals.R_sqrt <> sqrt def
+R915:923 Coq.Reals.R_sqrt <> sqrt_sqrt thm
+R915:923 Coq.Reals.R_sqrt <> sqrt_sqrt thm
+R915:923 Coq.Reals.R_sqrt <> sqrt_sqrt thm
+R915:923 Coq.Reals.R_sqrt <> sqrt_sqrt thm
+prf 1020:1037 <> even_plus_even_nat
+R1054:1056 Coq.Init.Datatypes <> nat ind
+binder 1048:1048 <> n:3
+binder 1050:1050 <> m:4
+R1069:1072 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1059:1066 Coq.Arith.PeanoNat Nat Even def
+R1068:1068 Chapter6 <> n:3 var
+R1083:1086 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1073:1080 Coq.Arith.PeanoNat Nat Even def
+R1082:1082 Chapter6 <> m:4 var
+R1087:1094 Coq.Arith.PeanoNat Nat Even def
+R1098:1100 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R1097:1097 Chapter6 <> n:3 var
+R1101:1101 Chapter6 <> m:4 var
+R1147:1149 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R1147:1149 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+prf 1171:1187 <> even_plus_odd_nat
+R1204:1206 Coq.Init.Datatypes <> nat ind
+binder 1198:1198 <> n:5
+binder 1200:1200 <> m:6
+R1219:1222 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1209:1216 Coq.Arith.PeanoNat Nat Even def
+R1218:1218 Chapter6 <> n:5 var
+R1232:1235 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1223:1229 Coq.Arith.PeanoNat Nat Odd def
+R1231:1231 Chapter6 <> m:6 var
+R1236:1242 Coq.Arith.PeanoNat Nat Odd def
+R1246:1248 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R1245:1245 Chapter6 <> n:5 var
+R1249:1249 Chapter6 <> m:6 var
+R1295:1297 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R1295:1297 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+prf 1319:1331 <> even_mult_nat
+R1348:1350 Coq.Init.Datatypes <> nat ind
+binder 1342:1342 <> n:7
+binder 1344:1344 <> m:8
+R1363:1366 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1353:1360 Coq.Arith.PeanoNat Nat Even def
+R1362:1362 Chapter6 <> n:7 var
+R1367:1374 Coq.Arith.PeanoNat Nat Even def
+R1378:1380 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R1377:1377 Chapter6 <> n:7 var
+R1381:1381 Chapter6 <> m:8 var
+R1420:1422 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R1420:1422 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+prf 1444:1459 <> odd_mult_odd_nat
+R1476:1478 Coq.Init.Datatypes <> nat ind
+binder 1470:1470 <> n:9
+binder 1472:1472 <> m:10
+R1490:1493 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1481:1487 Coq.Arith.PeanoNat Nat Odd def
+R1489:1489 Chapter6 <> n:9 var
+R1503:1506 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1494:1500 Coq.Arith.PeanoNat Nat Odd def
+R1502:1502 Chapter6 <> m:10 var
+R1507:1513 Coq.Arith.PeanoNat Nat Odd def
+R1517:1519 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R1516:1516 Chapter6 <> n:9 var
+R1520:1520 Chapter6 <> m:10 var
+R1578:1580 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R1574:1576 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R1570:1572 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R1566:1568 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R1578:1580 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R1574:1576 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R1570:1572 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R1566:1568 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+prf 1602:1615 <> even_minus_nat
+R1632:1634 Coq.Init.Datatypes <> nat ind
+binder 1626:1626 <> n:11
+binder 1628:1628 <> m:12
+R1703:1707 Coq.Init.Logic <> ::type_scope:x_'<->'_x not
+R1645:1648 Coq.Init.Logic <> ::type_scope:x_'\/'_x not
+R1640:1643 Coq.Init.Peano <> ::nat_scope:x_'>='_x not
+R1639:1639 Chapter6 <> m:12 var
+R1644:1644 Chapter6 <> n:11 var
+R1649:1649 Coq.Init.Logic <> ::type_scope:x_'\/'_x not
+R1674:1679 Coq.Init.Logic <> ::type_scope:x_'\/'_x not
+R1702:1702 Coq.Init.Logic <> ::type_scope:x_'\/'_x not
+R1660:1663 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R1650:1657 Coq.Arith.PeanoNat Nat Even def
+R1659:1659 Chapter6 <> n:11 var
+R1664:1671 Coq.Arith.PeanoNat Nat Even def
+R1673:1673 Chapter6 <> m:12 var
+R1689:1692 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R1680:1686 Coq.Arith.PeanoNat Nat Odd def
+R1688:1688 Chapter6 <> n:11 var
+R1693:1699 Coq.Arith.PeanoNat Nat Odd def
+R1701:1701 Chapter6 <> m:12 var
+R1708:1715 Coq.Arith.PeanoNat Nat Even def
+R1719:1721 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R1718:1718 Chapter6 <> n:11 var
+R1722:1722 Chapter6 <> m:12 var
+R1847:1849 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R1847:1849 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R1875:1877 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R1875:1877 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R1920:1923 Coq.Init.Logic <> ::type_scope:x_'\/'_x not
+R1915:1918 Coq.Init.Peano <> ::nat_scope:x_'>='_x not
+R1925:1928 Coq.Init.Peano <> ::nat_scope:x_'>='_x not
+R1920:1923 Coq.Init.Logic <> ::type_scope:x_'\/'_x not
+R1915:1918 Coq.Init.Peano <> ::nat_scope:x_'>='_x not
+R1925:1928 Coq.Init.Peano <> ::nat_scope:x_'>='_x not
+R1986:2000 Coq.Arith.PeanoNat Nat Even_or_Odd thm
+R1986:2000 Coq.Arith.PeanoNat Nat Even_or_Odd thm
+R2080:2082 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R2080:2082 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R2154:2156 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R2154:2156 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+prf 2178:2186 <> lemma_6_2
+R2201:2203 Coq.Init.Datatypes <> nat ind
+binder 2197:2197 <> n:13
+R2215:2218 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2207:2209 Coq.Init.Peano <> ::nat_scope:x_'<'_x_'<'_x not
+R2211:2213 Coq.Init.Peano <> ::nat_scope:x_'<'_x_'<'_x not
+R2210:2210 Chapter6 <> n:13 var
+R2210:2210 Chapter6 <> n:13 var
+R2219:2225 Coq.Arith.PeanoNat Nat Odd def
+R2233:2235 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R2229:2231 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R2232:2232 Chapter6 <> n:13 var
+prf 2314:2331 <> not_odd_iff_even_Z
+R2346:2346 Coq.Numbers.BinNums <> Z ind
+binder 2342:2342 <> z:14
+R2357:2361 Coq.Init.Logic <> ::type_scope:x_'<->'_x not
+R2349:2349 Coq.Init.Logic <> ::type_scope:'~'_x not
+R2350:2354 Coq.ZArith.BinInt Z Odd def
+R2356:2356 Chapter6 <> z:14 var
+R2362:2367 Coq.ZArith.BinInt Z Even def
+R2369:2369 Chapter6 <> z:14 var
+R2428:2440 Coq.ZArith.BinInt Z Even_or_Odd thm
+R2428:2440 Coq.ZArith.BinInt Z Even_or_Odd thm
+R2496:2511 Coq.ZArith.BinInt Z Even_Odd_False thm
+R2496:2511 Coq.ZArith.BinInt Z Even_Odd_False thm
+prf 2541:2552 <> NNPP_inverse
+binder 2563:2563 <> P:15
+R2574:2577 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2573:2573 Chapter6 <> P:15 var
+R2578:2578 Coq.Init.Logic <> ::type_scope:'~'_x not
+R2579:2579 Coq.Init.Logic <> ::type_scope:'~'_x not
+R2580:2580 Chapter6 <> P:15 var
+prf 2639:2656 <> not_even_iff_odd_Z
+R2671:2671 Coq.Numbers.BinNums <> Z ind
+binder 2667:2667 <> z:16
+R2683:2687 Coq.Init.Logic <> ::type_scope:x_'<->'_x not
+R2674:2674 Coq.Init.Logic <> ::type_scope:'~'_x not
+R2675:2680 Coq.ZArith.BinInt Z Even def
+R2682:2682 Chapter6 <> z:16 var
+R2688:2692 Coq.ZArith.BinInt Z Odd def
+R2694:2694 Chapter6 <> z:16 var
+R2742:2759 Chapter6 <> not_odd_iff_even_Z thm
+R2742:2759 Chapter6 <> not_odd_iff_even_Z thm
+R2742:2759 Chapter6 <> not_odd_iff_even_Z thm
+R2768:2771 Coq.Logic.Classical_Prop <> NNPP thm
+R2768:2771 Coq.Logic.Classical_Prop <> NNPP thm
+R2791:2808 Chapter6 <> not_odd_iff_even_Z thm
+R2791:2808 Chapter6 <> not_odd_iff_even_Z thm
+R2791:2808 Chapter6 <> not_odd_iff_even_Z thm
+R2817:2828 Chapter6 <> NNPP_inverse thm
+R2817:2828 Chapter6 <> NNPP_inverse thm
+prf 2843:2853 <> even_sign_Z
+R2868:2868 Coq.Numbers.BinNums <> Z ind
+binder 2864:2864 <> x:17
+R2879:2883 Coq.Init.Logic <> ::type_scope:x_'<->'_x not
+R2871:2876 Coq.ZArith.BinInt Z Even def
+R2878:2878 Chapter6 <> x:17 var
+R2884:2889 Coq.ZArith.BinInt Z Even def
+R2892:2892 Coq.ZArith.BinInt <> ::Z_scope:'-'_x not
+R2893:2893 Chapter6 <> x:17 var
+R2948:2948 Coq.ZArith.BinInt <> ::Z_scope:'-'_x not
+R2948:2948 Coq.ZArith.BinInt <> ::Z_scope:'-'_x not
+R2948:2948 Coq.ZArith.BinInt <> ::Z_scope:'-'_x not
+prf 2970:2979 <> odd_sign_Z
+R2994:2994 Coq.Numbers.BinNums <> Z ind
+binder 2990:2990 <> x:18
+R3004:3008 Coq.Init.Logic <> ::type_scope:x_'<->'_x not
+R2997:3001 Coq.ZArith.BinInt Z Odd def
+R3003:3003 Chapter6 <> x:18 var
+R3009:3013 Coq.ZArith.BinInt Z Odd def
+R3016:3016 Coq.ZArith.BinInt <> ::Z_scope:'-'_x not
+R3017:3017 Chapter6 <> x:18 var
+R3074:3076 Coq.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R3072:3072 Coq.ZArith.BinInt <> ::Z_scope:'-'_x not
+R3074:3076 Coq.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R3072:3072 Coq.ZArith.BinInt <> ::Z_scope:'-'_x not
+R3074:3076 Coq.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R3072:3072 Coq.ZArith.BinInt <> ::Z_scope:'-'_x not
+prf 3098:3108 <> even_plus_Z
+R3125:3125 Coq.Numbers.BinNums <> Z ind
+binder 3119:3119 <> x:19
+binder 3121:3121 <> y:20
+R3178:3182 Coq.Init.Logic <> ::type_scope:x_'<->'_x not
+R3132:3132 Coq.Init.Logic <> ::type_scope:x_'\/'_x not
+R3153:3158 Coq.Init.Logic <> ::type_scope:x_'\/'_x not
+R3177:3177 Coq.Init.Logic <> ::type_scope:x_'\/'_x not
+R3141:3144 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R3133:3138 Coq.ZArith.BinInt Z Even def
+R3140:3140 Chapter6 <> x:19 var
+R3145:3150 Coq.ZArith.BinInt Z Even def
+R3152:3152 Chapter6 <> y:20 var
+R3166:3169 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R3159:3163 Coq.ZArith.BinInt Z Odd def
+R3165:3165 Chapter6 <> x:19 var
+R3170:3174 Coq.ZArith.BinInt Z Odd def
+R3176:3176 Chapter6 <> y:20 var
+R3183:3188 Coq.ZArith.BinInt Z Even def
+R3192:3194 Coq.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R3191:3191 Chapter6 <> x:19 var
+R3195:3195 Chapter6 <> y:20 var
+R3297:3299 Coq.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R3297:3299 Coq.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R3331:3333 Coq.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R3327:3329 Coq.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R3331:3333 Coq.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R3327:3329 Coq.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R3375:3387 Coq.ZArith.BinInt Z Even_or_Odd thm
+R3375:3387 Coq.ZArith.BinInt Z Even_or_Odd thm
+R3466:3468 Coq.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R3466:3468 Coq.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R3543:3545 Coq.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R3539:3541 Coq.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R3543:3545 Coq.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R3539:3541 Coq.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+prf 3567:3576 <> odd_plus_Z
+R3593:3593 Coq.Numbers.BinNums <> Z ind
+binder 3587:3587 <> x:21
+binder 3589:3589 <> y:22
+R3646:3650 Coq.Init.Logic <> ::type_scope:x_'<->'_x not
+R3600:3600 Coq.Init.Logic <> ::type_scope:x_'\/'_x not
+R3620:3625 Coq.Init.Logic <> ::type_scope:x_'\/'_x not
+R3645:3645 Coq.Init.Logic <> ::type_scope:x_'\/'_x not
+R3609:3612 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R3601:3606 Coq.ZArith.BinInt Z Even def
+R3608:3608 Chapter6 <> x:21 var
+R3613:3617 Coq.ZArith.BinInt Z Odd def
+R3619:3619 Chapter6 <> y:22 var
+R3633:3636 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R3626:3630 Coq.ZArith.BinInt Z Odd def
+R3632:3632 Chapter6 <> x:21 var
+R3637:3642 Coq.ZArith.BinInt Z Even def
+R3644:3644 Chapter6 <> y:22 var
+R3651:3655 Coq.ZArith.BinInt Z Odd def
+R3659:3661 Coq.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R3658:3658 Chapter6 <> x:21 var
+R3662:3662 Chapter6 <> y:22 var
+R3755:3757 Coq.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R3755:3757 Coq.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R3755:3757 Coq.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R3798:3810 Coq.ZArith.BinInt Z Even_or_Odd thm
+R3798:3810 Coq.ZArith.BinInt Z Even_or_Odd thm
+R3889:3891 Coq.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R3889:3891 Coq.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R3963:3965 Coq.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R3963:3965 Coq.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+prf 3987:3998 <> even_minus_Z
+R4015:4015 Coq.Numbers.BinNums <> Z ind
+binder 4009:4009 <> x:23
+binder 4011:4011 <> y:24
+R4068:4072 Coq.Init.Logic <> ::type_scope:x_'<->'_x not
+R4022:4022 Coq.Init.Logic <> ::type_scope:x_'\/'_x not
+R4043:4048 Coq.Init.Logic <> ::type_scope:x_'\/'_x not
+R4067:4067 Coq.Init.Logic <> ::type_scope:x_'\/'_x not
+R4031:4034 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R4023:4028 Coq.ZArith.BinInt Z Even def
+R4030:4030 Chapter6 <> x:23 var
+R4035:4040 Coq.ZArith.BinInt Z Even def
+R4042:4042 Chapter6 <> y:24 var
+R4056:4059 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R4049:4053 Coq.ZArith.BinInt Z Odd def
+R4055:4055 Chapter6 <> x:23 var
+R4060:4064 Coq.ZArith.BinInt Z Odd def
+R4066:4066 Chapter6 <> y:24 var
+R4073:4078 Coq.ZArith.BinInt Z Even def
+R4082:4084 Coq.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R4081:4081 Chapter6 <> x:23 var
+R4085:4085 Chapter6 <> y:24 var
+R4122:4124 Coq.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R4135:4137 Coq.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R4138:4138 Coq.ZArith.BinInt <> ::Z_scope:'-'_x not
+R4122:4124 Coq.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R4135:4137 Coq.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R4138:4138 Coq.ZArith.BinInt <> ::Z_scope:'-'_x not
+R4180:4190 Chapter6 <> even_plus_Z thm
+R4180:4190 Chapter6 <> even_plus_Z thm
+R4262:4272 Chapter6 <> even_sign_Z thm
+R4262:4272 Chapter6 <> even_sign_Z thm
+R4283:4298 Coq.ZArith.BinInt Z opp_involutive thm
+R4283:4298 Coq.ZArith.BinInt Z opp_involutive thm
+R4283:4298 Coq.ZArith.BinInt Z opp_involutive thm
+R4342:4351 Chapter6 <> odd_sign_Z thm
+R4342:4351 Chapter6 <> odd_sign_Z thm
+R4362:4377 Coq.ZArith.BinInt Z opp_involutive thm
+R4362:4377 Coq.ZArith.BinInt Z opp_involutive thm
+R4362:4377 Coq.ZArith.BinInt Z opp_involutive thm
+R4409:4419 Chapter6 <> even_plus_Z thm
+R4409:4419 Chapter6 <> even_plus_Z thm
+R4497:4507 Chapter6 <> even_sign_Z thm
+R4497:4507 Chapter6 <> even_sign_Z thm
+R4551:4560 Chapter6 <> odd_sign_Z thm
+R4551:4560 Chapter6 <> odd_sign_Z thm
+prf 4581:4591 <> odd_minus_Z
+R4608:4608 Coq.Numbers.BinNums <> Z ind
+binder 4602:4602 <> x:25
+binder 4604:4604 <> y:26
+R4661:4665 Coq.Init.Logic <> ::type_scope:x_'<->'_x not
+R4615:4615 Coq.Init.Logic <> ::type_scope:x_'\/'_x not
+R4635:4640 Coq.Init.Logic <> ::type_scope:x_'\/'_x not
+R4660:4660 Coq.Init.Logic <> ::type_scope:x_'\/'_x not
+R4624:4627 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R4616:4621 Coq.ZArith.BinInt Z Even def
+R4623:4623 Chapter6 <> x:25 var
+R4628:4632 Coq.ZArith.BinInt Z Odd def
+R4634:4634 Chapter6 <> y:26 var
+R4648:4651 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R4641:4645 Coq.ZArith.BinInt Z Odd def
+R4647:4647 Chapter6 <> x:25 var
+R4652:4657 Coq.ZArith.BinInt Z Even def
+R4659:4659 Chapter6 <> y:26 var
+R4666:4670 Coq.ZArith.BinInt Z Odd def
+R4674:4676 Coq.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R4673:4673 Chapter6 <> x:25 var
+R4677:4677 Chapter6 <> y:26 var
+R4714:4716 Coq.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R4727:4729 Coq.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R4730:4730 Coq.ZArith.BinInt <> ::Z_scope:'-'_x not
+R4714:4716 Coq.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R4727:4729 Coq.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R4730:4730 Coq.ZArith.BinInt <> ::Z_scope:'-'_x not
+R4772:4781 Chapter6 <> odd_plus_Z thm
+R4772:4781 Chapter6 <> odd_plus_Z thm
+R4853:4862 Chapter6 <> odd_sign_Z thm
+R4853:4862 Chapter6 <> odd_sign_Z thm
+R4873:4888 Coq.ZArith.BinInt Z opp_involutive thm
+R4873:4888 Coq.ZArith.BinInt Z opp_involutive thm
+R4873:4888 Coq.ZArith.BinInt Z opp_involutive thm
+R4932:4942 Chapter6 <> even_sign_Z thm
+R4932:4942 Chapter6 <> even_sign_Z thm
+R4953:4968 Coq.ZArith.BinInt Z opp_involutive thm
+R4953:4968 Coq.ZArith.BinInt Z opp_involutive thm
+R4953:4968 Coq.ZArith.BinInt Z opp_involutive thm
+R5000:5009 Chapter6 <> odd_plus_Z thm
+R5000:5009 Chapter6 <> odd_plus_Z thm
+R5087:5096 Chapter6 <> odd_sign_Z thm
+R5087:5096 Chapter6 <> odd_sign_Z thm
+R5140:5150 Chapter6 <> even_sign_Z thm
+R5140:5150 Chapter6 <> even_sign_Z thm
+prf 5171:5181 <> even_mult_Z
+R5198:5198 Coq.Numbers.BinNums <> Z ind
+binder 5192:5192 <> x:27
+binder 5194:5194 <> y:28
+R5221:5225 Coq.Init.Logic <> ::type_scope:x_'<->'_x not
+R5209:5212 Coq.Init.Logic <> ::type_scope:x_'\/'_x not
+R5201:5206 Coq.ZArith.BinInt Z Even def
+R5208:5208 Chapter6 <> x:27 var
+R5213:5218 Coq.ZArith.BinInt Z Even def
+R5220:5220 Chapter6 <> y:28 var
+R5226:5231 Coq.ZArith.BinInt Z Even def
+R5235:5237 Coq.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R5234:5234 Chapter6 <> x:27 var
+R5238:5238 Chapter6 <> y:28 var
+R5322:5324 Coq.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R5322:5324 Coq.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R5353:5355 Coq.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R5353:5355 Coq.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R5393:5405 Coq.ZArith.BinInt Z Even_or_Odd thm
+R5434:5446 Coq.ZArith.BinInt Z Even_or_Odd thm
+R5393:5405 Coq.ZArith.BinInt Z Even_or_Odd thm
+R5434:5446 Coq.ZArith.BinInt Z Even_or_Odd thm
+R5434:5446 Coq.ZArith.BinInt Z Even_or_Odd thm
+prf 5572:5581 <> odd_mult_Z
+R5598:5598 Coq.Numbers.BinNums <> Z ind
+binder 5592:5592 <> x:29
+binder 5594:5594 <> y:30
+R5608:5611 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5601:5605 Coq.ZArith.BinInt Z Odd def
+R5607:5607 Chapter6 <> x:29 var
+R5619:5623 Coq.Init.Logic <> ::type_scope:x_'<->'_x not
+R5612:5616 Coq.ZArith.BinInt Z Odd def
+R5618:5618 Chapter6 <> y:30 var
+R5624:5628 Coq.ZArith.BinInt Z Odd def
+R5632:5634 Coq.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R5631:5631 Chapter6 <> x:29 var
+R5635:5635 Chapter6 <> y:30 var
+R5718:5720 Coq.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R5714:5716 Coq.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R5710:5712 Coq.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R5706:5708 Coq.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R5718:5720 Coq.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R5714:5716 Coq.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R5710:5712 Coq.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R5706:5708 Coq.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+binder 5756:5756 <> P:31
+binder 5758:5758 <> Q:32
+R5768:5768 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5777:5782 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5789:5789 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5771:5774 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5769:5769 Coq.Init.Logic <> ::type_scope:'~'_x not
+R5770:5770 Chapter6 <> Q:32 var
+R5775:5775 Coq.Init.Logic <> ::type_scope:'~'_x not
+R5776:5776 Chapter6 <> P:31 var
+R5784:5787 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5783:5783 Chapter6 <> P:31 var
+R5788:5788 Chapter6 <> Q:32 var
+binder 5756:5756 <> P:33
+binder 5758:5758 <> Q:34
+R5768:5768 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5777:5782 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5789:5789 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5771:5774 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5769:5769 Coq.Init.Logic <> ::type_scope:'~'_x not
+R5770:5770 Chapter6 <> Q:34 var
+R5775:5775 Coq.Init.Logic <> ::type_scope:'~'_x not
+R5776:5776 Chapter6 <> P:33 var
+R5784:5787 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5783:5783 Chapter6 <> P:33 var
+R5788:5788 Chapter6 <> Q:34 var
+R5845:5862 Chapter6 <> not_odd_iff_even_Z thm
+R5845:5862 Chapter6 <> not_odd_iff_even_Z thm
+R5893:5910 Chapter6 <> not_odd_iff_even_Z thm
+R5893:5910 Chapter6 <> not_odd_iff_even_Z thm
+R5930:5932 Coq.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R5926:5928 Coq.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R5922:5924 Coq.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R5930:5932 Coq.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R5926:5928 Coq.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R5922:5924 Coq.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+prf 5960:5968 <> lemma_6_3
+R5983:5983 Coq.Numbers.BinNums <> Z ind
+binder 5979:5979 <> x:35
+R5993:5996 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5986:5990 Coq.ZArith.BinInt Z Odd def
+R5992:5992 Chapter6 <> x:35 var
+R5997:6001 Coq.ZArith.BinInt Z Odd def
+R6005:6005 Coq.ZArith.BinInt <> ::Z_scope:x_'^'_x not
+R6004:6004 Chapter6 <> x:35 var
+R6051:6054 Coq.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R6060:6060 Coq.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R6047:6049 Coq.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R6056:6058 Coq.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R6051:6054 Coq.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R6060:6060 Coq.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R6047:6049 Coq.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R6056:6058 Coq.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+prf 6081:6091 <> lemma_6_3_'
+R6106:6106 Coq.Numbers.BinNums <> Z ind
+binder 6102:6102 <> x:36
+R6116:6119 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6109:6113 Coq.ZArith.BinInt Z Odd def
+R6115:6115 Chapter6 <> x:36 var
+R6120:6124 Coq.ZArith.BinInt Z Odd def
+R6128:6128 Coq.ZArith.BinInt <> ::Z_scope:x_'^'_x not
+R6127:6127 Chapter6 <> x:36 var
+R6165:6173 Coq.ZArith.BinInt Z pow_2_r thm
+R6165:6173 Coq.ZArith.BinInt Z pow_2_r thm
+R6165:6173 Coq.ZArith.BinInt Z pow_2_r thm
+R6182:6191 Chapter6 <> odd_mult_Z thm
+R6182:6191 Chapter6 <> odd_mult_Z thm
+prf 6212:6220 <> lemma_6_4
+R6235:6235 Coq.Numbers.BinNums <> Z ind
+binder 6231:6231 <> x:37
+R6246:6249 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6238:6243 Coq.ZArith.BinInt Z Even def
+R6245:6245 Chapter6 <> x:37 var
+R6250:6254 Coq.ZArith.BinInt Z Odd def
+R6262:6264 Coq.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R6258:6260 Coq.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R6261:6261 Chapter6 <> x:37 var
+R6310:6312 Coq.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R6306:6308 Coq.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R6310:6312 Coq.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R6306:6308 Coq.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+prf 6335:6344 <> lemma_6_4'
+R6359:6359 Coq.Numbers.BinNums <> Z ind
+binder 6355:6355 <> x:38
+R6370:6373 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6362:6367 Coq.ZArith.BinInt Z Even def
+R6369:6369 Chapter6 <> x:38 var
+R6374:6378 Coq.ZArith.BinInt Z Odd def
+R6386:6388 Coq.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R6382:6384 Coq.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R6385:6385 Chapter6 <> x:38 var
+R6423:6433 Chapter6 <> odd_minus_Z thm
+R6423:6433 Chapter6 <> odd_minus_Z thm
+R6461:6471 Chapter6 <> even_mult_Z thm
+R6461:6471 Chapter6 <> even_mult_Z thm
+prf 6513:6521 <> lemma_6_5
+R6540:6540 Coq.Numbers.BinNums <> Z ind
+binder 6532:6532 <> a:39
+binder 6534:6534 <> b:40
+binder 6536:6536 <> c:41
+R6550:6553 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6543:6547 Coq.ZArith.BinInt Z Odd def
+R6549:6549 Chapter6 <> a:39 var
+R6561:6564 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6554:6558 Coq.ZArith.BinInt Z Odd def
+R6560:6560 Chapter6 <> c:41 var
+R6565:6570 Coq.ZArith.BinInt Z Even def
+R6578:6580 Coq.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R6574:6576 Coq.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R6573:6573 Chapter6 <> a:39 var
+R6577:6577 Chapter6 <> b:40 var
+R6582:6584 Coq.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R6581:6581 Chapter6 <> b:40 var
+R6585:6585 Chapter6 <> c:41 var
+R6631:6643 Coq.ZArith.BinInt Z Even_or_Odd thm
+R6631:6643 Coq.ZArith.BinInt Z Even_or_Odd thm
+R6673:6683 Chapter6 <> even_plus_Z thm
+R6673:6683 Chapter6 <> even_plus_Z thm
+R6705:6715 Chapter6 <> even_mult_Z thm
+R6705:6715 Chapter6 <> even_mult_Z thm
+R6705:6715 Chapter6 <> even_mult_Z thm
+R6736:6746 Chapter6 <> even_plus_Z thm
+R6736:6746 Chapter6 <> even_plus_Z thm
+R6769:6778 Chapter6 <> odd_mult_Z thm
+R6769:6778 Chapter6 <> odd_mult_Z thm
+R6769:6778 Chapter6 <> odd_mult_Z thm
+prf 6799:6812 <> abs_val_lt_1_Z
+R6827:6827 Coq.Numbers.BinNums <> Z ind
+binder 6823:6823 <> n:42
+R6841:6844 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6837:6839 Coq.ZArith.BinInt <> ::Z_scope:x_'<'_x not
+R6830:6834 Coq.ZArith.BinInt Z abs def
+R6836:6836 Chapter6 <> n:42 var
+R6846:6848 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R6845:6845 Chapter6 <> n:42 var
+prf 6889:6897 <> lemma_6_6
+R6912:6912 Coq.Numbers.BinNums <> Z ind
+binder 6908:6908 <> n:43
+R6926:6929 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6922:6924 Coq.ZArith.BinInt <> ::Z_scope:x_'<'_x not
+R6915:6919 Coq.ZArith.BinInt Z abs def
+R6921:6921 Chapter6 <> n:43 var
+R6930:6935 Coq.ZArith.BinInt Z Even def
+R6943:6945 Coq.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R6939:6941 Coq.ZArith.BinInt <> ::Z_scope:x_'*'_x not
+R6942:6942 Chapter6 <> n:43 var
+R6980:6993 Chapter6 <> abs_val_lt_1_Z thm
+R6980:6993 Chapter6 <> abs_val_lt_1_Z thm
+R7022:7030 Coq.ZArith.BinInt Z mul_0_r thm
+R7022:7030 Coq.ZArith.BinInt Z mul_0_r thm
+R7022:7030 Coq.ZArith.BinInt Z mul_0_r thm
+prf 7063:7071 <> lemma_6_7
+R7087:7087 Coq.Numbers.BinNums <> Z ind
+binder 7082:7083 <> z1:44
+R7098:7101 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R7090:7094 Coq.ZArith.BinInt Z Odd def
+R7096:7097 Chapter6 <> z1:44 var
+R7102:7108 Coq.Init.Logic <> ::type_scope:'exists'_x_'..'_x_','_x not
+R7118:7119 Coq.Init.Logic <> ::type_scope:'exists'_x_'..'_x_','_x not
+R7117:7117 Coq.Numbers.BinNums <> Z ind
+binder 7109:7110 <> z2:45
+R7117:7117 Coq.Numbers.BinNums <> Z ind
+binder 7112:7113 <> z3:46
+R7122:7124 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R7120:7121 Chapter6 <> z1:44 var
+R7131:7133 Coq.ZArith.BinInt <> ::Z_scope:x_'-'_x not
+R7127:7129 Coq.ZArith.BinInt <> ::Z_scope:x_'^'_x not
+R7125:7126 Chapter6 <> z2:45 var
+R7136:7138 Coq.ZArith.BinInt <> ::Z_scope:x_'^'_x not
+R7134:7135 Chapter6 <> z3:46 var
+R7180:7182 Coq.ZArith.BinInt <> ::Z_scope:x_'+'_x not
+R7180:7182 Coq.ZArith.BinInt <> ::Z_scope:x_'+'_x not
