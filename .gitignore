@@ -1,0 +1,27 @@
+# Coq generated files
+*.vo
+*.vio
+*.aux
+*.glob
+*.v.d
+*.vok
+*.vos
+
+# Other miscellaneous files to ignore
+*.log
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.cache/
+__coqdoc__/
+Makefile
+Makefile.conf
+Makefile.d
+
+# Ignore hidden files and directories (except .gitignore itself)
+.*[a-zA-Z_0-9]*
+!/.gitignore
+Fibonacci/#Fib.v#
+
+# Coqpilot auxiliary files
+*_cp_aux.v
