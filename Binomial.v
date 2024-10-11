@@ -560,3 +560,13 @@ Proof.
   rewrite Z_fact_eq_fact. rewrite Nat2Z.inj_div. rewrite Nat2Z.inj_mul.
   repeat rewrite Z_fact_eq_fact. reflexivity.
 Qed.
+
+Fixpoint choose_3 (n k : nat) : nat :=
+  match n, k with
+  | 0%nat, 0%nat => 1
+  | 0%nat, _ => 0
+  | _, 0%nat => 1
+  | S n', S k' => choose_3 n' k' + choose_3 n' k
+  end.
+
+Open Scope nat_scope.
