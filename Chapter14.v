@@ -8,7 +8,7 @@ Open Scope nat_scope.
 Lemma lemma_14_1 : forall n : nat,
   n >= 7 -> fact n > 3^n.
 Proof.
-  intros n H1. induction n as [| k IH]; try lia.
+  intros n H1. induction n as [| k IH]. try lia.
   assert (S k = 7 \/ k >= 7) as [H2 | H2] by lia.
   - rewrite H2. compute; lia.
   - simpl in *. nia.
@@ -37,15 +37,7 @@ Qed.
 Lemma lemma_14_4 : forall (l : list Prop),
   ~ (fold_right and True l) <-> fold_right or False (map (fun P => ~ P) l).
 Proof.
-  intros l. split.
-  - intro H1. induction l as [| h t IH].
-    -- simpl in H1. exfalso. apply H1. apply I.
-    -- rewrite map_cons. replace ((~ h) :: map (fun P : Prop => ~ P) t) with ([~ h] ++ map (fun P : Prop => ~ P) t) by reflexivity.
-       rewrite fold_right_app. simpl. replace (h :: t) with ([h] ++ t) in H1 by reflexivity. rewrite fold_right_app in H1. simpl in H1.
-       apply not_and_or in H1 as [H2 | H2]. left. auto. right. apply (IH H2).
-  - intro H1. induction l as [| h t IH].
-    -- simpl. auto.
-    -- simpl in *. destruct H1 as [H1 | H1]. apply or_not_and. left. auto. apply or_not_and. right. apply IH; auto.
+  intros l; induction l as [| h t IH]; (simpl; tauto).
 Qed.
 
 Open Scope R_scope.
@@ -68,7 +60,7 @@ Section section_14_6.
   Local Notation F := fibonacci_R.
 
 (* run this command to print out the first 15 fib numbers*)
-(*  Compute (map F_nat (seq 0 15)). *)
+Compute (map F_nat (seq 0 15)).
 
   Lemma lemma_14_6_b : forall n : nat,
     sum_f 0 n (fun i => F i) = F (S (S n)) - 1.
@@ -86,7 +78,7 @@ Section section_14_6.
     - rewrite sum_f_i_Sn_f; try lia. rewrite IH. replace (F (S k) ^ 2) with (F (S k) * F (S k)) by lra. 
       repeat rewrite fib_S_S_n. lra.
   Qed.
-  
+
 End section_14_6.
 
 Section section_14_7.
@@ -103,11 +95,8 @@ Section section_14_7.
     - specialize (IH H2). rewrite fib_n in IH; try lia. rewrite fib_n; try lia. rewrite fib_n; try lia.
       replace (S k - 1 - 1)%nat with (k - 1)%nat by lia. replace (S k - 2)%nat with (k-1)%nat by lia.
       replace (S k - 1 - 2)%nat with (k - 2)%nat by lia. replace (INR (S k) ^ 2) with (INR k ^ 2 + 2 * INR k + 1).
-      2 : { break_INR. simpl. nra. } assert (H4 : F (k - 1) = F (k - 2) + F (k - 3)). 
-      { set (n := (k - 1)%nat). replace (k - 2)%nat with (n - 1)%nat by lia. replace (k - 3)%nat with (n - 2)%nat by lia. apply fib_n; lia. }
-      assert (H5 : F (k - 1) >= F (k - 2)). { apply n1_ge_n2_imp_fib_n1_ge_fib_n2; lia. }
-      assert (H6 : F (k - 2) >= F (k - 3)). { apply n1_ge_n2_imp_fib_n1_ge_fib_n2; lia. }
-      assert (H7 : F (k - 1) >= (INR k ^ 2) / 2). { nra. } assert (H8 : INR k >= 13). { apply le_INR in H2. simpl in H2; nra. } nra. 
+      2 : { break_INR. simpl. nra. } assert (H3 : F (k - 1) >= F (k - 2)). { apply n1_ge_n2_imp_fib_n1_ge_fib_n2; lia. }
+      assert (H4 : F (k - 1) >= (INR k ^ 2) / 2). { nra. } assert (H5 : INR k >= 13). { apply le_INR in H2. simpl in H2; nra. } nra. 
   Qed.
   
 End section_14_7.
