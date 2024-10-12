@@ -1,4 +1,4 @@
-Require Import Reals Lra Lia.
+Require Import Reals Lra Lia WI_SI_WO.
 
 Open Scope R_scope.
 
@@ -20,7 +20,13 @@ match n with
           end
 end.
 
+Local Notation F_nat := fibonacci_nat.
 Local Notation F := fibonacci_R.
+
+Open Scope nat_scope.
+Lemma fib_S_S_n_nat : forall n : nat, F_nat (S (S n)) = F_nat (S n) + F_nat n.
+Proof. reflexivity. Qed.
+Close Scope nat_scope.
 
 Lemma fib_S_S_n : forall n : nat, F (S (S n)) = F (S n) + F n.
 Proof.
@@ -60,33 +66,12 @@ Proof.
   replace (n - 1)%nat with (S (n - 2)) by lia. apply fib_S_S_n.
 Qed.
 
-Open Scope nat_scope.
-
-Lemma strong_induction :
-  forall P : nat -> Prop,
-  (forall m, (forall k : nat, k < m -> P k) -> P m) ->
-  forall n, P n.
-Proof.
-  intros P H1 n. assert (H2: forall k, k <= n -> P k).
-  - induction n.
-    -- intros k Hk. inversion Hk. apply H1. intros k' Hk'. inversion Hk'.
-    -- intros k Hk. apply H1. intros k' Hk'. apply IHn. lia.
-  - apply H2. lia.
-Qed.
-
-Close Scope nat_scope.
-
 Lemma fib_n_ge_1 : forall n, F n >= 1.
 Proof.
-  apply strong_induction.
-  intros n IH. destruct n as [| n'] eqn:En.
-  - simpl. lra.
-  - destruct n' as [| n''] eqn:En'.
-    -- simpl. lra.
-    -- assert (H1 : F (S n'') >= 1) by (apply IH; lia).
-      assert (H2 : F n'' >= 1) by (apply IH; lia).
-      rewrite fib_S_S_n.
-      lra.
+  intro n. strong_induction n. do 2 (destruct n; try (simpl; lra)).
+  assert (H1 : F (S n) >= 1) by (apply IH; lia).
+  assert (H2 : F n >= 1) by (apply IH; lia).
+  rewrite fib_S_S_n. lra.
 Qed.
 
 Lemma fib_n_gt_0 : forall n, F n > 0.

@@ -65,4 +65,50 @@ Compute intersection (find_divisors 60) (find_divisors 42).
 Compute gcd' 170 244.
 Compute Z.gcd 170 244.
 
+Compute (map (fun p => (Z.gcd (fst p) (snd p))) [(60, 42); (667, 851); (1855, 2345); (589, 437)]).
+
+Definition gcd_theory (a b gcd : Z) :=
+  if (a =? 0) && (b =? 0) then gcd = 0 else
+  (gcd | a) /\ (gcd | b) /\
+  forall d, (d | a) /\ (d | b) -> d <= gcd.
+
+Lemma gcd_existence : forall a b, exists g, gcd_theory a b g.
+Proof.
+  intros a b.
+  exists (Z.gcd a b).
+  unfold gcd_theory.
+  split; [apply Z.gcd_divide_l | split; [apply Z.gcd_divide_r |]].
+  intros d [H1 H2]. pose proof (Z.gcd_greatest a b d H1 H2) as [k H3].
+  pose proof (Z.gcd_nonneg a b) as H4. assert (d < 0 \/ d = 0 \/ d > 0) as [H5 | [H5 | H5]];
+  assert (k < 0 \/ k = 0 \/ k > 0) as [H6 | [H6 | H6]]; try nia.
+  rewrite H6 in H3. simpl in H3. rewrite H3. 
+Qed.
+
+Lemma doggooos : forall n m : nat,
+  Nat.gcd n (m + n) = Nat.gcd n m.
+Proof.
+  intros n m. induction n as [| k IH]; [simpl; lia |].
+  Locate Nat.gcd.
+  About Nat.gcd.
+  Search (Nat.gcd).
+  Print Nat.gcd.
+  pose proof (Nat.gcd_greatest).
+Qed.
+
+Section section_17_5.
+  Open Scope nat_scope.
+  Local Definition F := Fibonacci.fibonacci_nat.
+
+  Lemma lemma_17_5 : forall n,
+    Nat.gcd (F (S n)) (F n) = 1.
+  Proof.
+    intros n. induction n as [| k IH]; try reflexivity.
+    rewrite fib_S_S_n_nat. rewrite Nat.gcd_comm. rewrite Nat.add_comm.
+    rewrite Nat.gcd_add_diag_r. apply IH.
+  Qed.
+
+  Search Nat.gcd.
+  Print Nat.gcd.
+
+End section_17_5.
 
