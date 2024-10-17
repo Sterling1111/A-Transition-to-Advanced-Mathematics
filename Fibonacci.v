@@ -154,3 +154,43 @@ Proof.
   - apply H1.
   - apply H2.
 Qed.
+
+Open Scope nat_scope.
+
+Lemma fib_nat_gt_0 : forall n : nat, F_nat n > 0.
+Proof.
+  intros n. strong_induction n. destruct n as [| n'] eqn:En.
+  - simpl. lia.
+  - destruct n' as [| n''] eqn:En'.
+    -- simpl. lia.
+    -- rewrite fib_S_S_n_nat. specialize (IH n'' ltac :(lia)) as H1. specialize (IH (S n'') ltac:(lia)) as H2.
+       lia.
+Qed.
+
+Lemma n_ge_1_imp_fib_Sn_gt_fib_n_nat : forall n : nat,
+  n >= 1 -> F_nat (S n) > F_nat n.
+Proof.
+  intros n H. destruct n as [| n'] eqn:En.
+  - lia.
+  - rewrite -> fib_S_S_n_nat.
+    assert (H1 : F_nat (S n') > 0) by apply fib_nat_gt_0.
+    assert (H2 : F_nat n' > 0) by apply fib_nat_gt_0.
+    lia.
+Qed.
+
+Lemma fib_S_n_nat : forall n,
+  n > 0 -> F_nat (S n) = F_nat n + F_nat (n-1).
+Proof.
+  intros n H1. destruct n. simpl; try lia.
+  rewrite fib_S_S_n_nat. replace (S n - 1) with n; lia.
+Qed.
+
+Lemma fib_n_gt_n : forall n,
+  n > 3 -> F_nat n > n.
+Proof.
+  intros n H1. induction n as [| k IH]; try lia.
+  assert (k = 3 \/ k > 3) as [H2 | H2] by lia.
+  - rewrite H2. simpl. lia.
+  - specialize (IH H2). rewrite fib_S_n_nat; try lia.
+    pose proof (fib_nat_gt_0 (k - 1)). lia.
+Qed.

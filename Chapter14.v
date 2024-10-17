@@ -59,6 +59,8 @@ Section section_14_6.
   Local Notation F_nat := fibonacci_nat.
   Local Notation F := fibonacci_R.
 
+  Open Scope R_scope.
+
 (* run this command to print out the first 15 fib numbers*)
 Compute (map F_nat (seq 0 15)).
 
@@ -85,6 +87,8 @@ Section section_14_7.
   Import Fibonacci.
 
   Local Notation F := fibonacci_R.
+
+  Open Scope R_scope.
 
   Lemma lemma_14_7 : forall n : nat,
     (n >= 13)%nat -> F n > INR (n)^2.

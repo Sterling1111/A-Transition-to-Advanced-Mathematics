@@ -205,9 +205,8 @@ Proof.
   - assert (H3 : (i = S n')%nat \/ (i < S n')%nat) by lia. destruct H3 as [H3 | H3].
     -- replace (S n' - i)%nat with 0%nat by lia. simpl. apply H2. lia.
     -- replace (S n' - i)%nat with (S (n' - i)%nat) by lia. repeat rewrite sum_f_R0_f_Sn.
-       assert (0 <= f (S n')) as H4. { apply H2. lia. } specialize (IH (ltac:(lia))).
-       assert (forall k, (i <= k <= n')%nat -> 0 <= f k) as H5. { intros k H5. apply H2. lia. }
-       specialize (IH H5). replace (S (n' - i) + i)%nat with (S n')%nat by lia. lra.
+       rewrite IH; try lia. replace (S (n' - i) + i)%nat with (S n')%nat by lia. assert (0 <= f (S n')) as H4.
+       { apply H2. lia. } lra. intros k H5. apply H2. lia.
 Qed.
 
 Lemma sum_f_pos : forall f i n,
@@ -219,10 +218,8 @@ Proof.
   - assert (H3 : (i = S n')%nat \/ (i < S n')%nat) by lia. destruct H3 as [H3 | H3].
     -- replace (S n' - i)%nat with 0%nat by lia. simpl. apply H2. lia.
     -- replace (S n' - i)%nat with (S (n' - i)%nat) by lia. repeat rewrite sum_f_R0_f_Sn.
-       assert (forall k : nat, (i <= k <= n')%nat -> 0 < f k) as H4.
-       { intros k H4. apply H2. lia. } specialize (IH (ltac : (lia)) H4).
-       replace (S (n' - i) + i)%nat with (S n')%nat by lia. assert (0 < f (S n')) as H5.
-       { apply H2. lia. } lra.
+       rewrite IH; try lia. replace (S (n' - i) + i)%nat with (S n')%nat by lia. assert (0 < f (S n')) as H4.
+       { apply H2. lia. } lra. intros k H5. apply H2. lia.
 Qed.
 
 Lemma sum_f_le : forall f i n r,
