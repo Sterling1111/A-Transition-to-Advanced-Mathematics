@@ -38,12 +38,15 @@ Proof.
   intros n [[q1 H1] [q2 H2]]; lia.
 Qed.
 
-Definition find_divisors (n : nat) : list Z :=
+Definition find_divisors_pos (n : nat) : list Z :=
   fold_right (fun x l => if (Z.rem (Z.of_nat n) x =? 0) then x :: l else l) [] (map Z.of_nat (seq 1 n)).
 
-Compute find_divisors 12.
-Compute find_divisors 60.
+Definition find_divisors_neg (n : nat) : list Z :=
+  List.rev (map (fun x => -x) (find_divisors_pos n)).
 
+Definition find_divisors (n : nat) : list Z :=
+  find_divisors_neg n ++ find_divisors_pos n.
+  
 Definition in_list (x: Z) (l: list Z) : bool :=
   fold_right (fun y acc => if Z.eq_dec x y then true else acc) false l.
 
@@ -72,28 +75,31 @@ Definition gcd_theory (a b gcd : Z) :=
   (gcd | a) /\ (gcd | b) /\
   forall d, (d | a) /\ (d | b) -> d <= gcd.
 
-Lemma gcd_existence : forall a b, exists g, gcd_theory a b g.
+Lemma gcd_existence : forall a b, gcd_theory a b (Z.gcd a b).
 Proof.
   intros a b.
-  exists (Z.gcd a b).
-  unfold gcd_theory.
-  split; [apply Z.gcd_divide_l | split; [apply Z.gcd_divide_r |]].
-  intros d [H1 H2]. pose proof (Z.gcd_greatest a b d H1 H2) as [k H3].
-  pose proof (Z.gcd_nonneg a b) as H4. assert (d < 0 \/ d = 0 \/ d > 0) as [H5 | [H5 | H5]];
-  assert (k < 0 \/ k = 0 \/ k > 0) as [H6 | [H6 | H6]]; try nia.
-  rewrite H6 in H3. simpl in H3. rewrite H3. 
+  assert (a = 0 /\ b = 0 \/ (a <> 0 \/ b <> 0)) as [[H1 H2] | H1] by lia.
+  - rewrite H1, H2. unfold gcd_theory. simpl. lia.
+  - unfold gcd_theory. assert ((a =? 0) && (b =? 0) = false) as H2.
+    { destruct (a =? 0) eqn:Ha; destruct (b =? 0) eqn:Hb; simpl; lia. } rewrite H2.
+    split; [apply Z.gcd_divide_l | split; [apply Z.gcd_divide_r |]].
+    intros d [H3 H4]. pose proof (Z.gcd_greatest a b d H3 H4) as [k H5].
+    pose proof (Z.gcd_nonneg a b) as H6. assert (d < 0 \/ d = 0 \/ d > 0) as [H7 | [H7 | H7]];
+    assert (k < 0 \/ k = 0 \/ k > 0) as [H8 | [H8 | H8]]; try nia.
+    rewrite H8 in H5. simpl in H5. pose proof (Z.gcd_divide_r a b) as [p H9].
+    pose proof (Z.gcd_divide_l a b) as [q H10]. lia.
 Qed.
 
-Lemma doggooos : forall n m : nat,
-  Nat.gcd n (m + n) = Nat.gcd n m.
+Lemma doggooos : forall n m : Z,
+  Z.gcd n (m + n) = Z.gcd n m.
 Proof.
-  intros n m. induction n as [| k IH]; [simpl; lia |].
-  Locate Nat.gcd.
-  About Nat.gcd.
-  Search (Nat.gcd).
-  Print Nat.gcd.
-  pose proof (Nat.gcd_greatest).
-Qed.
+  intros n m. pose proof (gcd_existence n (m + n)) as H1. unfold gcd_theory in H1.
+  assert (n = 0 /\ (m + n) = 0 \/ (n <> 0 \/ (m + n) <> 0)) as [[H2 H3] | H2] by lia.
+  - rewrite H3, H2. simpl. lia.
+  - assert ((n =? 0) && ((m + n) =? 0) = false) as H3.
+    { destruct (n =? 0) eqn:H4; destruct ((m + n) =? 0) eqn:H5; simpl; lia. } rewrite H3 in H1. clear H3.
+    destruct H1 as [[p H3] [[q H4] H5]]. 
+Admitted.
 
 Section section_17_5.
   Open Scope nat_scope.
@@ -112,3 +118,5 @@ Section section_17_5.
 
 End section_17_5.
 
+Require Import FunctionalExtensionality.
+Check Surjective.
