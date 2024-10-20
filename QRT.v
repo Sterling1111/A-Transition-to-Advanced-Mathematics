@@ -32,12 +32,18 @@ Proof.
     - intros z. unfold S. intros H. destruct H as [t H]. lia.
 Qed.
 
+Theorem quotient_remainder_theorem_existence' : forall a d : Z,
+  (d >= 1) -> (a >= 0) -> exists q r : Z, a = d * q + r /\ 0 <= r < d.
+Proof.
+  intros a d H1 H2. apply quotient_remainder_theorem_existence; auto.
+Qed.
+
 Theorem quotient_remainder_theorem_uniqueness : forall a d q1 q2 r1 r2 : Z,
-  (d >= 1) /\  a = d * q1 + r1 /\ a = d * q2 + r2 /\ 0 <= r1 < d /\ 0 <= r2 < d
+  (d <> 0) ->  a = d * q1 + r1 -> a = d * q2 + r2 -> 0 <= r1 < d -> 0 <= r2 < d
   -> q1 = q2 /\ r1 = r2.
 Proof.
-  intros a d q1 q2 r1 r2 [H1 [H2 [H3 [H4 H5]]]].
-  assert (H: q1 = q2).
+  intros a d q1 q2 r1 r2 H1 H2 H3 H4 H5.
+  assert (H6: q1 = q2).
   {
     assert (H6 : q1 * d + r1 = q2 * d + r2) by lia.
     assert (H7 : (q1 - q2) * d = r2 - r1) by lia.
@@ -53,8 +59,16 @@ Proof.
     lia.
   }
   split.
-  - apply H.
+  - apply H6.
   - lia. 
+Qed.
+
+Theorem quotient_remainder_theorem_uniqueness' : forall a d q1 q2 r1 r2 : Z,
+  (d <> 0) ->  a = d * q1 + r1 -> a = d * q2 + r2 -> 0 <= r1 < d -> 0 <= r2 < d
+  -> q1 = q2 /\ r1 = r2.
+Proof.
+  intros a d q1 q2 r1 r2 H1 H2 H3 H4 H5.
+  assert (H6: q1 = q2); nia.
 Qed.
 
 Theorem quotient_remainder_theorem : forall a d : Z,
@@ -69,7 +83,7 @@ Proof.
     exists (q, r). auto.
   
   - intros [q1 r1] [q2 r2] [H1a H1b] [H2a H2b].
-    assert (H3 : q1 = q2 /\ r1 = r2) by (apply quotient_remainder_theorem_uniqueness with (a := a) (d := d); auto).
+    assert (H3 : q1 = q2 /\ r1 = r2) by (apply quotient_remainder_theorem_uniqueness with (a := a) (d := d); lia).
     destruct H3 as [H3a H3b]. rewrite H3a. rewrite H3b. reflexivity.
 Qed.
 

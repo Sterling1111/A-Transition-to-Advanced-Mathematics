@@ -79,7 +79,7 @@ Proof.
   pose proof lemma_2_10 as H1. pose proof lemma_2_11 as H2. pose proof (strong_induction_nat_imp_well_ordering_nat) as H3. tauto.
 Qed.
 
-Lemma WI_SO_WO : well_ordering_nat /\ strong_induction_nat /\ induction_nat.
+Lemma WI_SI_WO :  induction_nat /\ strong_induction_nat /\ well_ordering_nat.
 Proof.
   pose proof WI_SO_WO_equiv as H1. pose proof (induction_imp_induction_nat) as H2. tauto.
 Qed. 
