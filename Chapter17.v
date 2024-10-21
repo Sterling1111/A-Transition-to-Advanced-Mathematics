@@ -32,10 +32,17 @@ Proof.
   assert (r = 0 \/ r = 1) as [H3 | H3] by lia; [left | right]; exists q; lia.
 Qed.
 
+Ltac apply_lia_to_hyps :=
+  match goal with
+  | H: _ |- _ => specialize (H); lia
+  end.
+
 Lemma lemma_17_2_b : forall n : Z,
   (Z.Even n /\ Z.Odd n) -> False.
 Proof.
-  intros n [[q1 H1] [q2 H2]]; lia.
+  intros n [[q1 H1] [q2 H2]].
+  pose proof (quotient_remainder_theorem_uniqueness n 2 q1 q2 1 0 ltac:(lia) ltac:(lia) ltac:(lia) ltac:(lia) ltac:(lia)) as [_ H3].
+  discriminate H3.
 Qed.
 
 Definition find_divisors (n : nat) : list Z :=
@@ -64,6 +71,8 @@ Compute find_divisors 42.
 Compute intersection (find_divisors 60) (find_divisors 42).
 Compute gcd' 170 244.
 Compute Z.gcd 170 244.
+
+Compute (Z.rem 133 19).
 
 Compute (map (fun p => (Z.gcd (fst p) (snd p))) [(60, 42); (667, 851); (1855, 2345); (589, 437)]).
 
@@ -96,8 +105,6 @@ Section section_17_5.
   Qed.
 
 End section_17_5.
-
-Search (Z.gcd).
 
 Lemma gcd_switching : forall a b c z,
   a = z * b + c -> Z.gcd a b = Z.gcd b c.
@@ -152,4 +159,25 @@ Theorem division_algorithm : forall n d : Z,
 Proof.
   intros n d H1. assert (Z.abs d = d \/ Z.abs d = -d) as [H2 | H2] by lia;
   [rewrite H2; apply quotient_remainder_theorem_existence | apply lemma_17_8_b]; lia.
+Qed.
+
+Open Scope R_scope.
+
+Definition R_pos := { x : R | x > 0 }.
+
+Definition R_pos_to_R (x : R_pos) : R := proj1_sig x.
+
+Coercion R_pos_to_R : R_pos >-> R.
+
+Lemma glubbby : forall x y : R_pos,
+  x * y = y * x.
+Proof.
+  intros x y. lra.
+Qed.
+
+Lemma testinggg : forall l : list Type,
+  2 + 2 = 4.
+Proof.
+  set (l := [R; nat; Z]).
+
 Qed.

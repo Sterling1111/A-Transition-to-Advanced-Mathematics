@@ -76,7 +76,7 @@ Proof.
 Qed.
 
 (* dont forget that our x is 2x and y is 3y*)
-(* Compute ((8 ∁ 3) * 2^5 * 3^3)%nat. *)
+(*Compute ((8 ∁ 3) * 2^5 * 3^3)%nat.*)
 
 Lemma lemma_16_6 : forall x y, (2 * x + 3 * y)^8 = 256 * x ^ 8 + 3072 * x ^ 7 * y + 16128 * x ^ 6 * y ^ 2 + 48384 * x ^ 5 * y ^ 3 + 90720 * x ^ 4 * y ^ 4 + 108864 * x ^ 3 * y ^ 5 + 81648 * x ^ 2 * y ^ 6 + 34992 * x * y ^ 7 + 6561 * y ^ 8.
 Proof.

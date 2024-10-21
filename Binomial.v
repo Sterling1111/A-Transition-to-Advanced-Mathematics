@@ -567,6 +567,20 @@ Fixpoint choose_3 (n k : nat) : nat :=
   | 0%nat, _ => 0
   | _, 0%nat => 1
   | S n', S k' => choose_3 n' k' + choose_3 n' k
-  end.
+  end.  
 
 Open Scope nat_scope.
+
+Compute (seq 0 9).
+Compute (2^7).
+
+Compute (map (fun k => choose_3 9 k) (seq 0 9)).
+
+Lemma choose_3_eq_choose : forall n k : nat,
+  choose_3 n k = choose n k.
+Proof.
+  induction n as [| n IH]; destruct k as [| k]; try reflexivity.
+  simpl. rewrite n_choose_0. reflexivity. simpl. rewrite IH. rewrite IH. 
+  rewrite binomial_recursion_4 with (n := S n) (k := S k); try lia.
+  replace (S n - 1) with n by lia. replace (S k - 1) with k by lia. reflexivity.
+Qed.
