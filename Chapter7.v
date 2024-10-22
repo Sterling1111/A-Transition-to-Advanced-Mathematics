@@ -18,6 +18,12 @@ Qed.
 Lemma contra_2_reverse' : forall P Q : Prop, (~Q -> ~P) -> (P -> Q).
 Proof. intros; tauto. Qed.
 
+Theorem theorem_7_15 : forall a b c x y : Z,
+  (a | b) -> (a | c) -> (a | (b * x + c * y)).
+Proof.
+  intros a b c x y [k H1] [j H2]. exists (k * x + j * y). lia.
+Qed.
+
 Lemma lemma_7_1 : forall a : Z, Z.Odd (a^2 + 3) -> Z.Even a.
 Proof.
     intros a. apply contra_2_reverse. intros H1. rewrite not_even_iff_odd_Z in H1.
