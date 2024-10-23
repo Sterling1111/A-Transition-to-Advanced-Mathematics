@@ -109,8 +109,6 @@ Section section_17_5.
 
 End section_17_5.
 
-Search (Z.gcd).
-
 Lemma gcd_switching : forall a b c z,
   a = z * b + c -> Z.gcd a b = Z.gcd b c.
 Proof.
