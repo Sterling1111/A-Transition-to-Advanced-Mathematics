@@ -7,21 +7,6 @@ Require Export Chapter17.
 
 Import ListNotations SetNotations Choose_Notations.
 
-Open Scope string_scope.
-
-Definition compute_extgcd_text (pair : Z * Z) : string :=
-  let (a, b) := pair in
-  let '(x, y, gcd) := Znumtheory.extgcd a b in
-  let equation :=
-    Z_to_string gcd ++ " = " ++
-    Z_to_string a ++ " * " ++ Z_to_string x ++ " + " ++
-    Z_to_string b ++ " * " ++ Z_to_string y in
-  equation.
-
-Compute map compute_extgcd_text [(15, 27); (29, 23); (91, 133); (221, 377)].
-
-Close Scope string_scope.
-
 Definition linear_combination (a b n : Z) : Prop :=
   exists x y : Z, n = a * x + b * y.
 
@@ -151,6 +136,21 @@ Proof.
     rewrite <- Z.gcd_abs_r. rewrite <- Z.gcd_abs_l. apply gcd_helper_correct; lia.
 Qed.
 
+Open Scope string_scope.
+
+Definition compute_extgcd_text (pair : Z * Z) : string :=
+  let (a, b) := pair in
+  let '(x, y, gcd) := Znumtheory.extgcd a b in
+  let equation :=
+    Z_to_string gcd ++ " = " ++
+    Z_to_string a ++ " * " ++ Z_to_string x ++ " + " ++
+    Z_to_string b ++ " * " ++ Z_to_string y in
+  equation.
+
+Compute map compute_extgcd_text [(15, 27); (29, 23); (91, 133); (221, 377)].
+
+Close Scope string_scope.
+
 Lemma lemma_18_2 : forall a n,
   Z.gcd a n = 1 -> exists b, a * b ≡ 1 (mod n).
 Proof.
@@ -164,15 +164,13 @@ Proof.
 Qed.
 
 Lemma lemma_18_3_b : forall a b c d,
-  c > 0 -> (c | a) -> (c | b) -> linear_combination a b c -> d = Z.gcd a b -> c = d.
+  c > 0 -> b <> 0 -> (c | a) -> (c | b) -> linear_combination a b c -> d = Z.gcd a b -> c = d.
 Proof.
-  intros a b c d H0 H1 H2 H3 H4. pose proof gcd_satisfies_gcd_theory a b as H5. unfold gcd_theory in H5.
-  assert (a = 0 /\ b = 0 \/ a <> 0 \/ b <> 0) as [[H6 H7] | H6] by lia.
-  - rewrite H6, H7 in H4. compute in H4. destruct H3 as [x [y H3]]. lia.
-  - assert ((a =? 0) && (b =? 0) = false) as H7 by lia. rewrite H7 in H5. destruct H5 as [H8 [H9 H10]].
-    specialize (H10 c ltac:(auto)). rewrite <- H4 in H10. rewrite <- H4 in H8, H9. destruct H8 as [j H8]. destruct H9 as [k H9].
-    destruct H3 as [x1 [y1 H3]]. rewrite H8, H9 in H3. assert (d | c) as H11. { exists (j * x1 + k * y1). lia. }
-    apply (Z.divide_pos_le) in H11; lia.
+  intros a b c d H1 H2 H3 H4 H5 H6. pose proof gcd_satisfies_gcd_theory a b as H7. unfold gcd_theory in H7.
+  assert ((a =? 0) && (b =? 0) = false) as H8 by lia. rewrite H8 in H7. clear H8. destruct H7 as [H7 [H8 H9]].
+  specialize (H9 c ltac:(auto)). destruct H5 as [x [y H5]]. rewrite <- H6 in H7, H8, H9. destruct H7 as [j H7].
+  destruct H8 as [k H8]. rewrite H7, H8 in H5. assert (d | c) as H10. { exists (j * x + k * y). lia. }
+  apply Z.divide_pos_le in H10; lia.
 Qed.
 
 Lemma lemma_18_4 : forall a b n d,
@@ -181,11 +179,9 @@ Proof.
   intros a b n d H1. split; intros H2.
   - destruct H2 as [k H2]. pose proof gcd_is_linear_combination a b as [x [y H3]]. rewrite <- H1 in H3.
     exists (k * x), (k * y). lia.
-  - pose proof gcd_satisfies_gcd_theory a b as H3. unfold gcd_theory in H3. assert (a = 0 /\ b = 0 \/ a <> 0 \/ b <> 0) as [[H4 H5] | H4] by lia.
-    -- rewrite H4, H5 in H1. compute in H1. destruct H2 as [x [y H2]]. exists 0. lia.
-    -- assert ((a =? 0) && (b =? 0) = false) as H6 by lia. rewrite H6 in H3. clear H4 H6. destruct H3 as [H3 [H4 _]].
-       destruct H2 as [x [y H2]]. destruct H3 as [j H3]. destruct H4 as [k H4]. rewrite <- H1 in H3, H4.
-       exists (j * x + k * y). lia.
+  - pose proof gcd_divides_both a b as [H3 H4]. destruct H2 as [x [y H2]].
+    destruct H3 as [j H3]. destruct H4 as [k H4]. rewrite <- H1 in H3, H4.
+    exists (j * x + k * y). lia.
 Qed.
 
 Lemma lemma_18_5 : forall a b c d,
@@ -195,9 +191,7 @@ Proof.
   pose proof Z.gcd_nonneg c d as H5. assert (Z.gcd c d = 0 \/ Z.gcd c d > 1) as [H6 | H6] by lia.
   - apply gcd_0 in H6 as [H6 H7]. rewrite H6 in H2. rewrite H7 in H3. destruct H2 as [j H2]. destruct H3 as [k H3].
     replace a with 0 in H1; replace b with 0 in H1; try lia. compute in H1. lia. 
-  - pose proof gcd_satisfies_gcd_theory c d as H7. unfold gcd_theory in H7. assert (c = 0 /\ d = 0 \/ c <> 0 \/ d <> 0) as [[H8 H9] | H8] by lia.
-    { rewrite H8, H9 in H6. replace (Z.gcd 0 0) with 0 in H6 by (compute; lia). lia. }
-    assert ((c =? 0) && (d =? 0) = false) as H10 by lia. rewrite H10 in H7. clear H8 H10. destruct H7 as [H7 [H8 _]].
+  - pose proof gcd_divides_both c d as [H7 H8].
     assert (H9 : (Z.gcd c d | a)). { apply Z.divide_trans with (m := c); auto. }
     assert (H10 : (Z.gcd c d | b)). { apply Z.divide_trans with (m := d); auto. }
     pose proof (gcd_satisfies_gcd_theory a b) as H11. unfold gcd_theory in H11. assert (a = 0 /\ b = 0 \/ a <> 0 \/ b <> 0) as [[H12 H13] | H12] by lia.
@@ -209,24 +203,19 @@ Qed.
 Lemma lemma_18_6_a : forall a b d,
   (a <> 0 \/ b <> 0) -> d = Z.gcd a b -> Z.gcd (a/d) (b/d) = 1.
 Proof.
-  intros a b d H1 H2. pose proof gcd_is_linear_combination a b as [x1 [y1 H3]]. rewrite <- H2 in H3.
-  pose proof gcd_satisfies_gcd_theory a b as H4. unfold gcd_theory in H4. assert (a = 0 /\ b = 0 \/ a <> 0 \/ b <> 0) as [[H5 H6] | H5] by lia.
-  { rewrite H5, H6 in H2. compute in H2. lia. }
-  assert ((a =? 0) && (b =? 0) = false) as H7 by lia. rewrite H7 in H4. clear H5 H7. destruct H4 as [H4 [H5 H6]].
-  rewrite <- H2 in H4, H5. destruct H4 as [j H4]. destruct H5 as [k H5].
+  intros a b d H1 H2. pose proof gcd_is_linear_combination a b as [x [y H3]]. rewrite <- H2 in H3.
+  pose proof gcd_divides_both a b as [H4 H5]. destruct H4 as [j H4]. destruct H5 as [k H5]. rewrite <- H2 in *.
   assert (a / d = j) as H7. { rewrite H4. apply Z.div_mul. lia. } assert (b / d = k) as H9. { rewrite H5. apply Z.div_mul. lia. }
-  rewrite theorem_18_10. exists x1, y1. nia.
+  rewrite theorem_18_10. exists x, y. nia.
 Qed.
 
 Lemma lemma_18_6_b : forall a b,
   b <> 0 -> exists r s, s <> 0 /\ a / b = r / s /\ Z.gcd r s = 1.
 Proof.
   intros a b H1. set (d := Z.gcd a b). pose proof gcd_is_linear_combination a b as [x [y H2]].
-  pose proof gcd_satisfies_gcd_theory a b as H3. unfold gcd_theory in H3. assert (a = 0 /\ b = 0 \/ a <> 0 \/ b <> 0) as [[H4 H5] | H4] by lia.
-  { rewrite H4, H5 in H3. compute in H3. lia. } assert ((a =? 0) && (b =? 0) = false) as H6 by lia. rewrite H6 in H3. clear H4 H6.
-  destruct H3 as [H3 [H4 H5]]. assert (d <> 0) as H6. { intros H6. unfold d in H6. apply gcd_0 in H6; lia. } pose proof Z.gcd_nonneg a b as H7.
-  exists (a / d), (b / d). repeat split.
-  - intros H8. apply Z.div_small_iff in H8 as [H8 | H8]; try lia. pose proof (Z.divide_pos_le d b ltac:(lia) ltac:(auto)) as H9. lia.
+  pose proof gcd_divides_both a b as [H3 H4]. assert (d <> 0) as H5. { intros H5. unfold d in H5. apply gcd_0 in H5; lia. }
+  pose proof Z.gcd_nonneg a b as H6. exists (a / d), (b / d). repeat split.
+  - intros H7. apply Z.div_small_iff in H7 as [H7 | H7]; try lia. pose proof (Z.divide_pos_le d b ltac:(lia) ltac:(auto)) as H8. lia.
   - fold d in H3, H4. destruct H3 as [j H3]. destruct H4 as [k H4]. rewrite H3, H4. rewrite Zdiv_mult_cancel_r; repeat rewrite Z.div_mul; lia.
   - apply lemma_18_6_a; auto.
 Qed.
@@ -293,30 +282,28 @@ Qed.
 Lemma lemma_18_7 : forall a b,
   a > 0 -> b > 0 -> Z.lcm a b = a * b / Z.gcd a b.
 Proof.
-  intros a b Ha_pos Hb_pos. pose proof gcd_satisfies_gcd_theory a b as H1. unfold gcd_theory in H1.
-  assert (a = 0 /\ b = 0 \/ a <> 0 \/ b <> 0) as [[H2 H3] | H2] by lia.
-  { rewrite H2, H3. compute. lia. } assert ((a =? 0) && (b =? 0) = false) as H4 by lia. rewrite H4 in H1. clear H2 H4.
-  destruct H1 as [[j H1] [[k H2] H3]]. set (d := Z.gcd a b). assert (d | a * b) as [l H4]. { exists (j * b); lia. }
-  assert (H5 : d * l = d * j * b). { nia. } assert (H6 : d * l = d * k * a). { nia. } pose proof (Z.gcd_nonneg a b) as H7.
-  assert (H8 : l = k * a). { apply Z.mul_cancel_l with (p := d); lia. } assert (H9 : l = j * b). { apply Z.mul_cancel_l with (p := d); lia. } 
-  assert (H10 : (a | l)). { exists k; lia. } assert (H11 : (b | l)). { exists j; lia. }
-  pose proof lcm_satisfies_lcm_theory a b as [H12 [H13 H14]]. specialize (H14 l H10 H11 ltac:(lia)).
-  pose proof (gcd_is_linear_combination a b) as [x [y H15]]. fold d in H15.
-  assert (H16 : forall m, m > 0 -> (a | m) -> (b | m) -> (l | m)).
+  intros a b Ha_pos Hb_pos. pose proof gcd_divides_both a b as [H1 H2]. destruct H1 as [j H1]. destruct H2 as [k H2].
+  set (d := Z.gcd a b). assert (d | a * b) as [l H3]. { exists (j * b); lia. }
+  assert (H4 : d * l = d * j * b). { nia. } assert (H5 : d * l = d * k * a). { nia. } pose proof (Z.gcd_nonneg a b) as H6.
+  assert (H7 : l = k * a). { apply Z.mul_cancel_l with (p := d); lia. } assert (H8 : l = j * b). { apply Z.mul_cancel_l with (p := d); lia. } 
+  assert (H9 : (a | l)). { exists k; lia. } assert (H10 : (b | l)). { exists j; lia. }
+  pose proof lcm_satisfies_lcm_theory a b as [H11 [H12 H13]]. specialize (H13 l H9 H10 ltac:(lia)).
+  pose proof (gcd_is_linear_combination a b) as [x [y H14]]. fold d in H14.
+  assert (H15 : forall m, m > 0 -> (a | m) -> (b | m) -> (l | m)).
   {
-    intros m H16 [p H17] [q H18]. assert (H19 : m * d = d * l * (q * x + p * y)).
+    intros m H15 [p H16] [q H17]. assert (H18 : m * d = d * l * (q * x + p * y)).
     {
-       apply Z.mul_cancel_l with (p := m) in H15; try lia. rewrite Z.mul_add_distr_l in H15. replace (m * (a * x)) with (b * q * a * x) in H15 by lia.
-       replace (m * (b * y)) with (a * p * b * y) in H15. 2 : { rewrite H17. lia. } lia. 
+       apply Z.mul_cancel_l with (p := m) in H14; try lia. rewrite Z.mul_add_distr_l in H14. replace (m * (a * x)) with (b * q * a * x) in H14 by lia.
+       replace (m * (b * y)) with (a * p * b * y) in H14. 2 : { rewrite H16. lia. } lia. 
     }
-    assert (H20 : m = l * (q * x + p * y)). { apply Z.mul_cancel_l with (p := d); lia. }
-    assert (H21 : (l | m)). { exists (q * x + p * y). lia. } auto.
+    assert (H19 : m = l * (q * x + p * y)). { apply Z.mul_cancel_l with (p := d); lia. }
+    assert (H20 : (l | m)). { exists (q * x + p * y). lia. } auto.
   }
-  assert (H17 : l = Z.lcm a b).
+  assert (H16 : l = Z.lcm a b).
   {
-    specialize (H16 (Z.lcm a b)). pose proof (Z.lcm_nonneg a b) as H17. assert (Z.lcm a b = 0 \/ 0 < Z.lcm a b) as [H18 | H18] by lia; try lia.
-    - apply Z.lcm_eq_0 in H18. lia.
-    - specialize (H16 ltac:(lia) ltac:(auto) ltac:(auto)). apply Z.divide_pos_le in H16; lia.
+    specialize (H15 (Z.lcm a b)). pose proof (Z.lcm_nonneg a b) as H16. assert (Z.lcm a b = 0 \/ 0 < Z.lcm a b) as [H17 | H17] by lia; try lia.
+    - apply Z.lcm_eq_0 in H17. lia.
+    - specialize (H15 ltac:(lia) ltac:(auto) ltac:(auto)). apply Z.divide_pos_le in H15; lia.
   }
-  rewrite <- H17. rewrite H4. rewrite Z.div_mul; lia.
+  rewrite <- H16. rewrite H3. rewrite Z.div_mul; lia.
 Qed.

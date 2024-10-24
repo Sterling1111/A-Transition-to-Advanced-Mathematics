@@ -95,6 +95,12 @@ Proof.
     assert (d < 0 \/ d = 0 \/ d > 0) as [H10 | [H10 | H10]]; assert (k < 0 \/ k = 0 \/ k > 0) as [H11 | [H11 | H11]]; try nia.
 Qed.
 
+Lemma gcd_divides_both : forall a b,
+  (Z.gcd a b | a) /\ (Z.gcd a b | b).
+Proof.
+  intros a b. split; [apply Z.gcd_divide_l | apply Z.gcd_divide_r].
+Qed.
+
 Section section_17_5.
   Open Scope nat_scope.
   Local Definition F := Fibonacci.fibonacci_nat.
