@@ -571,11 +571,6 @@ Fixpoint choose_3 (n k : nat) : nat :=
 
 Open Scope nat_scope.
 
-Compute (seq 0 9).
-Compute (2^7).
-
-Compute (map (fun k => choose_3 9 k) (seq 0 9)).
-
 Lemma choose_3_eq_choose : forall n k : nat,
   choose_3 n k = choose n k.
 Proof.

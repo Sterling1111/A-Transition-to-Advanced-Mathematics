@@ -89,8 +89,8 @@ Proof.
   apply lemma_2_11. apply induction_imp_induction_nat.
 Qed.
 
-Ltac strong_induction n :=
-  (* Revert all hypotheses except n *)
+Ltac strong_induction_nat n :=
+  intros;
   repeat match goal with
          | [ H : _ |- _ ] =>
            lazymatch H with
@@ -104,7 +104,6 @@ Ltac strong_induction n :=
   clear n;
   (* Introduce n and IH *)
   intros n IH.
-
 
 Close Scope nat_scope.
 
@@ -175,6 +174,28 @@ Proof.
     -- intros z H. intros k Hk. apply H1. intros k' Hk'. apply H. lia.
   - apply H1. intros k Hk. apply H3. lia.
 Qed.
+
+Ltac strong_induction_Z_pos z :=
+  intros;
+  let H2 := fresh "H" in
+  assert (H2 : 0 <= z) by nia;
+  repeat match goal with
+         | [ H : _ |- _ ] =>
+           lazymatch H with
+           | H2 => fail
+           | z => fail
+           | _ => revert H
+           end
+         end;
+  apply strong_induction_Z with (n := z); try lia;
+  clear H2; clear z; intros z IH H1.
+
+Ltac strong_induction T :=
+match type of T with
+| nat => strong_induction_nat T
+| Z => strong_induction_Z_pos T
+| _ => fail "unsupported type"
+end.
 
 Lemma well_ordering_principle_contrapositive_Z : forall E : Z -> Prop,
   (forall n : Z, E n -> n >= 0) ->
