@@ -173,6 +173,12 @@ Proof.
     -- apply IH in H2. destruct H2 as [x H2]. exists (x * h). lia.
 Qed.
 
+Lemma not_congruent_3n : forall n,
+  ~(3 * n ≡ -1 (mod 3)).
+Proof.
+  intros n H1. unfold Zmod_equiv in H1. destruct H1 as [k H1]. lia.
+Qed.
+
 Lemma lemma_19_4_c : forall n,
   n > 1 -> n ≡ -1 (mod 3) -> exists p, (p | n) /\ Znt.prime p /\ p ≡ -1 (mod 3).
 Proof.
@@ -187,17 +193,27 @@ Proof.
     -- apply prime_list_cons in H4; tauto.
     -- destruct H6 as [j H6]. lia.
   - apply not_all_ex_not in H6 as [i H6]. apply imply_to_and in H6 as [H6 H7]. destruct l. simpl in *. lia.
-    pose proof (classic (exists i, (0 <= i < length (z :: l))%nat /\ nth i (z :: l) 0 <> 3)) as [[k [H8 H9]] | H8].
-    -- exists (nth k (z :: l) 0); split; [| split].
-       * rewrite H5. apply in_divides_Zmul_fold_right. apply nth_In. lia.
-       * assert (In (nth k (z :: l) 0) (z :: l)) as H10. { apply nth_In. lia. } unfold prime_list in H4.
-         rewrite Forall_forall in H4. apply H4. auto.
-       * apply lemma_19_4_a in H9. destruct H9 as [H9 | H9]; try tauto. lia.
-       ++ apply nth_In; lia.
-       ++ apply (in_prime_list _ _ H4) in H9. apply lemma_19_4_a in H9; auto. tauto.
-       ++ apply (in_prime_list _ _ H4) in H9. apply lemma_19_4_a in H9; auto. tauto.
-    exists (nth i (z :: l) 0). assert (nth i (z :: l) 0 = 3 \/ nth i (z :: l) 0 <> 3) as [H8 | H8] by lia.
-    -- admit.
-    -- assert (In (nth i (z :: l) 0) (z :: l)) as H9. { apply nth_In; lia. } apply (in_prime_list _ _ H4) in H9.
-       apply lemma_19_4_a in H9; auto. split. admit. split. admit. tauto.
+    assert (nth i (z :: l) 0 <> 3) as H8.
+    { 
+      intros H8. assert (In (nth i (z :: l) 0) (z :: l)) as H9. { apply nth_In; lia. } 
+      apply in_divides_Zmul_fold_right in H9 as [k H9]. rewrite H9, H8 in H5. rewrite Z.mul_comm in H5.
+      rewrite H5 in H2. apply not_congruent_3n in H2. auto.
+    }
+    assert (In (nth i (z :: l) 0) (z :: l)) as H9. { apply nth_In; lia. }
+    exists (nth i (z :: l) 0). split; [ | split].
+    -- rewrite H5. apply in_divides_Zmul_fold_right; auto.
+    -- unfold prime_list in H4. rewrite Forall_forall in H4. apply H4. auto.
+    -- apply lemma_19_4_a in H8 as [H8 | H8]; try tauto. unfold prime_list in H4. rewrite Forall_forall in H4.
+       apply H4; auto.
+Qed.
+
+Lemma lemma_19_4_d : forall l,
+  prime_list l -> Forall (fun p => p ≡ -1 (mod 3)) l -> exists p, p ≡ -1 (mod 3) /\ ~ In p l.
+Proof.
+  intros l H1 H2. set (n := -1 + 3 * fold_right Z.mul 1 l). pose proof (prime_list_product_gt_1 l H1) as H3.
+  assert (H4 : n > 1) by lia. apply lemma_19_4_c in H4 as [q [H5 [H6 H7]]].
+  2 : { exists (fold_right Z.mul 1 l). lia. } exists q. split; auto. intros H8. apply in_divides_Zmul_fold_right in H8 as [k H8].
+  apply Z.mul_cancel_l with (p := 3) in H8; try lia. replace (3 * fold_right Z.mul 1 l) with (n + 1) in H8 by lia.
+  assert (q | 1) as H9. { apply Z.divide_add_cancel_r with (m := n); auto. exists (3 * k). lia. }
+  destruct H6 as [H6 _]. destruct H9 as [j H9]. apply Z.eq_sym in H9. rewrite Z.mul_comm in H9. apply Znt.Zmult_one in H9; try lia.
 Qed.

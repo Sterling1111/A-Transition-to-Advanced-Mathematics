@@ -761,3 +761,14 @@ Proof.
   - apply H3.
   - apply gt_max_gt_all with (l := l); tauto.
 Qed.
+
+Lemma exists_prime_list : exists l,
+  prime_list l /\ NoDup l /\ (length l > 0)%nat.
+Proof.
+  exists [2]. repeat split.
+  - unfold prime_list. rewrite Forall_forall. intros x H1. destruct H1 as [H1 | H1]; subst.
+    -- apply Znt.prime_2.
+    -- inversion H1.
+  - repeat constructor. intros H1. inversion H1.
+  - simpl. lia.
+Qed.
