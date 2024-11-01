@@ -57,16 +57,6 @@ Proof.
   intros; split; auto.
 Qed.
 
-Ltac solve_in_Union :=
-  simpl; auto;
-  match goal with
-  | [ |- ?x ∈ Singleton _ _ ] => 
-      apply Singleton_intro; (try reflexivity; try nia; try nra)
-  | [ |- ?x ∈ Union _ ?A ?B ] => 
-      apply In_Union_def; solve [ left; solve_in_Union | right; solve_in_Union ]
-  | [ |- ?G ] => assert G as H1 by autoset; apply H1
-  end.
-
 Section section_20_1.
   Let A := ⦃ 1, 2, 3, 4, 5, 6 ⦄.
   

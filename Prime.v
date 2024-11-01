@@ -597,7 +597,7 @@ Lemma Zseq_len : forall start len,
   let l := seq start len in
     length (l) = length (Zseq_pos l).
 Proof.
-  intros start len. unfold Zseq_pos. rewrite map_length. reflexivity.
+  intros start len. unfold Zseq_pos. rewrite length_map. reflexivity.
 Qed.
 
 Lemma list_has_len : forall (l : list Z) (a : Z),
@@ -685,7 +685,7 @@ Proof.
   intros l H1 H2 H3 H4. destruct (in_dec Z.eq_dec 1 l) as [H5 | H5]. apply H5.
   set (l2 := Zseq_pos (seq 2 (Z.to_nat (max_list_Z l - 1)))). assert (~NoDup l) as H6.
   - apply pigeonhole_principle_Z with (l2 := l2).
-    2 : { assert (length l2 = Z.to_nat (max_list_Z l) - 1)%nat. { unfold l2. rewrite <- Zseq_len. rewrite seq_length. lia. } lia. }
+    2 : { assert (length l2 = Z.to_nat (max_list_Z l) - 1)%nat. { unfold l2. rewrite <- Zseq_len. rewrite length_seq. lia. } lia. }
     intros x H6. apply in_Zseq_pos. rewrite Forall_forall in H3. specialize (H3 x). tauto. apply in_seq.
     replace (2 + Z.to_nat (max_list_Z l - 1))%nat with (Z.to_nat (max_list_Z l) + 1)%nat by lia. pose proof H6 as H6'. pose proof H6 as H6''.
     apply in_list_le_max in H6. rewrite Forall_forall in H3. specialize (H3 x). apply H3 in H6'. assert (~x = 1). unfold not in *. intros H7. apply H5. rewrite H7 in H6''. tauto.
