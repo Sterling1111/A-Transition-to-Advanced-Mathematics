@@ -67,13 +67,11 @@ Section section19_1.
 
   Close Scope string_scope.
 
-  (*
   Compute canonical_prime_factorization_string 27.
   Compute canonical_prime_factorization_string 3072.
   Compute canonical_prime_factorization_string 60.
-  *)  
-End section19_1.
 
+End section19_1.
 
 Lemma lemma_19_2 : forall p l,
   Znt.prime p -> (p | fold_right Z.mul 1 l) -> exists x, In x l /\ (p | x).
@@ -188,10 +186,7 @@ Proof.
   clear H3. rename H4 into H3. apply theorem_19_8 in H1 as [l [H4 H5]].
   pose proof classic ((forall i, (0 <= i < length l)%nat -> nth i l 0 ≡ 1 (mod 3))) as [H6 | H6].
   - apply lemma_19_4_b in H6. rewrite <- H5 in H6. exists (nth 0 l 0). destruct l; simpl in *; destruct H2 as [k H2]; try lia.
-   split; [ | split].
-    -- exists (fold_right Z.mul 1 l). lia.
-    -- apply prime_list_cons in H4; tauto.
-    -- destruct H6 as [j H6]. lia.
+    destruct H6 as [j H6]; lia.
   - apply not_all_ex_not in H6 as [i H6]. apply imply_to_and in H6 as [H6 H7]. destruct l. simpl in *. lia.
     assert (nth i (z :: l) 0 <> 3) as H8.
     { 
@@ -214,6 +209,6 @@ Proof.
   assert (H4 : n > 1) by lia. apply lemma_19_4_c in H4 as [q [H5 [H6 H7]]].
   2 : { exists (fold_right Z.mul 1 l). lia. } exists q. split; auto. intros H8. apply in_divides_Zmul_fold_right in H8 as [k H8].
   apply Z.mul_cancel_l with (p := 3) in H8; try lia. replace (3 * fold_right Z.mul 1 l) with (n + 1) in H8 by lia.
-  assert (q | 1) as H9. { apply Z.divide_add_cancel_r with (m := n); auto. exists (3 * k). lia. }
+  assert (q | 1) as H9. { apply Z.divide_add_cancel_r with (m := n). auto. exists (3 * k). lia. }
   destruct H6 as [H6 _]. destruct H9 as [j H9]. apply Z.eq_sym in H9. rewrite Z.mul_comm in H9. apply Znt.Zmult_one in H9; try lia.
 Qed.

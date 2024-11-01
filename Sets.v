@@ -209,10 +209,22 @@ Ltac break_union_intersection :=
 Ltac solve_in_Union :=
   simpl; auto;
   match goal with
+  | [ |- ?x ∈ Singleton _ _ ] => 
+      apply Singleton_intro; (try reflexivity; try nia; try nra)
+  | [ |- ?x ∈ Union _ ?A ?B ] => 
+      apply In_Union_def; solve [ left; solve_in_Union | right; solve_in_Union ]
+  | [ |- ?G ] => fail "Goal not solvable"
+  end.
+
+(*
+Ltac solve_in_Union :=
+  simpl; auto;
+  match goal with
   | [ |- ?x ∈ Singleton _ _ ] => apply Singleton_intro; (try reflexivity; try nia; try nra)
   | [ |- ?x ∈ _ ⋃ _ ] => apply In_Union_def; solve [ left; solve_in_Union | right; solve_in_Union ]
   | [ |- ?G ] => fail "Goal not solvable"
   end.
+*)
 
 Ltac solve_in_Intersection :=
   simpl; auto;
