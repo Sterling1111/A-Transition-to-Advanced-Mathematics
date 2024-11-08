@@ -17,10 +17,13 @@ Open Scope type_scope.
 Axiom univalence : forall (A B : Type), (A = B) <-> exists (f : A -> B) (g : B -> A),
   (forall x, g (f x) = x) /\ (forall y, f (g y) = y).
 
+<<<<<<< HEAD
 Axiom EquivThenEqual: prop_extensionality.
 
 Close Scope type_scope.
 
+=======
+>>>>>>> 41d7cf2d2595139515cb0659a1f42baf692c5eec
 Lemma Relation_is_Ensemble : forall A, Relation A = Ensemble (A * A).
 Proof.
   intros A.
@@ -59,16 +62,6 @@ Proof.
   intros; split; auto.
 Qed.
 
-Ltac solve_in_Union :=
-  simpl; auto;
-  match goal with
-  | [ |- ?x ∈ Singleton _ _ ] => 
-      apply Singleton_intro; (try reflexivity; try nia; try nra)
-  | [ |- ?x ∈ Union _ ?A ?B ] => 
-      apply In_Union_def; solve [ left; solve_in_Union | right; solve_in_Union ]
-  | [ |- ?G ] => assert G as H1 by autoset; apply H1
-  end.
-
 Section section_20_1.
   Open Scope type_scope.
   Open Scope R_scope.
@@ -91,6 +84,7 @@ Section section_20_1.
     apply x_y_In_implies_rel. unfold R. rewrite ens_rel_ens_id. autoset.
   Qed.
 
+<<<<<<< HEAD
   Lemma lemma_20_1_b : ~ R 2 1.
   Proof.
     assert (H1 : (2,1) ∉ R). { unfold R. rewrite ens_rel_ens_id. autoset. } auto.
@@ -118,3 +112,36 @@ Admitted.
   Qed.
 
 End section_20_1.
+=======
+End section_20_1.
+
+Definition disjoint_pieces {A} (P : Ensemble (Ensemble A)) : Prop :=
+  forall E1 E2, E1 ∈ P -> E2 ∈ P -> E1 ⋂ E2 = ∅.
+
+Definition nonempty_pieces {A} (P : Ensemble (Ensemble A)) : Prop :=
+  forall E, E ∈ P -> E ≠ ∅.
+
+Definition covering {A} (P : Ensemble (Ensemble A)) : Prop :=
+  forall x : A, exists E, E ∈ P /\ x ∈ E.
+
+Definition partition {A} (E : Ensemble (Ensemble A)) : Prop :=
+  disjoint_pieces E /\ nonempty_pieces E /\ covering E.
+
+Definition Forall_Ensemble {A : Type} (E : Ensemble A) (P : A -> Prop) :=
+  forall x, x ∈ E -> P x.
+
+Definition Ensemble_map {A B} (f : A -> B) (E : Ensemble A) : Ensemble B :=
+  fun y => exists x, x ∈ E /\ y = f x.
+
+Section testsection.
+  Definition Ensemble_to_Type {A} (E : Ensemble A) : Type := {x : A | x ∈ E}.
+  Definition E := ⦃⦃1, 2, 3⦄, ⦃4, 5, 6⦄, ⦃7, 8, 9⦄⦄.
+  Definition E' := Ensemble_map (fun x => Ensemble_to_Type x) E.
+
+  Theorem pasting_together_theorem : forall {A B : Type} (P : Ensemble (Ensemble A)) (Q : Ensemble (Ensemble B)),
+    partition P -> partition Q -> exists R : (Ensemble (Type -> Type)), 2 + 2 = 4.
+  Proof.
+    intros. exists ⦃⦄. lra.
+  Qed.
+End testsection.
+>>>>>>> 41d7cf2d2595139515cb0659a1f42baf692c5eec
