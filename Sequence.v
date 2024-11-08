@@ -1,4 +1,4 @@
-Require Export Reals Lra Lia Reals_util.
+Require Import Reals Lra Lia Reals_util Arith Nat PeanoNat.
 
 Open Scope R_scope.
 
@@ -52,8 +52,6 @@ Proof.
     field_simplify in H2; try nra. 
 Qed.
 
-Require Import Coq.Arith.Arith.
-
 Proposition proposition_34_13 : limit_of_sequence (fun n => 1 - 3 / INR n) 1.
 Proof.
   intros ε H1. exists (3 / ε). intros n H2.
@@ -93,10 +91,26 @@ Proof.
     apply Rabs_def2 in H1 as [H1 _]. lra.
 Qed.
 
+Lemma Rmax_Rgt : forall x y z, z > Rmax x y -> z > x /\ z > y.
+Proof.
+  intros x y z H1. unfold Rmax in H1. destruct (Rle_dec x y); lra.
+Qed.
+
 Proposition Proposition_34_19 : limit_of_sequence (fun n => INR (n + 3) / INR (2 * n - 21)) (1/2).
 Proof.
-  intros ε H1. set (N := Rmax (21/2) (27 + 42 * ε) / (4 * ε)). exists N.
-  intros n H2. unfold Rabs. destruct (Rcase_abs (INR (n + 3) / INR (2 * n - 21) - 1/2)) as [H3 | H3].
-  - replace (INR (n + 3) / INR (2 * n - 21) - 1/2) with (27 / INR (4 * n - 42)).
-    2 : { solve_INR. assert (INR n > 21/2). { unfold N in H2. Search (_ > Rmax _ _).
-          assert (INR (2 * n - 21) > 0). { solve_INR. } field_simplify; try lra. }
+  intros ε H1. set (N := Rmax (21/2) ((27 + 42 * ε) / (4 * ε))). exists N.
+  intros n H2. apply Rmax_Rgt in H2 as [H2 H3].
+  assert (INR (n + 3) / INR (2 * n - 21) - 1/2 = 27 / INR (4 * n - 42)) as H4.
+  { solve_INR; assert (n > 10)%nat by (apply INR_lt; simpl; lra); try lia. } rewrite H4.
+  assert (INR (4 * n - 42) > 0) as H5 by (solve_INR; assert (n > 10)%nat by (apply INR_lt; simpl; lra); try lia).
+  unfold Rabs. destruct (Rcase_abs (27 / INR (4 * n - 42))) as [H6 | H6].
+  - pose proof Rdiv_pos_pos 27 (INR (4 * n - 42)) ltac:(lra) as H7. nra.
+  - assert (INR (4 * n - 42) > 27 / ε) as H7.
+    {
+       solve_INR. rewrite Rplus_0_l. field_simplify; try lra. apply Rmult_gt_compat_r with (r := 4) in H3; try lra.
+       field_simplify in H3; try lra. replace ((42 * ε + 27) / ε) with (27 / ε + 42) in H3 by (field; lra); lra.
+       assert (n > 10)%nat by (apply INR_lt; simpl; lra); try lia.
+    }
+    apply Rmult_gt_compat_r with (r := ε) in H7; try lra.
+    apply Rmult_gt_compat_r with (r := /INR (4 * n - 42)) in H7; try lra. field_simplify in H7; try lra. apply Rinv_pos; lra.
+Qed.
