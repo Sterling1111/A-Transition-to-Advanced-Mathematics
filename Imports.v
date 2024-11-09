@@ -1,9 +1,4 @@
-(* Turn off common noisy warnings *)
-Set Warnings "-ambiguous-paths".
-Set Warnings "-uniform-inheritance".
-Set Warnings "-notation-overridden".
-Set Warnings "-parsing".
-Set Warnings "-deprecated-hint-without-locality".
+Set Warnings "-all".
 
 (* Standard Library imports *)
 From Coq Require Export 
@@ -36,6 +31,7 @@ From Coq Require Export
   
   (* Logic *)
   Logic.Classical
+  Logic.ClassicalFacts
   Logic.Classical_Pred_Type
   Logic.Classical_Prop
   Logic.FunctionalExtensionality

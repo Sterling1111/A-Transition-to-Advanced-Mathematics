@@ -1,4 +1,5 @@
 -Q . ""
+-arg -w -arg "-uniform-inheritance,-ambiguous-paths"
 
 Imports.v
 Reals_util.v
@@ -26,3 +27,4 @@ Chapter17.v
 Chapter18.v
 Chapter19.v
 Chapter20.v
+Chapter34.v

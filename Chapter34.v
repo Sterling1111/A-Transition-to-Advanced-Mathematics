@@ -1,5 +1,4 @@
-Require Import Reals Lra Lia Reals_util Arith Nat PeanoNat Sequence List.
-Import ListNotations.
+Require Import Imports Sequence.
 Require Export Chapter20.
 
 Open Scope R_scope.
@@ -65,6 +64,10 @@ Section section_34_2.
   
   Lemma prop_34_2_b_symbolic : prop_34_2_b = exists ε : ℝ, ε > 0 ⇒ forall N : ℝ, exists n : ℕ, INR n > N ⇒ Rabs (6 - 3) >= ε.
   Proof.
-    unfold prop_34_2_b, limit_of_sequence. apply 
-
+    unfold prop_34_2_b, limit_of_sequence. apply EquivThenEqual. split.
+    - intros _. exists 1. intros _. intros N. exists 0%nat. intros _. rewrite Rabs_pos_eq; lra.
+    - intros [ε H1] H2. specialize (H2 1 ltac:(lra)) as [N H2]. pose proof INR_unbounded N as [n H3].
+      specialize (H2 n H3). rewrite Rabs_pos_eq in H2; lra.
+  Qed.
 End section_34_2.
+

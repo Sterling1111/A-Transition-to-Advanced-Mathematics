@@ -2,6 +2,8 @@ Require Import Imports Reals_util.
 
 Open Scope R_scope.
 
+Notation "| x |" := (Rabs x) (at level 70, format "| x |").
+
 Definition sequence := nat -> R.
 
 Definition arithmetic_sequence (a : sequence) (c d : R) : Prop :=
@@ -12,7 +14,7 @@ Definition geometric_sequence (a : sequence) (c r : R) : Prop :=
 
 Definition limit_of_sequence (a : sequence) (L : R) : Prop :=
   forall ε : R, ε > 0 ->
-    exists N : R, forall n : nat, INR n > N -> Rabs (a n - L) < ε.
+    exists N : R, forall n : nat, INR n > N -> |a n - L| < ε.
 
 Definition convergent_sequence (a : sequence) : Prop :=
   exists (L : R), limit_of_sequence a L.
