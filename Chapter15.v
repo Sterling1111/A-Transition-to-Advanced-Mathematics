@@ -1,9 +1,9 @@
-Require Import ZArith Lia Classical Reals Lra Classical_sets List Fibonacci Sums Sets WI_SI_WO.
+Require Import Imports Fibonacci WI_SI_WO.
 Require Export Chapter14.
 
-Import ListNotations SetNotations.
-
 Open Scope nat_scope.
+
+Notation In := List.In.
 
 Lemma lemma_15_3_a : forall n,
   n >= 14 -> exists x y, n = 3 * x + 8 * y.

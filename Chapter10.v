@@ -1,7 +1,7 @@
-Require Import ZArith Lia Classical Reals Lra Classical_sets List Ensembles Finite_sets Sets.
+Require Import Imports Sets.
 Require Export Chapter9.
 
-Import ListNotations SetNotations.
+Import SetNotations.
 
 Open Scope R_scope.
 

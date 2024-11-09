@@ -1,7 +1,5 @@
-Require Import ZArith Lia Classical Reals Lra Classical_sets List Ensembles.
+Require Import Imports.
 Require Export Chapter10.
-
-Import ListNotations.
 
 Open Scope Z_scope.
 

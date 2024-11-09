@@ -1,9 +1,7 @@
-Require Import ZArith Lia Classical Reals Lra Classical_sets List
-               Ensembles QArith ClassicalFacts Finite_sets Powerset Finite_sets_facts Image
-               Fibonacci Sums Sets Binomial.
+Require Import Imports Sums Binomial.
 Require Export Chapter15.
 
-Import ListNotations SetNotations Choose_Notations.
+Import Choose_Notations.
 
 Open Scope nat_scope.
 

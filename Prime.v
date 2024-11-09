@@ -1,11 +1,9 @@
-Require Import ZArith Lia Classical List WI_SI_WO FunctionalExtensionality
-               Orders Sorting Permutation Chapter18.
-
-Import ListNotations.
+Require Import Imports WI_SI_WO Chapter18.
 
 Open Scope Z_scope.
 
 Module Znt := ZArith.Znumtheory.
+Notation In := List.In.
 
 Definition composite (n : Z) : Prop := (1 < n)%Z /\ ~ Znt.prime n.
 
@@ -86,8 +84,6 @@ Proof.
     specialize (H2 b c ltac:(exists 1; lia)). destruct H2 as [H2 | H2];
     apply Z.divide_pos_le in H2; nia.
 Qed.
-
-Notation In := List.In.
 
 Theorem theorem_19_6 : forall p l,
   Znt.prime p -> (p | fold_right Z.mul 1 l) -> exists x, In x l /\ (p | x).

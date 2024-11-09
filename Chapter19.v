@@ -1,11 +1,6 @@
-Require Import ZArith Lia Classical Reals Lra Classical_sets List
-               Ensembles QArith ClassicalFacts Finite_sets Powerset Finite_sets_facts Image 
-               NArith DecimalString DecimalNat DecimalNat Decimal
-               Fibonacci Sums Sets Binomial QRT WI_SI_WO Prime.
+Require Import Imports QRT Prime.
 
 Require Export Chapter18.
-
-Import ListNotations SetNotations Choose_Notations.
 
 Open Scope Z_scope.
 
@@ -103,7 +98,7 @@ Proof.
 Qed.
 
 Lemma lemma_19_4_a : forall p : Z,
-  Znt.prime p -> p ≠ 3 -> p ≡ 1 (mod 3) \/ p ≡ -1 (mod 3).
+  Znt.prime p -> p <> 3 -> p ≡ 1 (mod 3) \/ p ≡ -1 (mod 3).
 Proof.
   intros p H1 H2. apply Znt.prime_alt in H1 as [H1 H3]. assert (p = 2 \/ p > 3) as [H4 | H4] by lia.
   - right. exists 1. lia.

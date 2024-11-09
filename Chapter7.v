@@ -1,4 +1,4 @@
-Require Import ZArith Lia Classical.
+Require Import Imports.
 Require Export Chapter6.
 
 Open Scope Z_scope.

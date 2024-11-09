@@ -1,8 +1,6 @@
-Require Import ZArith Lia Classical Reals Lra Classical_sets List Ensembles 
-                QArith ClassicalFacts Finite_sets Finite_sets_facts Sums 
-                Sets WI_SI_WO Reals_util.
+Require Import Imports Sets WI_SI_WO Reals_util Sums.
 Require Export Chapter12.
-Import ListNotations SetNotations.
+Import SetNotations.
 
 Open Scope R_scope.
 

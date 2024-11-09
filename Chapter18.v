@@ -1,11 +1,6 @@
-Require Import ZArith Lia Classical Reals Lra Classical_sets List String
-               Ensembles QArith ClassicalFacts Finite_sets Powerset Finite_sets_facts Image 
-               NArith DecimalString DecimalNat DecimalNat Decimal
-               Fibonacci Sums Sets Binomial QRT WI_SI_WO.
+Require Import Imports QRT WI_SI_WO String.
 
 Require Export Chapter17.
-
-Import ListNotations SetNotations Choose_Notations.
 
 Definition linear_combination (a b n : Z) : Prop :=
   exists x y : Z, n = a * x + b * y.

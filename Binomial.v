@@ -1,5 +1,4 @@
-Require Import Reals Lra Lia FunctionalExtensionality List Sums.
-Import ListNotations.
+Require Import Imports Sums.
 
 Definition is_natural (r : R) : Prop :=
     exists n : nat, r = INR n.

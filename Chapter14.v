@@ -1,7 +1,5 @@
-Require Import ZArith Lia Classical Reals Lra Classical_sets List Fibonacci Sums Sets Reals_util.
+Require Import Imports Fibonacci Sums Reals_util.
 Require Export Chapter13.
-
-Import ListNotations SetNotations.
 
 Open Scope nat_scope.
 

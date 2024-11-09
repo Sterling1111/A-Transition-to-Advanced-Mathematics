@@ -1,7 +1,7 @@
-Require Import ZArith Lia Classical Reals Lra Classical_sets List Ensembles QArith Sets.
+Require Import Imports Sets.
 Require Export Chapter11.
 
-Import ListNotations SetNotations.
+Import SetNotations.
 
 Notation ℕ := nat.
 Notation ℤ := Z.

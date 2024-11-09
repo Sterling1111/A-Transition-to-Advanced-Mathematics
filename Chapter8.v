@@ -1,4 +1,4 @@
-Require Import ZArith Lia Classical Reals Lra QRT.
+Require Import Imports QRT.
 Require Export Chapter7.
 
 Open Scope Z_scope.
