@@ -1,4 +1,4 @@
-Require Import Imports Sequence.
+Require Import Imports Sequence Reals_util.
 Require Export Chapter20.
 
 Open Scope R_scope.
@@ -71,3 +71,32 @@ Section section_34_2.
   Qed.
 End section_34_2.
 
+Lemma lemma_34_3_a : forall a b,
+  Rmax a b >= a /\ Rmax a b >= b.
+Proof.
+  intros a b. unfold Rmax. destruct (Rle_dec a b); lra.
+Qed.
+
+Lemma lemma_34_3_b : forall a b,
+  Rmin a b <= a /\ Rmin a b <= b.
+Proof.
+  intros a b. unfold Rmin. destruct (Rle_dec a b); lra.
+Qed.
+
+Lemma lemma_34_3_c : forall a b x,
+  x > Rmax a b -> x > a /\ x > b.
+Proof.
+  intros a b x H1. unfold Rmax in H1. destruct (Rle_dec a b); lra.
+Qed.
+
+Require Import Reals_util.
+
+Lemma lemma_34_4 : limit_of_sequence (fun n => 2 / INR n ^ 2) 0.
+Proof.
+  apply sandwich_convergence_lower with (a := fun n => 1 / INR n).
+  - apply theorem_34_12.
+  - exists 1. intros n H1. apply Rle_ge. apply Rmult_le_reg_r with (r := INR n ^ 2); field_simplify; solve_INR.
+    replace 1 with (INR 1) in H1 by auto. apply INR_lt in H1. replace 2 with (INR 2) by auto. apply le_INR in H1. lra.
+  - intro n. destruct n. replace (INR 0 ^ 2) with 0 by (simpl; lra). rewrite Rdiv_0_r; lra.
+    apply Rlt_le. apply Rdiv_lt_0_compat; try lra. Search (0 < _ ^ 2). apply pow2_gt_0. pose proof pos_INR n. solve_INR.
+Qed.

@@ -4,6 +4,7 @@
 Imports.v
 Reals_util.v
 Complex.v
+Completeness.v
 Sums.v
 WI_SI_WO.v
 QRT.v

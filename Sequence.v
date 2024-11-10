@@ -1,10 +1,30 @@
-Require Import Imports Reals_util.
+Require Import Imports Reals_util Completeness.
 
 Open Scope R_scope.
 
 Notation "| x |" := (Rabs x) (at level 70, format "| x |").
 
 Definition sequence := nat -> R.
+
+Definition decreasing (a : sequence) : Prop :=
+  forall n : nat, a n >= a (S n).
+
+Definition increasing (a : sequence) : Prop :=
+  forall n : nat, a n <= a (S n).
+
+Definition bounded_below (a : sequence) : Prop :=
+  exists LB : R, forall n : nat, LB <= a n.
+
+Definition bounded_above (a : sequence) : Prop := 
+  exists UB : R, forall n : nat, UB >= a n.
+
+Definition eventually_decreasing (a : sequence) : Prop :=
+  exists (N : nat),
+    forall (n : nat), (n >= N)%nat -> a n >= a (S n).
+
+Definition eventually_increasing (a : sequence) : Prop :=
+  exists (N : nat),
+    forall (n : nat), (n >= N)%nat -> a n <= a (S n).
 
 Definition arithmetic_sequence (a : sequence) (c d : R) : Prop :=
   a 0%nat = c /\ forall n : nat, a (S n) - a n = d.
@@ -21,6 +41,24 @@ Definition convergent_sequence (a : sequence) : Prop :=
 
 Definition divergent_sequence (a : sequence) : Prop :=
   ~ convergent_sequence a.
+
+Definition lower_bound (a : sequence) (LB : R) : Prop :=
+  forall n : nat, LB <= a n.
+
+Definition upper_bound (a : sequence) (UB : R) : Prop :=
+  forall n : nat, UB >= a n.
+
+Definition a_bounded_above_by_b (a b : sequence) : Prop :=
+  forall n : nat, a n <= b n.
+
+Definition a_bounded_below_by_b (a b : sequence) : Prop :=
+  forall n : nat, a n >= b n.
+
+Definition a_eventually_bounded_above_by_b (a b : sequence) : Prop :=
+  exists (N : R), forall n : nat, INR n > N -> a n <= b n.
+
+Definition a_eventually_bounded_below_by_b (a b : sequence) : Prop :=
+  exists (N : R), forall n : nat, INR n > N -> a n >= b n.
 
 Lemma Rinv_lt_0 : forall r, 
   / r < 0 -> r < 0.
@@ -115,4 +153,235 @@ Proof.
     }
     apply Rmult_gt_compat_r with (r := ε) in H7; try lra.
     apply Rmult_gt_compat_r with (r := /INR (4 * n - 42)) in H7; try lra. field_simplify in H7; try lra. apply Rinv_pos; lra.
+Qed.
+
+Lemma increasing_ge : forall (a : sequence) (n1 n2 : nat),
+  increasing a -> (n1 >= n2)%nat -> a n1 >= a n2.
+Proof.
+  intros a n1 n2 H1 H2. unfold increasing in H1.
+  induction H2.
+  - lra.
+  - assert (H3 : a (S m) >= a m).
+    { apply Rle_ge. apply H1. }
+    lra.
+Qed.
+
+Lemma decreasing_le : forall (a : sequence) (n1 n2 : nat),
+  decreasing a -> (n1 >= n2)%nat -> a n1 <= a n2.
+Proof.
+  intros a n1 n2 H1 H2. unfold decreasing in H1.
+  induction H2.
+  - lra.
+  - assert (H3 : a (S m) <= a m).
+    { apply Rge_le. apply H1. }
+    lra.
+Qed.
+
+Lemma eventually_decreasing_le : forall (a : sequence),
+  eventually_decreasing a ->
+    exists (N : nat),
+       forall (n1 n2 : nat), (n2 >= N)%nat -> (n1 >= n2)%nat -> a n1 <= a n2.
+Proof.
+  intros a [N H1]. unfold eventually_decreasing in H1.
+  exists N. intros n1 n2 H2. intros H3.
+  induction H3.
+  - lra.
+  - assert (H4 : a (S m) <= a m).
+    { apply Rge_le. apply H1. lia. }
+    lra.
+Qed.
+
+Lemma eventually_increasing_ge : forall (a : sequence),
+  eventually_increasing a ->
+    exists (N : nat),
+       forall (n1 n2 : nat), (n2 >= N)%nat -> (n1 >= n2)%nat -> a n1 >= a n2.
+Proof.
+  intros a [N H1]. unfold eventually_increasing in H1.
+  exists N. intros n1 n2 H2. intros H3.
+  induction H3.
+  - lra.
+  - assert (H4 : a (S m) >= a m).
+    { apply Rle_ge. apply H1. lia. }
+    lra.
+Qed.
+
+(*
+  Monotonic Sequence Theorem (Increasing)
+
+  Suppose that a is an increasing sequence and that it is bounded above. 
+  Then by the completeness axiom, a has a least upper bound L. Given e > 0, 
+  L - e is not an upper bound for a, so there exists a natural number N such
+  that a_N > L - e. But the sequence is increasing so a_n >= a_N forall n >= N.
+  So forall n >= N, a_n > L - e. Now 0 <= L - a_n < e which means that 
+  |L - a_n| < e. and so lim a -> L.
+*)
+
+Lemma Monotonic_Sequence_Theorem_Increasing : forall (a : sequence),
+  increasing a -> bounded_above a -> convergent_sequence a.
+Proof.
+  intros a H1 H2. unfold bounded_above in H2. destruct H2 as [UB H2].
+  assert (H3 : is_upper_bound (fun x => exists n, a n = x) UB).
+  { unfold is_upper_bound. intros x [n H3]. rewrite <- H3. apply Rge_le. apply H2. }
+  assert (H4 : bound (fun x => exists n : nat, a n = x)).
+  { unfold bound. exists UB. apply H3. }
+  assert (H5 : {L : R | is_lub (fun x => exists n : nat, a n = x) L}).
+  { apply completeness. apply H4. exists (a 0%nat). exists 0%nat. reflexivity. }
+  destruct H5 as [L H5]. unfold is_lub in H5. destruct H5 as [H5 H6]. unfold is_upper_bound in H5.
+  unfold convergent_sequence. exists L. intros eps H7.
+
+  assert (H8 : ~ (is_upper_bound (fun x => exists n, a n = x) (L - eps))).
+  { unfold not. intros contra. specialize (H6 (L - eps)). apply H6 in contra. lra. }
+  unfold is_upper_bound in H8. unfold not in H8.
+
+  assert (H9 : exists N : nat, a N > L - eps).
+  { 
+    apply not_all_not_ex. unfold not. intro H9. apply H8. intros x H10. 
+    destruct H10 as [n H10]. rewrite <- H10. specialize (H9 n). 
+    apply Rnot_gt_le. unfold not. apply H9.
+  }
+  destruct H9 as [N H9].
+
+  assert (H10 : forall n : nat, (n >= N)%nat -> a n > L - eps).
+  { intros n H. assert (a n >= a N). apply increasing_ge. apply H1. lia. lra. }
+  assert (H11 : forall n : nat, (n >= N)%nat -> a n <= L).
+  {  intros n H11. specialize (H5 (a n)). apply H5. exists n. reflexivity. }
+  assert (H12 : forall n : nat, (n >= N)%nat -> 0 <= L - a n < eps).
+  { intros n. split. 
+    assert (H12 : (a n <= L) -> 0 <= L - a n). lra. apply H12. apply H11. apply H. 
+    assert (H12 : (a n > L - eps) -> L - a n < eps). lra. apply H12. apply H10. apply H. }
+    exists (INR N). intros n H13. specialize (H12 n). unfold Rabs. destruct Rcase_abs.
+    - replace (- (a n - L)) with (L - a n) by lra. apply H12. apply Rgt_lt in H13. apply INR_lt in H13. lia.
+    - assert (H14 : a n >= L) by lra. assert (H15 : a n <= L). { apply H11. apply Rgt_lt in H13. apply INR_lt in H13. lia. } 
+      lra.
+Qed.
+
+Lemma Monotonic_Sequence_Theorem_Decreasing : forall (a : sequence),
+  decreasing a -> bounded_below a -> convergent_sequence a.
+Proof.
+  intros a Hdec Hbounded.
+  unfold bounded_below in Hbounded.
+  destruct Hbounded as [LB HLB].
+
+  assert (H3 : is_lower_bound (fun x => exists n, a n = x) LB).
+  { unfold is_lower_bound. intros x [n H3]. rewrite <- H3. apply Rle_ge. apply HLB. }
+
+  assert (H4 : has_lower_bound (fun x => exists n : nat, a n = x)).
+  { unfold has_lower_bound. exists LB. apply H3. }
+
+  assert (H5 : {L : R | is_glb (fun x => exists n : nat, a n = x) L}).
+  { apply completeness_lower_bound. apply H4. exists (a 0%nat). exists 0%nat. reflexivity. }
+
+  destruct H5 as [L H5]. unfold is_glb in H5. destruct H5 as [H5 H6]. unfold is_lower_bound in H5.
+
+  unfold convergent_sequence. exists L. intros eps H7.
+
+  assert (H8 : ~ (is_lower_bound (fun x => exists n, a n = x) (L + eps))).
+  { unfold not. intros contra. specialize (H6 (L + eps)). apply H6 in contra. lra. }
+
+  unfold is_lower_bound in H8. unfold not in H8.
+
+  assert (H9 : exists N : nat, a N < L + eps).
+  { 
+    apply not_all_not_ex. unfold not. intro H9. apply H8. intros x H10. 
+    destruct H10 as [n H10]. rewrite <- H10. specialize (H9 n). 
+    apply Rnot_lt_ge. unfold not. apply H9.
+  }
+  destruct H9 as [N H9].
+
+  assert (H10 : forall n : nat, (n >= N)%nat -> a n < L + eps).
+  { intros n H. assert (a n <= a N). apply decreasing_le. apply Hdec. lia. lra. }
+
+  assert (H11 : forall n : nat, (n >= N)%nat -> a n >= L).
+  {  intros n H11. specialize (H5 (a n)). apply H5. exists n. reflexivity. }
+
+  assert (H12 : forall n : nat, (n >= N)%nat -> 0 <= a n - L < eps).
+  { intros n. split. 
+    assert (H12 : (a n >= L) -> 0 <= a n - L). lra. apply H12. apply H11. apply H. 
+    assert (H12 : (a n < L + eps) -> a n - L < eps). lra. apply H12. apply H10. apply H. }
+    
+  exists (INR N). intros n H13. specialize (H12 n). unfold R_dist.
+  unfold Rabs. destruct Rcase_abs.
+  - replace (- (a n - L)) with (L - a n) by lra. assert (H14 : a n >= L).
+    { apply H11. apply Rgt_lt in H13. apply INR_lt in H13. lia. } lra.
+  - apply H12. apply Rgt_lt in H13. apply INR_lt in H13. lia.
+Qed.
+
+(*
+  Monotonic Sequence Theorem (Eventually Increasing)
+
+  Suppose that a is an eventually increasing sequence that is bound above.
+  Construct a set S of all the elements of a starting from the point of
+  continual increase. Then this set has a least upper bound since it is bound
+  above by at most the bound of sequence a. Then the proof follows the same
+  as above.
+*)
+
+Lemma Monotonic_Sequence_Theorem_Increasing_Eventually : forall (a : sequence),
+  eventually_increasing a -> bounded_above a -> convergent_sequence a.
+Proof.
+  intros a [N H1] [UB H2].
+  pose (b := (fun n => a ((n + N)%nat)) : sequence).
+
+  assert (H3 : increasing b) by (intros n; apply H1; lia).
+  assert (H4 : bounded_above b) by (exists UB; intros n; apply H2).
+
+  assert (H5 : convergent_sequence b).
+  { apply Monotonic_Sequence_Theorem_Increasing. apply H3. apply H4. }
+
+  destruct H5 as [L H5].
+  exists L. intros eps.
+  specialize (H5 eps).
+  intros H6.
+  destruct H5 as [N' H5]; auto.
+  exists (INR N + Rmax N' 0). intros n H7.
+  specialize (H5 (n - N)%nat).
+  unfold b in H5. assert (N' < 0 \/ N' >= 0) as [H8 | H8] by lra.
+  - replace (Rmax N' 0) with 0 in H7. 2 : { rewrite Rmax_right; lra. } rewrite Rplus_0_r in H7.
+    apply INR_lt in H7. replace (n - N + N)%nat with n in H5 by lia. apply H5. pose proof pos_INR (n - N) as H9. lra.
+  - assert (Rmax N' 0 >= 0) as H9. { rewrite Rmax_left; lra. } assert (INR n > INR N) as H10 by lra.
+    apply INR_lt in H10. replace (n - N + N)%nat with n in H5 by lia. apply H5.
+    assert (Rmax N' 0 = N') as H11. { unfold Rmax. destruct (Rle_dec N'); lra. } solve_INR. apply INR_lt in H10. lia.
+Qed.
+
+Lemma Monotonic_Sequence_Theorem_Decreasing_Eventually : forall (a : sequence),
+  eventually_decreasing a -> bounded_below a -> convergent_sequence a.
+Proof.
+  intros a [N H1] [LB H2].
+  pose (b := (fun n => a ((n + N)%nat)) : sequence).
+
+  assert (H : convergent_sequence b).
+  { apply Monotonic_Sequence_Theorem_Decreasing; 
+    [intros n; apply H1; lia | exists LB; intros n; apply H2]. }
+
+  destruct H as [L H]. exists L.
+  intros eps H6. destruct (H eps H6) as [N' H5].
+  exists (INR N + Rmax N' 0). intros n H7.
+  specialize (H5 (n - N)%nat). unfold b in H5. assert (N' < 0 \/ N' >= 0) as [H8 | H8] by lra.
+  - replace (Rmax N' 0) with 0 in H7. 2 : { rewrite Rmax_right; lra. } rewrite Rplus_0_r in H7.
+    apply INR_lt in H7. replace (n - N + N)%nat with n in H5 by lia. apply H5. pose proof pos_INR (n - N) as H9. lra.
+  - assert (Rmax N' 0 >= 0) as H9. { rewrite Rmax_left; lra. } assert (INR n > INR N) as H10 by lra.
+    apply INR_lt in H10. replace (n - N + N)%nat with n in H5 by lia. apply H5.
+    assert (Rmax N' 0 = N') as H11. { unfold Rmax. destruct (Rle_dec N'); lra. } solve_INR. apply INR_lt in H10. lia.
+Qed.
+
+Theorem Monotonic_Sequence_Theorem : forall (a : sequence),
+  (increasing a /\ bounded_above a) \/ (decreasing a /\ bounded_below a) -> convergent_sequence a.
+Proof.
+  intros a [[H1 H2] | [H1 H2]]; 
+  [apply Monotonic_Sequence_Theorem_Increasing | apply Monotonic_Sequence_Theorem_Decreasing]; auto.
+Qed.
+
+Theorem Monotonic_Sequence_Theorem_Strong : forall (a : sequence),
+  (eventually_increasing a /\ bounded_above a) \/ (eventually_decreasing a /\ bounded_below a) -> convergent_sequence a.
+Proof.
+  intros a [[H1 H2] | [H1 H2]]; 
+  [apply Monotonic_Sequence_Theorem_Increasing_Eventually | apply Monotonic_Sequence_Theorem_Decreasing_Eventually]; auto.
+Qed.
+
+Lemma sandwich_convergence_lower : forall a b LB,
+  limit_of_sequence a LB -> a_eventually_bounded_below_by_b a b -> lower_bound b LB -> limit_of_sequence b LB.
+Proof.
+  intros a b LB H1 [N1 H2] H3 ε H4. specialize (H1 ε H4) as [N2 H1]. exists (Rmax N1 N2). intros n H5.
+  specialize (H1 n ltac:(apply Rmax_Rgt in H5; lra)). specialize (H2 n ltac:(apply Rmax_Rgt in H5; lra)).
+  specialize (H3 n). assert (|b n - LB| <= |a n - LB|) as H6 by solve_abs. lra.
 Qed.

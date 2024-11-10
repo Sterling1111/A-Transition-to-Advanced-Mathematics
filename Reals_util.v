@@ -26,3 +26,11 @@ Ltac convert_nat_to_INR_in_H :=
 
 Ltac solve_INR :=
   convert_nat_to_INR_in_H; try field_simplify_eq; try break_INR; simpl; try field; try nra; try lia.
+
+Ltac solve_abs := 
+  try intros; repeat unfold Rabs in *; repeat destruct Rcase_abs in *; try nra; try field; try nia.
+
+Lemma pow2_gt_0 : forall r, r <> 0 -> r ^ 2 > 0.
+Proof.
+  intros r H1. pose proof Rtotal_order r 0 as [H2 | [H2 | H2]]; try nra.
+Qed.

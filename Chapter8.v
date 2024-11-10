@@ -1,4 +1,4 @@
-Require Import Imports QRT.
+Require Import Imports QRT Reals_util.
 Require Export Chapter7.
 
 Open Scope Z_scope.
@@ -120,9 +120,6 @@ Proof.
 Qed. 
 
 Open Scope R_scope.
-
-Ltac solve_abs := 
-  try intros; repeat unfold Rabs in *; repeat destruct Rcase_abs in *; try nra; try field; try nia.
 
 Lemma lemma_8_8 : forall x y : R, Rabs (x + y) <= Rabs x + Rabs y.
 Proof.
