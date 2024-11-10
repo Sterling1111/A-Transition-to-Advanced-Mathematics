@@ -205,9 +205,7 @@ Qed.
 Lemma lemma_13_7_c : forall (A : Ensemble ℕ),
   A ≠ ∅ -> exists n, n ∈ A /\ forall n', n' ∈ A -> n <= n'.
 Proof.
-  intros A H1. pose proof (classic (Finite_set A)) as [H2 | H2].
-  - apply lemma_13_7_a; auto.
-  - apply lemma_13_7_b; auto.
+  intros A H1; pose proof (classic (Finite_set A)) as [H2 | H2]; [apply lemma_13_7_a | apply lemma_13_7_b]; auto.
 Qed.
 
 Lemma count_occ_remove_neq : 
