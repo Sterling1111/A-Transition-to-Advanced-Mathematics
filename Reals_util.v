@@ -14,6 +14,9 @@ Ltac break_INR :=
       rewrite minus_INR
   end.
 
+Ltac break_INR_simpl :=
+  break_INR; simpl; try field_simplify; try nra; try nia.
+
 Ltac convert_nat_to_INR_in_H :=
   try
   match goal with
@@ -29,6 +32,9 @@ Ltac solve_INR :=
 
 Ltac solve_abs := 
   try intros; repeat unfold Rabs in *; repeat destruct Rcase_abs in *; try nra; try field; try nia.
+
+Ltac solve_max := 
+  try intros; repeat unfold Rmax in *; repeat destruct Rle_dec in *; try nra; try field; try nia.
 
 Lemma pow2_gt_0 : forall r, r <> 0 -> r ^ 2 > 0.
 Proof.

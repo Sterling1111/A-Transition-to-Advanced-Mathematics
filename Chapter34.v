@@ -89,14 +89,26 @@ Proof.
   intros a b x H1. unfold Rmax in H1. destruct (Rle_dec a b); lra.
 Qed.
 
-Require Import Reals_util.
-
 Lemma lemma_34_4 : limit_of_sequence (fun n => 2 / INR n ^ 2) 0.
 Proof.
-  apply sandwich_convergence_lower with (a := fun n => 1 / INR n).
+  apply sequence_squeeze_lower with (a := fun n => 1 / INR n).
   - apply theorem_34_12.
   - exists 1. intros n H1. apply Rle_ge. apply Rmult_le_reg_r with (r := INR n ^ 2); field_simplify; solve_INR.
     replace 1 with (INR 1) in H1 by auto. apply INR_lt in H1. replace 2 with (INR 2) by auto. apply le_INR in H1. lra.
   - intro n. destruct n. replace (INR 0 ^ 2) with 0 by (simpl; lra). rewrite Rdiv_0_r; lra.
-    apply Rlt_le. apply Rdiv_lt_0_compat; try lra. Search (0 < _ ^ 2). apply pow2_gt_0. pose proof pos_INR n. solve_INR.
+    apply Rlt_le. apply Rdiv_lt_0_compat; try lra. apply pow2_gt_0. pose proof pos_INR n. solve_INR.
+Qed.
+
+Lemma lemma_34_5 : limit_of_sequence (fun n => INR (3 * n - 5) / INR (2 * n + 4)) (3 / 2).
+Proof.
+  apply sequence_squeeze with (a := fun n => 3 / 2 - 6 * (1 / INR n)) (c := fun n => 3 / 2).
+  - set (a := fun n : nat => 3 / 2). set (b := fun n : nat => 1 / INR n).
+    replace ((fun n : ℕ => 3 / 2 - 1 / INR n)) with (fun n : ℕ => a n - b n) by reflexivity.
+    replace (3 / 2) with (3/2 - (6 * 0)) at 1 by lra. apply limit_of_sequence_sub;
+    [ apply limit_of_const_sequence | apply limit_of_sequence_mul_const; apply theorem_34_12 ].
+  - apply limit_of_const_sequence.
+  - exists 2. intros n H1. assert (n > 2)%nat as H2. { replace 2 with (INR 2) in H1 by auto. apply INR_lt in H1. lia. }
+    break_INR_simpl. apply Rle_ge. apply Rmult_le_reg_r with (r := 2 * INR n); try lra. apply Rmult_le_reg_r with (r := 2 * INR n + 4); field_simplify; nra.
+  - exists 1. intros n H1. assert (n > 1)%nat as H2. { replace 1 with (INR 1) in H1 by auto. apply INR_lt in H1. lia. }
+    break_INR_simpl. apply Rmult_le_reg_r with (r := 2); try lra. apply Rmult_le_reg_r with (r := 2 * INR n + 4); field_simplify; nra.
 Qed.

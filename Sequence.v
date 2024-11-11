@@ -378,10 +378,58 @@ Proof.
   [apply Monotonic_Sequence_Theorem_Increasing_Eventually | apply Monotonic_Sequence_Theorem_Decreasing_Eventually]; auto.
 Qed.
 
-Lemma sandwich_convergence_lower : forall a b LB,
+Lemma sequence_squeeze_lower : forall a b LB,
   limit_of_sequence a LB -> a_eventually_bounded_below_by_b a b -> lower_bound b LB -> limit_of_sequence b LB.
 Proof.
   intros a b LB H1 [N1 H2] H3 ε H4. specialize (H1 ε H4) as [N2 H1]. exists (Rmax N1 N2). intros n H5.
   specialize (H1 n ltac:(apply Rmax_Rgt in H5; lra)). specialize (H2 n ltac:(apply Rmax_Rgt in H5; lra)).
   specialize (H3 n). assert (|b n - LB| <= |a n - LB|) as H6 by solve_abs. lra.
+Qed.
+
+Lemma sequence_squeeze_upper : forall a b UB,
+  limit_of_sequence a UB -> a_eventually_bounded_above_by_b a b -> upper_bound b UB -> limit_of_sequence b UB.
+Proof.
+  intros a b UB H1 [N1 H2] H3 ε H4. specialize (H1 ε H4) as [N2 H1]. exists (Rmax N1 N2). intros n H5.
+  specialize (H1 n ltac:(apply Rmax_Rgt in H5; lra)). specialize (H2 n ltac:(apply Rmax_Rgt in H5; lra)).
+  specialize (H3 n). assert (|b n - UB| <= |a n - UB|) as H6 by solve_abs. lra.
+Qed.
+
+Lemma sequence_squeeze : forall a b c L,
+  limit_of_sequence a L -> limit_of_sequence c L -> a_eventually_bounded_below_by_b b a -> a_eventually_bounded_above_by_b b c -> limit_of_sequence b L.
+Proof.
+  intros a b c L H1 H2 [N3 H3] [N4 H4] ε H5. specialize (H1 ε H5) as [N1 H1]. specialize (H2 ε H5) as [N2 H2].
+  set (N := Rmax (Rmax N1 N2) (Rmax N3 N4)). assert (N >= N1 /\ N >= N2 /\ N >= N3 /\ N >= N4) as [H6 [H7 [H8 H9]]] by (unfold N; solve_max).
+  exists N. intros n H10. specialize (H1 n ltac:(lra)). specialize (H2 n ltac:(lra)). specialize (H3 n ltac:(lra)). specialize (H4 n ltac:(lra)).
+  solve_abs.
+Qed.
+
+Lemma limit_of_const_sequence : forall c,
+  limit_of_sequence (fun _ => c) c.
+Proof.
+  intros; exists 0; solve_abs.
+Qed.
+
+Lemma limit_of_sequence_add : forall a b L1 L2,
+  limit_of_sequence a L1 -> limit_of_sequence b L2 -> limit_of_sequence (fun n => a n + b n) (L1 + L2).
+Proof.
+  intros a b L1 L2 H1 H2 ε H3. specialize (H1 (ε/2) ltac:(lra)) as [N1 H1]. specialize (H2 (ε/2) ltac:(lra)) as [N2 H2].
+  exists (Rmax N1 N2). intros n H4. specialize (H1 n ltac:(apply Rmax_Rgt in H4; lra)). specialize (H2 n ltac:(apply Rmax_Rgt in H4; lra)).
+  solve_abs.
+Qed.
+
+Lemma limit_of_sequence_sub : forall a b L1 L2,
+  limit_of_sequence a L1 -> limit_of_sequence b L2 -> limit_of_sequence (fun n => a n - b n) (L1 - L2).
+Proof.
+  intros a b L1 L2 H1 H2 ε H3. specialize (H1 (ε/2) ltac:(lra)) as [N1 H1]. specialize (H2 (ε/2) ltac:(lra)) as [N2 H2].
+  exists (Rmax N1 N2). intros n H4. specialize (H1 n ltac:(apply Rmax_Rgt in H4; lra)). specialize (H2 n ltac:(apply Rmax_Rgt in H4; lra)).
+  solve_abs.
+Qed.
+
+Lemma limit_of_sequence_mul_const : forall a c L,
+  limit_of_sequence a L -> limit_of_sequence (fun n => c * a n) (c * L).
+Proof.
+  intros a c L H1 ε H2. assert (c = 0 \/ c <> 0) as [H3 | H3] by lra.
+  - exists 0. solve_abs.
+  - specialize (H1 (ε / Rabs c) ltac:(apply Rdiv_pos_pos; solve_abs)) as [N H1].
+    exists N. intros n H4. specialize (H1 n ltac:(apply H4)). apply Rmult_lt_compat_r with (r := Rabs c) in H1; field_simplify in H1; solve_abs.
 Qed.
