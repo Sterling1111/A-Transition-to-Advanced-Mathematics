@@ -2,7 +2,8 @@ Require Import Imports Reals_util Completeness.
 
 Open Scope R_scope.
 
-Notation "| x |" := (Rabs x) (at level 70, format "| x |").
+Notation "| x |" := (Rabs x) 
+  (at level 20, x at level 99, format "| x |", no associativity) : R_scope.
 
 Definition sequence := nat -> R.
 
@@ -27,10 +28,10 @@ Definition eventually_increasing (a : sequence) : Prop :=
     forall (n : nat), (n >= N)%nat -> a n <= a (S n).
 
 Definition arithmetic_sequence (a : sequence) (c d : R) : Prop :=
-  a 0%nat = c /\ forall n : nat, a (S n) - a n = d.
+  a = (fun n => c + d * INR n).
 
 Definition geometric_sequence (a : sequence) (c r : R) : Prop :=
-  a 0%nat = c /\ forall n : nat, a (S n) = r * a n.
+  a = (fun n => c * r ^ n).
 
 Definition limit_of_sequence (a : sequence) (L : R) : Prop :=
   forall ε : R, ε > 0 ->
@@ -431,5 +432,6 @@ Proof.
   intros a c L H1 ε H2. assert (c = 0 \/ c <> 0) as [H3 | H3] by lra.
   - exists 0. solve_abs.
   - specialize (H1 (ε / Rabs c) ltac:(apply Rdiv_pos_pos; solve_abs)) as [N H1].
-    exists N. intros n H4. specialize (H1 n ltac:(apply H4)). apply Rmult_lt_compat_r with (r := Rabs c) in H1; field_simplify in H1; solve_abs.
+    exists N. intros n H4. specialize (H1 n ltac:(apply H4)).
+    apply Rmult_lt_compat_r with (r := Rabs c) in H1; field_simplify in H1; solve_abs.
 Qed.

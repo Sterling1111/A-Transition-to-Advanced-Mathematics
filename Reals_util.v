@@ -34,9 +34,17 @@ Ltac solve_abs :=
   try intros; repeat unfold Rabs in *; repeat destruct Rcase_abs in *; try nra; try field; try nia.
 
 Ltac solve_max := 
-  try intros; repeat unfold Rmax in *; repeat destruct Rle_dec in *; try nra; try field; try nia.
+  try intros; repeat unfold Rmax in *; repeat destruct Rle_dec in *; repeat unfold Nat.max; repeat destruct le_dec; try nra; try field; try nia.
 
 Lemma pow2_gt_0 : forall r, r <> 0 -> r ^ 2 > 0.
 Proof.
   intros r H1. pose proof Rtotal_order r 0 as [H2 | [H2 | H2]]; try nra.
 Qed.
+
+Lemma Rmult_le_ge_reg_neg_l :
+  forall r r1 r2, r * r1 >= r * r2 -> r < 0 -> r1 <= r2.
+Proof. intros; nra. Qed.
+
+Lemma Rmult_ge_le_reg_neg_l :
+  forall r r1 r2, r * r1 <= r * r2 -> r < 0 -> r1 >= r2.
+Proof. intros; nra. Qed.

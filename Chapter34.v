@@ -112,3 +112,86 @@ Proof.
   - exists 1. intros n H1. assert (n > 1)%nat as H2. { replace 1 with (INR 1) in H1 by auto. apply INR_lt in H1. lia. }
     break_INR_simpl. apply Rmult_le_reg_r with (r := 2); try lra. apply Rmult_le_reg_r with (r := 2 * INR n + 4); field_simplify; nra.
 Qed.
+
+Lemma lemma_34_6_a : limit_of_sequence (fun n => (INR n + 1) / INR n) 1.
+Proof.
+  intros ε H1. assert (limit_of_sequence (fun n => INR n / INR n) 1) as H2.
+  { intros ε2 H2. exists 1. intros n H3. rewrite Rdiv_diag; solve_abs. }
+  assert (limit_of_sequence (fun n => 1 / INR n) 0) as H3 by apply theorem_34_12.
+  specialize (H2 ε H1) as [N1 H2]. specialize (H3 ε H1) as [N2 H3].
+  exists (Rmax N1 (Rmax N2 1)). intros n H4. 
+  assert (INR n > N1 /\ INR n > N2 /\ INR n > 1) as [H5 [H6 H7]] by solve_max.
+  specialize (H2 n H5). specialize (H3 n H6). replace ((INR n + 1) / INR n - 1) with (1 / INR n) by solve_INR.
+  solve_abs.
+Qed.
+
+Lemma lemma_34_6_b : convergent_sequence (fun n => (INR n + 1) / INR n).
+Proof.
+  exists 1. apply lemma_34_6_a.
+Qed.
+
+Lemma lemma_34_7 : forall c, limit_of_sequence (fun n => c) c.
+Proof.
+  apply limit_of_const_sequence.
+Qed.
+
+Lemma lemma_34_8 : ~ limit_of_sequence (fun n => INR n) 3.
+Proof.
+  intros H1. specialize (H1 1 ltac:(lra)) as [N H1]. pose proof INR_unbounded N as [n H2].
+  specialize (H1 (max n 4)). assert (INR (max n 4) > N) as H3. 
+  { assert ((Nat.max n 4) >= n)%nat as H3. apply Nat.le_max_l. apply le_INR in H3. lra. }
+  assert (INR (max n 4) >= 4) as H4. 
+  { assert ((Nat.max n 4) >= 4)%nat as H4. apply Nat.le_max_r. apply le_INR in H4. simpl in H4; lra. }
+  specialize (H1 H3). solve_abs.
+Qed.
+
+Lemma lemma_34_9 : limit_of_sequence (fun n => sqrt (INR n ^ 2 + 1) - INR n) 0.
+Proof.
+  apply sequence_squeeze with (a := fun n => -1 * (1 / INR n)) (c := fun n => 1 / INR n).
+  - replace 0 with (-1 * 0) by lra. apply limit_of_sequence_mul_const. apply theorem_34_12.
+  - apply theorem_34_12.
+  - exists 1. intros n H1. apply Rplus_ge_reg_r with (r := INR n). field_simplify; try lra.
+    rewrite Rdiv_minus_distr. replace (INR n ^ 2 / INR n) with (INR n) by (field_simplify; lra).
+    apply Rle_ge. apply Rsqr_incr_0. repeat rewrite Rsqr_def. field_simplify; try nra. rewrite pow2_sqrt; try nra.
+    3 : { apply sqrt_pos. } 2 : { apply Rmult_le_reg_r with (r := INR n); field_simplify; try nra. }
+    rewrite Rdiv_plus_distr. rewrite Rdiv_minus_distr. replace (INR n ^ 4 / INR n ^ 2) with (INR n ^ 2) by (field_simplify; lra).
+    replace (2 * INR n ^ 2 / INR n ^ 2) with 2 by (field_simplify; lra). assert (H2 : 1 / INR n ^ 2 < 1).
+    { unfold Rdiv. rewrite Rmult_1_l. replace 1 with (/1) by nra. apply Rinv_lt_contravar; nra. } nra.
+  - exists 1. intros n H1. apply Rplus_le_reg_r with (r := INR n); try lra. field_simplify; try lra.
+    rewrite Rdiv_plus_distr. replace (INR n ^ 2 / INR n) with (INR n) by (field_simplify; lra).
+    apply Rsqr_incr_0. repeat rewrite Rsqr_def. field_simplify; try lra. rewrite pow2_sqrt. 
+    3 : { apply sqrt_pos. } 2 : { apply Rmult_le_reg_r with (r := INR n); field_simplify; nra. }
+    2 : { apply Rmult_le_reg_r with (r := INR n); field_simplify; nra. } repeat rewrite Rdiv_plus_distr.
+    replace (INR n ^ 4 / INR n ^ 2) with (INR n ^ 2) by (field_simplify; lra).
+    replace (2 * INR n ^ 2 / INR n ^ 2) with 2 by (field_simplify; lra). assert (H2 : 1 / INR n ^ 2 > 0).
+    { unfold Rdiv. rewrite Rmult_1_l. apply Rinv_pos; nra. } nra.
+Qed.
+
+Section section_34_10.
+
+  Variable c r : R.
+  Variable a : sequence.
+
+  Hypothesis H1 : geometric_sequence a c r.
+
+  Lemma lemma_34_10_a : |r| < 1 -> limit_of_sequence a 0.
+  Proof.
+    intros H2. unfold geometric_sequence in H1.
+    assert (r > -1 /\ r < 1 /\ (r < 0 \/ r = 0 \/ r > 0)) as [H4 [H5 [H6 | [H6 | H6]]]] by solve_abs.
+    - admit.
+    - exists 0. intros n H7. replace (a n) with 0; solve_abs. subst. rewrite pow_i; try lra.
+      replace 0 with (INR 0) in H7 by auto. apply INR_lt in H7; lia.
+    - admit.
+  Admitted.
+  
+  Lemma lemma_34_10_b : c <> 0 -> limit_of_sequence a 0 -> |r| < 1.
+  Proof.
+
+  Admitted.
+
+  Lemma lemma_34_10_c : c > 0 -> r > 1 -> divergent_sequence a.
+  Proof.
+
+  Admitted.
+
+End section_34_10.
