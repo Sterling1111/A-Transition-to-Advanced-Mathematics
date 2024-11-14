@@ -174,6 +174,18 @@ Section section_34_10.
 
   Hypothesis H1 : geometric_sequence a c r.
 
+  Lemma lemma_34_10_c : c > 0 -> r > 1 -> divergent_sequence a.
+  Proof.
+    unfold geometric_sequence in H1.
+    assert (divergent_sequence (fun n => r ^ n)) as H2.
+    {
+      assert (exists h, r = 1 + h) as [h H3] by (exists (r - 1); lra); subst.
+      unfold divergent_sequence. intros L. specialize (H1 L) as [N H1].
+    }
+    intros H2 H3. unfold geometric_sequence in H1. assert (exists h, r = 1 + h) as [h H4] by (exists (r - 1); lra).
+    
+  Qed.
+
   Lemma lemma_34_10_a : |r| < 1 -> limit_of_sequence a 0.
   Proof.
     intros H2. unfold geometric_sequence in H1.
@@ -186,6 +198,12 @@ Section section_34_10.
   
   Lemma lemma_34_10_b : c <> 0 -> limit_of_sequence a 0 -> |r| < 1.
   Proof.
+    intros H2 H3. assert (|r| = 1 \/ |r| < 1 \/ |r| > 1) as [H4 | [H4 | H4]] by lra; auto.
+    - assert (r = 1 \/ r = -1) as [H5 | H5] by solve_abs.
+      -- unfold geometric_sequence in H1. subst. replace (fun n : nat => c * 1^n) with (fun n : nat => c) in H3.
+         2 : { apply functional_extensionality. intros n. rewrite pow1. lra. } pose proof limit_of_const_sequence c as H6.
+         pose proof limit_of_sequence_unique a 0 c H3 H6. subst. apply H1.
+         apply limit_of_const_sequence in H3. subst. apply H1.
 
   Admitted.
 

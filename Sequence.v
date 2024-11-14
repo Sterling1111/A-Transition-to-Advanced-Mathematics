@@ -19,6 +19,12 @@ Definition bounded_below (a : sequence) : Prop :=
 Definition bounded_above (a : sequence) : Prop := 
   exists UB : R, forall n : nat, UB >= a n.
 
+Definition unbounded_above (a : sequence) : Prop :=
+  forall UB : R, exists n : nat, a n > UB.
+
+Definition unbounded_below (a : sequence) : Prop :=
+  forall LB : R, exists n : nat, a n < LB.
+
 Definition eventually_decreasing (a : sequence) : Prop :=
   exists (N : nat),
     forall (n : nat), (n >= N)%nat -> a n >= a (S n).
@@ -31,7 +37,7 @@ Definition arithmetic_sequence (a : sequence) (c d : R) : Prop :=
   a = (fun n => c + d * INR n).
 
 Definition geometric_sequence (a : sequence) (c r : R) : Prop :=
-  a = (fun n => c * r ^ n).
+  a = (fun n => c * (r ^ n)).
 
 Definition limit_of_sequence (a : sequence) (L : R) : Prop :=
   forall ε : R, ε > 0 ->
@@ -40,8 +46,12 @@ Definition limit_of_sequence (a : sequence) (L : R) : Prop :=
 Definition convergent_sequence (a : sequence) : Prop :=
   exists (L : R), limit_of_sequence a L.
 
+Definition not_limit_of_sequence (a : sequence) (L : R) : Prop :=
+  exists ε : R, ε > 0 /\
+    forall N : R, exists n : nat, INR n > N /\ |a n - L| >= ε.
+
 Definition divergent_sequence (a : sequence) : Prop :=
-  ~ convergent_sequence a.
+  forall L : R, not_limit_of_sequence a L.
 
 Definition lower_bound (a : sequence) (LB : R) : Prop :=
   forall n : nat, LB <= a n.
@@ -60,6 +70,25 @@ Definition a_eventually_bounded_above_by_b (a b : sequence) : Prop :=
 
 Definition a_eventually_bounded_below_by_b (a b : sequence) : Prop :=
   exists (N : R), forall n : nat, INR n > N -> a n >= b n.
+
+Lemma divergent_sequence_iff : forall a, divergent_sequence a <-> ~ convergent_sequence a.
+Proof.
+  intros a. split.
+  - intros H1 [L H2]. destruct H1 with L as [ε [H3 H4]]. destruct H2 with ε as [N H5]; auto.
+    specialize (H4 N) as [n [H6 H7]]. specialize (H5 n ltac:(auto)). lra.
+  - intros H1 L. unfold convergent_sequence in H1. apply not_ex_all_not with (n := L) in H1.
+    apply not_all_ex_not in H1 as [ε H1]. apply not_all_ex_not in H1 as [H1 H2].
+    exists ε. split; auto. intros N. apply not_ex_all_not with (n := N) in H2.
+    apply not_all_ex_not in H2 as [n H2]. exists n. apply imply_to_and in H2; nra.
+Qed.
+
+Lemma unbounded_above_iff : forall a, unbounded_above a <-> ~ bounded_above a.
+Proof.
+  intros a. split.
+  - intros H1 [UB H2]. destruct H1 with UB as [n H3]. specialize (H2 n). lra.
+  - intros H1 UB. unfold bounded_above in H1. apply not_ex_all_not with (n := UB) in H1.
+    apply not_all_ex_not in H1 as [n H1]. exists n. nra.
+Qed.
 
 Lemma Rinv_lt_0 : forall r, 
   / r < 0 -> r < 0.
@@ -122,7 +151,7 @@ Qed.
 
 Proposition proposition_34_16 : divergent_sequence (fun n => (-1) ^ n).
 Proof.
-  intros [L H1]. specialize (H1 (1/2) ltac:(lra)) as [N H1].
+  apply divergent_sequence_iff. intros [L H1]. specialize (H1 (1/2) ltac:(lra)) as [N H1].
   pose proof INR_unbounded N as [n H2]. assert (0 <= INR n) as H3.
   { replace 0 with (INR 0) by auto. apply le_INR. lia. }
   assert (L >= 0 \/ L < 0) as [H4 | H4] by lra.
@@ -404,6 +433,47 @@ Proof.
   solve_abs.
 Qed.
 
+Lemma exists_max_of_sequence_on_interval : forall (a : sequence) (i j : nat),
+  exists n : nat, (i <= n <= j)%nat /\ forall m : nat, (i <= m <= j)%nat -> a m <= a n.
+Proof.
+  intros a i j. 
+Qed.
+
+Lemma unbounded_above_divergent_sequence : forall a,
+  unbounded_above a -> divergent_sequence a.
+Proof.
+  intros a H1. apply divergent_sequence_iff. intros [L H2].
+  specialize (H2 1 ltac:(lra)) as [N H2]. pose proof INR_unbounded N as [n1 H3].
+  assert (H4 : exists n : nat,  )
+   specialize (H1 (L + 1)) as [n2 H4].
+  specialize (H2 (Rmax n1 n2)%nat). assert (INR (Rmax n1 n2) > N) as H5.
+  { assert (Rmax n1 n2 >= n1)%nat as H5 by apply Rmax_l. solve_INR. }
+  solve_abs.
+Qed.
+
+Lemma unbounded_increasing_sequence_divergent : forall a,
+  increasing a -> unbounded_above a -> divergent_sequence a.
+Proof.
+  intros a H1 H2. apply unbounded_above_iff in H2. apply divergent_sequence_iff. intros [L H3].
+  specialize (H3 1 ltac:(lra)) as [N H3]. pose proof INR_unbounded N as [n H4].
+  assert (H5 : forall L : R, exists n : nat, a n > L).
+  { intros L2. pose proof classic (exists n0 : nat, a n0 > L2) as [H5 | H5]; auto. exfalso. apply H2.
+    unfold bounded_above. exists L2. intros n2. apply not_ex_all_not with (n := n2) in H5. nra. 
+  }
+  specialize (H5 (L + 1)) as [n2 H5]. assert (a (n + n2)%nat >= a n2). { apply increasing_ge; auto; lia. }
+  specialize (H3 (n + n2)%nat). assert (INR (n + n2) > N) as H6.
+  { assert (n + n2 >= n)%nat as H6 by lia. solve_INR. rewrite plus_INR in H6. nra. }
+  specialize (H3 ltac:(apply H6)). solve_abs.
+Qed.
+
+Lemma bound_below_by_increasing_unbounded_sequence : forall a b,
+  increasing a -> unbounded_above a -> a_bounded_below_by_b a b -> (increasing b /\ unbounded_above b).
+Proof.
+  intros a b H1 H2 H3. split.
+  - intros n. specialize (H3 (S n)). apply Rle_ge. apply H3.
+  - intros [UB H4]. apply H2. unfold bounded_above. exists UB. intros n. apply H3.
+Qed.
+
 Lemma limit_of_const_sequence : forall c,
   limit_of_sequence (fun _ => c) c.
 Proof.
@@ -435,3 +505,32 @@ Proof.
     exists N. intros n H4. specialize (H1 n ltac:(apply H4)).
     apply Rmult_lt_compat_r with (r := Rabs c) in H1; field_simplify in H1; solve_abs.
 Qed.
+
+Lemma limit_of_sequence_mul_const_rev : forall a c L,
+  c <> 0 -> limit_of_sequence (fun n => c * a n) (c * L) -> limit_of_sequence a L.
+Proof.
+  intros a c L H1 H2 ε H3. specialize (H2 (ε * |c|) ltac:(solve_abs)) as [N H2].
+  exists N. intros n H4. specialize (H2 n ltac:(apply H4)); solve_abs.
+Qed.
+
+Lemma divergent_sequence_mul_const : forall a c,
+  divergent_sequence a -> c <> 0 -> divergent_sequence (fun n => c * a n).
+Proof.
+  intros a c H1 H2. rewrite divergent_sequence_iff in *. intros [L H3]. apply H1. exists (L / c).
+  apply limit_of_sequence_mul_const_rev with (c := c); auto.
+  replace (c * (L / c)) with L by (field; lra); auto.
+Qed.
+
+Lemma linear_sequence_divergent : forall c,
+  c <> 0 -> divergent_sequence (fun n => c * INR n).
+Proof.
+  intros c. apply divergent_sequence_mul_const. apply divergent_sequence_iff. intros [L H1]. specialize (H1 1 ltac:(lra)) as [N H1].
+  pose proof INR_unbounded (Rmax N (L + 1)) as [n H2]. specialize (H1 n ltac:(solve_max)).
+  assert (H3 : INR n > L + 1) by solve_max; solve_abs.
+Qed.
+
+Lemma limit_of_sequence_unique : forall a L1 L2,
+  limit_of_sequence a L1 -> limit_of_sequence a L2 -> L1 = L2.
+Proof.
+  intros a L1 L2 H1 H2. 
+Admitted.
