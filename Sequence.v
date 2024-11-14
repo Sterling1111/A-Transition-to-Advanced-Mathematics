@@ -434,9 +434,18 @@ Proof.
 Qed.
 
 Lemma exists_max_of_sequence_on_interval : forall (a : sequence) (i j : nat),
-  exists n : nat, (i <= n <= j)%nat /\ forall m : nat, (i <= m <= j)%nat -> a m <= a n.
+  (i <= j)%nat -> exists n : nat, (i <= n <= j)%nat /\ forall m : nat, (i <= m <= j)%nat -> a m <= a n.
 Proof.
-  intros a i j. 
+  intros a i j H1. induction j.
+  - assert (i = 0)%nat by lia. subst. exists 0%nat. split; try lia.
+    intros m H2. replace m with 0%nat by lia. lra.
+  - assert (i = S j \/ i <= j)%nat as [H2 | H2] by lia.
+    -- subst. exists (S j). split; try lia. intros m H3. replace m with (S j) by lia. lra.
+    -- specialize (IHj H2) as [n [H3 H4]]. assert (a (S j) >= a n \/ a (S j) < a n) as [H5 | H5] by lra.
+       + exists (S j). split; try lia. intros m H6. specialize (H4 m). assert (m = S j \/ m <= j)%nat as [H7 | H7] by lia;
+         subst; try lra. specialize (H4 ltac:(lia)). lra.
+       + exists n. split; try lia. intros m H6. specialize (H4 m). assert (m = S j \/ m <= j)%nat as [H7 | H7] by lia;
+         subst; try lra. specialize (H4 ltac:(lia)). lra.
 Qed.
 
 Lemma unbounded_above_divergent_sequence : forall a,
@@ -444,11 +453,13 @@ Lemma unbounded_above_divergent_sequence : forall a,
 Proof.
   intros a H1. apply divergent_sequence_iff. intros [L H2].
   specialize (H2 1 ltac:(lra)) as [N H2]. pose proof INR_unbounded N as [n1 H3].
-  assert (H4 : exists n : nat,  )
-   specialize (H1 (L + 1)) as [n2 H4].
-  specialize (H2 (Rmax n1 n2)%nat). assert (INR (Rmax n1 n2) > N) as H5.
-  { assert (Rmax n1 n2 >= n1)%nat as H5 by apply Rmax_l. solve_INR. }
-  solve_abs.
+  pose proof exists_max_of_sequence_on_interval a 0 n1 ltac:(lia) as [n2 [H4 H5]].
+  unfold unbounded_above in H1. specialize (H1 (a n2 + 2)) as [n3 H6].
+  assert (n3 <= n1 \/ n3 > n1)%nat as [H7 | H7] by lia.
+  - specialize (H5 n3 ltac:(lia)). lra.
+  - specialize (H5 n1 ltac:(lia)). pose proof H2 as H8.
+    specialize (H2 n1 ltac:(lra)). apply lt_INR in H7.
+    specialize (H8 n3 ltac:(lra)). solve_abs.
 Qed.
 
 Lemma unbounded_increasing_sequence_divergent : forall a,
@@ -466,12 +477,20 @@ Proof.
   specialize (H3 ltac:(apply H6)). solve_abs.
 Qed.
 
-Lemma bound_below_by_increasing_unbounded_sequence : forall a b,
-  increasing a -> unbounded_above a -> a_bounded_below_by_b a b -> (increasing b /\ unbounded_above b).
+Lemma bound_below_by_unbounded_above_sequence : forall a b,
+  unbounded_above b -> a_bounded_below_by_b a b -> unbounded_above a.
 Proof.
-  intros a b H1 H2 H3. split.
-  - intros n. specialize (H3 (S n)). apply Rle_ge. apply H3.
-  - intros [UB H4]. apply H2. unfold bounded_above. exists UB. intros n. apply H3.
+  intros a b H1 H2 UB. specialize (H1 UB) as [n H1]. specialize (H2 n). 
+  exists n. lra.
+Qed.
+
+Lemma linear_sequence_unbounded_above : forall a c,
+  c > 0 -> unbounded_above (fun n => c * INR n + a).
+Proof.
+  intros a c H1. unfold unbounded_above. intros L. 
+  pose proof INR_unbounded ((L - a) / c) as [n H2]. exists n.
+  apply Rmult_gt_compat_r with (r := c) in H2; try lra.
+  field_simplify in H2; try lra.
 Qed.
 
 Lemma limit_of_const_sequence : forall c,

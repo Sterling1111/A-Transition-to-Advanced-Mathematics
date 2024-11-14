@@ -176,24 +176,35 @@ Section section_34_10.
 
   Lemma lemma_34_10_c : c > 0 -> r > 1 -> divergent_sequence a.
   Proof.
-    unfold geometric_sequence in H1.
-    assert (divergent_sequence (fun n => r ^ n)) as H2.
-    {
-      assert (exists h, r = 1 + h) as [h H3] by (exists (r - 1); lra); subst.
-      unfold divergent_sequence. intros L. specialize (H1 L) as [N H1].
+    intros H2 H3. unfold geometric_sequence in H1.
+    set (a' := fun n => r^n).
+    set (b := fun n => (r - 1) * INR n + 1). 
+    assert (unbounded_above b) as H4 by (apply linear_sequence_unbounded_above; lra).
+    apply (bound_below_by_unbounded_above_sequence a' b) in H4.
+    2 : { 
+      intros n. pose proof (lemma_13_6 n (r - 1) ltac:(lra)) as H5. unfold a', b.
+      replace (1 + (r - 1)) with r in H5 by lra. lra.
     }
-    intros H2 H3. unfold geometric_sequence in H1. assert (exists h, r = 1 + h) as [h H4] by (exists (r - 1); lra).
-    
+    replace a with (fun n => c * a' n). apply divergent_sequence_mul_const; try lra.
+    apply unbounded_above_divergent_sequence; auto.
   Qed.
 
   Lemma lemma_34_10_a : |r| < 1 -> limit_of_sequence a 0.
   Proof.
     intros H2. unfold geometric_sequence in H1.
-    assert (r > -1 /\ r < 1 /\ (r < 0 \/ r = 0 \/ r > 0)) as [H4 [H5 [H6 | [H6 | H6]]]] by solve_abs.
-    - admit.
-    - exists 0. intros n H7. replace (a n) with 0; solve_abs. subst. rewrite pow_i; try lra.
-      replace 0 with (INR 0) in H7 by auto. apply INR_lt in H7; lia.
-    - admit.
+    assert (c = 0 \/ c <> 0) as [H3 | H3] by lra.
+    - subst. replace (fun n : nat => 0 * r ^ n) with (fun n : nat => 0).
+      2 : { apply functional_extensionality. intros n. lra. }
+      apply limit_of_const_sequence.
+    - assert (r > -1 /\ r < 1 /\ (r < 0 \/ r = 0 \/ r > 0)) as [H4 [H5 [H6 | [H6 | H6]]]] by solve_abs.
+      -- admit.
+      -- exists 0. intros n H7. replace (a n) with 0; solve_abs. subst. rewrite pow_i; try lra.
+         replace 0 with (INR 0) in H7 by auto. apply INR_lt in H7; lia.
+      -- set (b := fun n => (1 / r)^n). set (a' := fun n => r^n).
+         assert (forall n, b n = 1 / (a' n)) as H7.
+         { intros n. unfold b, a'. unfold Rdiv. repeat rewrite Rmult_1_l. apply pow_inv. }
+         assert (unbounded_above a') as H8. { 
+         admit.
   Admitted.
   
   Lemma lemma_34_10_b : c <> 0 -> limit_of_sequence a 0 -> |r| < 1.
