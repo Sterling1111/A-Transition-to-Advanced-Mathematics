@@ -1,4 +1,4 @@
-Require Import Imports Reals_util Completeness.
+Require Import Imports Reals_util Completeness Chapter13.
 
 Open Scope R_scope.
 
@@ -493,6 +493,14 @@ Proof.
   field_simplify in H2; try lra.
 Qed.
 
+Lemma linear_sequence_unbounded_below : forall a c,
+  c < 0 -> unbounded_below (fun n => c * INR n + a).
+Proof.
+  intros a c H1. unfold unbounded_below. intros L. 
+  pose proof INR_unbounded ((L - a) / c) as [n H2]. exists n.
+  apply Rmult_lt_gt_compat_neg_l with (r := c) in H2; try lra. field_simplify in H2; try lra.
+Qed.
+
 Lemma limit_of_const_sequence : forall c,
   limit_of_sequence (fun _ => c) c.
 Proof.
@@ -547,6 +555,63 @@ Proof.
   pose proof INR_unbounded (Rmax N (L + 1)) as [n H2]. specialize (H1 n ltac:(solve_max)).
   assert (H3 : INR n > L + 1) by solve_max; solve_abs.
 Qed.
+
+Lemma unbounded_above_mul_neg_const : forall a c,
+  c < 0 -> unbounded_above a -> unbounded_below (fun n => c * a n).
+Proof.
+  intros a c H1 H2 UB. specialize (H2 (UB * (1 / c))) as [n H4]. exists n.
+  apply Rmult_lt_gt_compat_neg_l with (r := c) in H4; field_simplify in H4; try lra.
+Qed.
+
+Lemma unbounded_below_mul_neg_const : forall a c,
+  c < 0 -> unbounded_below a -> unbounded_above (fun n => c * a n).
+Proof.
+  intros a c H1 H2 UB. specialize (H2 (UB * (1 / c))) as [n H4]. exists n.
+  apply Rmult_lt_gt_compat_neg_l with (r := c) in H4; field_simplify in H4; try lra.
+Qed.
+
+Lemma geometric_sequence_unbounded_above : forall c r a, geometric_sequence a c r -> c > 0 -> r > 1 -> unbounded_above a.
+Proof.
+  intros c r a H1 H2 H3. unfold geometric_sequence in H1.
+  set (a' := fun n => r^n).
+  set (b := fun n => (r - 1) * INR n + 1). 
+  assert (unbounded_above b) as H4 by (apply linear_sequence_unbounded_above; lra).
+  apply (bound_below_by_unbounded_above_sequence a' b) in H4.
+  2 : { 
+    intros n. pose proof (lemma_13_6 n (r - 1) ltac:(lra)) as H5. unfold a', b.
+    replace (1 + (r - 1)) with r in H5 by lra. lra.
+  }
+  replace a with (fun n => c * a' n). intros UB. specialize (H4 (UB / c)) as [n H5].
+  exists n. apply Rmult_lt_compat_r with (r := c) in H5; field_simplify in H5; lra.
+Qed.
+
+Lemma geometric_sequence_unbounded_below : forall c r a, geometric_sequence a c r -> c < 0 -> r > 1 -> unbounded_below a.
+Proof.
+  intros c r a H1 H2 H3. unfold geometric_sequence in H1.
+  set (a' := fun n => r^n).
+  set (b := fun n => (r - 1) * INR n + 1). 
+  assert (unbounded_above b) as H4 by (apply linear_sequence_unbounded_above; lra).
+  apply (bound_below_by_unbounded_above_sequence a' b) in H4.
+  2 : { 
+    intros n. pose proof (lemma_13_6 n (r - 1) ltac:(lra)) as H5. unfold a', b.
+    replace (1 + (r - 1)) with r in H5 by lra. lra.
+  }
+  rewrite H1. apply unbounded_above_mul_neg_const; try lra.
+  apply geometric_sequence_unbounded_above with (c := 1) (r := r); try lra.
+  apply functional_extensionality. intros n. nra.
+Qed.
+
+Lemma limit_of_sequence_reciprocal_unbounded_below : forall a b,
+  (forall n, b n = 1 / a n) -> unbounded_below b -> limit_of_sequence a 0.
+Proof.
+  intros a b H1 H2 ε H3. unfold unbounded_below in H2.
+Admitted.
+
+Lemma limit_of_sequence_reciprocal_unbounded_above : forall a b,
+  (forall n, b n = 1 / a n) -> unbounded_above b -> limit_of_sequence a 0.
+Proof.
+  intros a b H1 H2 ε H3. unfold unbounded_above in H2.
+Admitted.
 
 Lemma limit_of_sequence_unique : forall a L1 L2,
   limit_of_sequence a L1 -> limit_of_sequence a L2 -> L1 = L2.

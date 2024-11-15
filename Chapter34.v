@@ -176,17 +176,8 @@ Section section_34_10.
 
   Lemma lemma_34_10_c : c > 0 -> r > 1 -> divergent_sequence a.
   Proof.
-    intros H2 H3. unfold geometric_sequence in H1.
-    set (a' := fun n => r^n).
-    set (b := fun n => (r - 1) * INR n + 1). 
-    assert (unbounded_above b) as H4 by (apply linear_sequence_unbounded_above; lra).
-    apply (bound_below_by_unbounded_above_sequence a' b) in H4.
-    2 : { 
-      intros n. pose proof (lemma_13_6 n (r - 1) ltac:(lra)) as H5. unfold a', b.
-      replace (1 + (r - 1)) with r in H5 by lra. lra.
-    }
-    replace a with (fun n => c * a' n). apply divergent_sequence_mul_const; try lra.
-    apply unbounded_above_divergent_sequence; auto.
+    intros H2 H3. apply unbounded_above_divergent_sequence.
+    apply geometric_sequence_unbounded_above with (c := c) (r := r); auto.
   Qed.
 
   Lemma lemma_34_10_a : |r| < 1 -> limit_of_sequence a 0.
@@ -196,15 +187,30 @@ Section section_34_10.
     - subst. replace (fun n : nat => 0 * r ^ n) with (fun n : nat => 0).
       2 : { apply functional_extensionality. intros n. lra. }
       apply limit_of_const_sequence.
-    - assert (r > -1 /\ r < 1 /\ (r < 0 \/ r = 0 \/ r > 0)) as [H4 [H5 [H6 | [H6 | H6]]]] by solve_abs.
-      -- admit.
+    - assert (r > -1 /\ r < 1 /\ (r > 0 \/ r = 0 \/ r < 0)) as [H4 [H5 [H6 | [H6 | H6]]]] by solve_abs.
+      -- set (b := fun n => (1 / c) * (1 / r)^n).
+         assert (forall n, b n = 1 / (a n)) as H7.
+         { intros n. subst. unfold b. unfold Rdiv. repeat rewrite Rmult_1_l. rewrite Rinv_mult. rewrite pow_inv. lra. }
+         assert (c < 0 \/ c > 0) as [H8 | H8] by lra.
+         * assert (unbounded_below b) as H9.
+           {
+              apply geometric_sequence_unbounded_below with (c := 1 / c) (r := 1 / r).
+              - apply functional_extensionality. intros n. rewrite H7, H1. unfold Rdiv.
+                repeat rewrite Rmult_1_l. rewrite Rinv_mult. rewrite pow_inv. nra.
+              - apply Rdiv_pos_neg; lra.
+              - apply Rmult_lt_reg_r with (r := r); field_simplify; try lra.
+           } apply limit_of_sequence_reciprocal_unbounded_below with (b := b); auto.
+         * assert (unbounded_above b) as H9.
+           {
+              apply geometric_sequence_unbounded_above with (c := 1 / c) (r := 1 / r).
+              - apply functional_extensionality. intros n. rewrite H7, H1. unfold Rdiv.
+                repeat rewrite Rmult_1_l. rewrite Rinv_mult. rewrite pow_inv. nra.
+              - apply Rdiv_pos_pos; lra.
+              - apply Rmult_lt_reg_r with (r := r); field_simplify; try lra.
+           } apply limit_of_sequence_reciprocal_unbounded_above with (b := b); auto.
       -- exists 0. intros n H7. replace (a n) with 0; solve_abs. subst. rewrite pow_i; try lra.
          replace 0 with (INR 0) in H7 by auto. apply INR_lt in H7; lia.
-      -- set (b := fun n => (1 / r)^n). set (a' := fun n => r^n).
-         assert (forall n, b n = 1 / (a' n)) as H7.
-         { intros n. unfold b, a'. unfold Rdiv. repeat rewrite Rmult_1_l. apply pow_inv. }
-         assert (unbounded_above a') as H8. { 
-         admit.
+      -- (* instead of trying to do a repeat of above prove that a with r < 0 is alwasy same dist from 0 as when r > 0*) 
   Admitted.
   
   Lemma lemma_34_10_b : c <> 0 -> limit_of_sequence a 0 -> |r| < 1.
