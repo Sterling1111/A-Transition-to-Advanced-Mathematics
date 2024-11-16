@@ -86,6 +86,25 @@ Proof.
     apply not_all_ex_not in H2 as [n H2]. exists n. apply imply_to_and in H2; nra.
 Qed.
 
+Lemma not_limit_of_sequence_iff : forall a L, not_limit_of_sequence a L <-> ~ limit_of_sequence a L.
+Proof.
+  intros a L. split.
+  - intros [ε [H1 H2]] H3. specialize (H3 ε H1) as [N H3]. specialize (H2 N) as [n [H4 H5]].
+    specialize (H3 n ltac:(auto)). lra.
+  - intros H1. apply not_all_ex_not in H1 as [N1 H1].
+    apply imply_to_and in H1 as [H1 H2]. exists N1. split; try lra. intros N2.
+    set (N := Rmax N1 N2). apply not_ex_all_not with (n := N) in H2.
+    apply not_all_ex_not in H2 as [n H2]. apply imply_to_and in H2 as [H2 H3].
+    exists n. assert (N >= N2) as H4. { unfold N. solve_max. } split; solve_abs.
+Qed.
+
+Lemma divergent_sequence_iff' : forall a, divergent_sequence a <-> forall L, ~limit_of_sequence a L.
+Proof.
+  intros a. split.
+  - intros H1 L H2. apply divergent_sequence_iff in H1. apply H1. exists L. apply H2.
+  - intros H1 L. apply not_limit_of_sequence_iff. apply H1.
+Qed.
+
 Lemma unbounded_above_iff : forall a, unbounded_above a <-> ~ bounded_above a.
 Proof.
   intros a. split.
@@ -452,6 +471,21 @@ Proof.
          subst; try lra. specialize (H4 ltac:(lia)). lra.
 Qed.
 
+Lemma exists_min_of_sequence_on_interval : forall (a : sequence) (i j : nat),
+  (i <= j)%nat -> exists n : nat, (i <= n <= j)%nat /\ forall m : nat, (i <= m <= j)%nat -> a n <= a m.
+Proof.
+  intros a i j H1. induction j.
+  - assert (i = 0)%nat by lia. subst. exists 0%nat. split; try lia.
+    intros m H2. replace m with 0%nat by lia. lra.
+  - assert (i = S j \/ i <= j)%nat as [H2 | H2] by lia.
+    -- subst. exists (S j). split; try lia. intros m H3. replace m with (S j) by lia. lra.
+    -- specialize (IHj H2) as [n [H3 H4]]. assert (a (S j) <= a n \/ a (S j) > a n) as [H5 | H5] by lra.
+       + exists (S j). split; try lia. intros m H6. specialize (H4 m). assert (m = S j \/ m <= j)%nat as [H7 | H7] by lia;
+         subst; try lra. specialize (H4 ltac:(lia)). lra.
+       + exists n. split; try lia. intros m H6. specialize (H4 m). assert (m = S j \/ m <= j)%nat as [H7 | H7] by lia;
+         subst; try lra. specialize (H4 ltac:(lia)). lra.
+Qed.
+
 Lemma unbounded_above_divergent_sequence : forall a,
   unbounded_above a -> divergent_sequence a.
 Proof.
@@ -459,6 +493,20 @@ Proof.
   specialize (H2 1 ltac:(lra)) as [N H2]. pose proof INR_unbounded N as [n1 H3].
   pose proof exists_max_of_sequence_on_interval a 0 n1 ltac:(lia) as [n2 [H4 H5]].
   unfold unbounded_above in H1. specialize (H1 (a n2 + 2)) as [n3 H6].
+  assert (n3 <= n1 \/ n3 > n1)%nat as [H7 | H7] by lia.
+  - specialize (H5 n3 ltac:(lia)). lra.
+  - specialize (H5 n1 ltac:(lia)). pose proof H2 as H8.
+    specialize (H2 n1 ltac:(lra)). apply lt_INR in H7.
+    specialize (H8 n3 ltac:(lra)). solve_abs.
+Qed.
+
+Lemma unbounded_below_divergent_sequence : forall a,
+  unbounded_below a -> divergent_sequence a.
+Proof.
+  intros a H1. apply divergent_sequence_iff. intros [L H2].
+  specialize (H2 1 ltac:(lra)) as [N H2]. pose proof INR_unbounded N as [n1 H3].
+  pose proof exists_min_of_sequence_on_interval a 0 n1 ltac:(lia) as [n2 [H4 H5]].
+  unfold unbounded_below in H1. specialize (H1 (a n2 - 2)) as [n3 H6].
   assert (n3 <= n1 \/ n3 > n1)%nat as [H7 | H7] by lia.
   - specialize (H5 n3 ltac:(lia)). lra.
   - specialize (H5 n1 ltac:(lia)). pose proof H2 as H8.
@@ -605,17 +653,63 @@ Proof.
   apply functional_extensionality. intros n. nra.
 Qed.
 
-Lemma limit_of_sequence_reciprocal_unbounded_below : forall a b,
-  (forall n, b n = 1 / a n) -> unbounded_below b -> limit_of_sequence a 0.
+Lemma limit_of_sequence_reciprocal_unbounded_below_decreasing : forall a b,
+  (forall n, b n = 1 / a n) -> unbounded_below b -> decreasing b -> limit_of_sequence a 0.
 Proof.
-  intros a b H1 H2 ε H3. unfold unbounded_below in H2.
+  intros a b H1 H2 H3 ε H4. specialize (H2 (- 1 / ε)) as [n H2].
+  exists (INR n). intros m H5. pose proof classic (a m = 0) as [H6 | H6]; [solve_abs | ].
+  apply decreasing_le with (n1 := m) (n2 := n) in H3. 2 : { apply INR_le; lra. }
+  assert (a m = 1 / b m) as H7. { rewrite H1. field; lra. } rewrite H7.
+  assert (b n < 0) as H8. { pose proof Rdiv_neg_pos (-1) ε ltac:(lra) as H8. lra. }
+  assert (b m < 0) as H9. { lra. } assert (-1 / b m > 0) as H10. { apply Rdiv_neg_neg; lra. }
+  assert (b m < -1 / ε) as H11 by lra. apply Rmult_lt_compat_l with (r := ε * (-1 / b m)) in H11; field_simplify in H11; solve_abs.
+Qed.
+
+Lemma limit_of_sequence_reciprocal_unbounded_above_increasing : forall a b,
+  (forall n, b n = 1 / a n) -> unbounded_above b ->  increasing b -> limit_of_sequence a 0.
+Proof.
+  intros a b H1 H2 H3 ε H4. specialize (H2 (1 / ε)) as [n H2].
+  exists (INR n). intros m H5. pose proof classic (a m = 0) as [H6 | H6]; [solve_abs | ].
+  apply increasing_ge with (n1 := m) (n2 := n) in H3. 2 : { apply INR_le; lra. }
+  assert (a m = 1 / b m) as H7. { rewrite H1. field; lra. } rewrite H7.
+  assert (b n > 0) as H8. { pose proof Rdiv_pos_pos 1 ε ltac:(lra) as H8. lra. }
+  assert (b m > 0) as H9. { lra. } assert (1 / b m > 0) as H10. { apply Rdiv_pos_pos; lra. }
+  assert (b m > 1 / ε) as H11 by lra. apply Rmult_lt_compat_l with (r := ε * (1 / b m)) in H11; field_simplify in H11; solve_abs.
+Qed.
+
+Lemma sequence_convergence_comparison : forall a b L,
+  limit_of_sequence a L -> (forall n, |b n - L| <= |a n - L|) -> limit_of_sequence b L.
+Proof.
+  intros a b L H1 H2 ε H3. specialize (H1 ε H3) as [N H1]. exists N. intros n H4.
+  specialize (H2 n). specialize (H1 n ltac:(apply H4)). solve_abs.
+Qed.
+
+Lemma sequence_divergence_comparison : forall a b,
+  divergent_sequence a -> (forall n, |b n| = |a n|) -> divergent_sequence b.
+Proof.
+  intros a b H1 H2. rewrite divergent_sequence_iff in *. intros [L H3].
+  apply H1. exists L. intros ε H4. specialize (H3 ε H4) as [N H3]. exists N. intros n H5.
+  specialize (H3 n H5). specialize (H2 n). admit.
 Admitted.
 
-Lemma limit_of_sequence_reciprocal_unbounded_above : forall a b,
-  (forall n, b n = 1 / a n) -> unbounded_above b -> limit_of_sequence a 0.
+Lemma oscillating_on_parity_sequence_divergent : forall a c,
+  c <> 0 -> (forall n, Nat.Odd n -> a n = c) -> (forall n, Nat.Even n -> a n = -c) -> divergent_sequence a.
 Proof.
-  intros a b H1 H2 ε H3. unfold unbounded_above in H2.
-Admitted.
+  intros a c H1 H2 H3. apply divergent_sequence_iff. intros [L H4].
+  unfold limit_of_sequence in H4. assert ((L <> c /\ L <> -c) \/ L = c \/ L = -c) as [H5 | [H5 | H5]] by lra.
+  - specialize (H4 (Rabs (L - c) / 2) ltac:(solve_abs)) as [N H4].
+    pose proof INR_unbounded N as [n H6]. pose proof Nat.Even_or_Odd n as [[k H7] | H7].
+    -- specialize (H4 (n + 1)%nat ltac:(solve_INR)). specialize (H2 (n + 1)%nat ltac:(exists k; lia)). solve_abs.
+    -- specialize (H4 n ltac:(solve_INR)). specialize (H2 n H7). solve_abs.
+  - specialize (H4 (Rabs (L + c) / 2) ltac:(solve_abs)) as [N H4]. pose proof INR_unbounded N as [n H6].
+    pose proof Nat.Even_or_Odd n as [H7 | [k H7]].
+    -- specialize (H3 n H7). specialize (H4 n H6). solve_abs.
+    -- specialize (H4 (n + 1)%nat ltac:(solve_INR)). specialize (H3 (n+1)%nat ltac:(exists (k + 1)%nat; lia)). solve_abs.
+  - specialize (H4 (Rabs (L - c) / 2) ltac:(solve_abs)) as [N H4]. pose proof INR_unbounded N as [n H6].
+    pose proof Nat.Even_or_Odd n as [[k H7] | H7].
+    -- specialize (H4 (n+1)%nat ltac:(solve_INR)). specialize (H2 (n + 1)%nat ltac:(exists k; lia)). solve_abs.
+    -- specialize (H4 n ltac:(solve_INR)). specialize (H2 n H7). solve_abs.
+Qed.
 
 Lemma limit_of_sequence_unique : forall a L1 L2,
   limit_of_sequence a L1 -> limit_of_sequence a L2 -> L1 = L2.

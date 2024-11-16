@@ -187,46 +187,88 @@ Section section_34_10.
     - subst. replace (fun n : nat => 0 * r ^ n) with (fun n : nat => 0).
       2 : { apply functional_extensionality. intros n. lra. }
       apply limit_of_const_sequence.
-    - assert (r > -1 /\ r < 1 /\ (r > 0 \/ r = 0 \/ r < 0)) as [H4 [H5 [H6 | [H6 | H6]]]] by solve_abs.
-      -- set (b := fun n => (1 / c) * (1 / r)^n).
-         assert (forall n, b n = 1 / (a n)) as H7.
-         { intros n. subst. unfold b. unfold Rdiv. repeat rewrite Rmult_1_l. rewrite Rinv_mult. rewrite pow_inv. lra. }
-         assert (c < 0 \/ c > 0) as [H8 | H8] by lra.
-         * assert (unbounded_below b) as H9.
-           {
-              apply geometric_sequence_unbounded_below with (c := 1 / c) (r := 1 / r).
-              - apply functional_extensionality. intros n. rewrite H7, H1. unfold Rdiv.
-                repeat rewrite Rmult_1_l. rewrite Rinv_mult. rewrite pow_inv. nra.
-              - apply Rdiv_pos_neg; lra.
-              - apply Rmult_lt_reg_r with (r := r); field_simplify; try lra.
-           } apply limit_of_sequence_reciprocal_unbounded_below with (b := b); auto.
-         * assert (unbounded_above b) as H9.
-           {
-              apply geometric_sequence_unbounded_above with (c := 1 / c) (r := 1 / r).
-              - apply functional_extensionality. intros n. rewrite H7, H1. unfold Rdiv.
-                repeat rewrite Rmult_1_l. rewrite Rinv_mult. rewrite pow_inv. nra.
-              - apply Rdiv_pos_pos; lra.
-              - apply Rmult_lt_reg_r with (r := r); field_simplify; try lra.
-           } apply limit_of_sequence_reciprocal_unbounded_above with (b := b); auto.
-      -- exists 0. intros n H7. replace (a n) with 0; solve_abs. subst. rewrite pow_i; try lra.
-         replace 0 with (INR 0) in H7 by auto. apply INR_lt in H7; lia.
-      -- (* instead of trying to do a repeat of above prove that a with r < 0 is alwasy same dist from 0 as when r > 0*) 
-  Admitted.
-  
+    - assert (forall a c r, a = (fun n : ℕ => c * r ^ n) -> |r| < 1 -> c <> 0 -> r > 0 -> ⟦ lim n → ∞ ⟧ a = 0) as H4.
+      {
+        clear. intros a c r H1 H2 H3 H4. assert (r < 1) as H5 by solve_abs. set (b := fun n => (1 / c) * (1 / r)^n).
+        assert (forall n, b n = 1 / (a n)) as H6.
+        { intros n. subst. unfold b. unfold Rdiv. repeat rewrite Rmult_1_l. rewrite Rinv_mult. rewrite pow_inv. lra. }
+        assert (c < 0 \/ c > 0) as [H7 | H7] by lra.
+        - assert (unbounded_below b) as H8.
+          {
+            apply geometric_sequence_unbounded_below with (c := 1 / c) (r := 1 / r).
+            - apply functional_extensionality. intros n. rewrite H6, H1. unfold Rdiv.
+              repeat rewrite Rmult_1_l. rewrite Rinv_mult. rewrite pow_inv. nra.
+            - apply Rdiv_pos_neg; lra.
+            - apply Rmult_lt_reg_r with (r := r); field_simplify; try lra.
+          }
+          assert (decreasing b) as H9.
+          {
+            intros n. unfold b. induction n as [| k IH].
+            - field_simplify; try lra. apply Rmult_ge_le_reg_neg_l with (r := c); try lra;
+              apply Rmult_le_reg_l with (r := r); field_simplify; try lra.
+            - simpl in *. field_simplify; try lra. field_simplify in IH; try lra.
+              apply Rmult_ge_le_reg_neg_l with (r := c); try lra; apply Rmult_le_reg_l with (r := r); field_simplify; try lra.
+              apply Rge_le in IH. apply Rmult_le_ge_compat_neg_l with (r := c) in IH; try lra. field_simplify in IH; try lra.
+          }
+          apply limit_of_sequence_reciprocal_unbounded_below_decreasing with (b := b); auto.
+        - assert (unbounded_above b) as H8.
+          {
+            apply geometric_sequence_unbounded_above with (c := 1 / c) (r := 1 / r).
+            - apply functional_extensionality. intros n. rewrite H6, H1. unfold Rdiv.
+              repeat rewrite Rmult_1_l. rewrite Rinv_mult. rewrite pow_inv. nra.
+            - apply Rdiv_pos_pos; lra.
+            - apply Rmult_lt_reg_r with (r := r); field_simplify; try lra.
+          }
+          assert (increasing b) as H9.
+          {
+            intros n. unfold b. induction n as [| k IH].
+            - field_simplify; try lra. apply Rmult_le_reg_r with (r := c); try lra;
+              apply Rmult_le_reg_l with (r := r); field_simplify; try lra.
+            - simpl in *. field_simplify; try lra. field_simplify in IH; try lra.
+              apply Rmult_le_reg_r with (r := c); try lra; apply Rmult_le_reg_l with (r := r); field_simplify; try lra.
+              apply Rmult_le_compat_r with (r := c) in IH; try lra. field_simplify in IH; try lra.
+          }
+          apply limit_of_sequence_reciprocal_unbounded_above_increasing with (b := b); auto.
+      }
+      assert (r > -1 /\ r < 1 /\ (r > 0 \/ r = 0 \/ r < 0)) as [H5 [H6 [H7 | [H7 | H7]]]] by solve_abs.
+      -- apply (H4 a c r); auto.
+      -- intros ε H8. exists 0. intros n H9. replace (a n) with 0; solve_abs. subst. rewrite pow_i; try lra.
+         replace 0 with (INR 0) in H9 by auto. apply INR_lt in H9; lia.
+      -- apply sequence_convergence_comparison with (a := (fun n : ℕ => c * (-r) ^ n)).
+         2 : { intros n. rewrite H1. pose proof (Nat.Even_or_Odd n) as [[k H8] | [k H8]].
+          - rewrite H8. repeat rewrite pow_Rsqr. replace ((- r)²) with (r²) by (unfold Rsqr; lra). solve_abs.
+          - rewrite H8. repeat rewrite pow_add. repeat rewrite pow_Rsqr. replace ((- r)²) with (r²) by (unfold Rsqr; lra). solve_abs.
+         }
+         specialize (H4 (fun n : ℕ => c * (-r) ^ n) c (-r)) as H8. apply H8; solve_abs. apply functional_extensionality. intros n. reflexivity.
+  Qed.
+
   Lemma lemma_34_10_b : c <> 0 -> limit_of_sequence a 0 -> |r| < 1.
   Proof.
     intros H2 H3. assert (|r| = 1 \/ |r| < 1 \/ |r| > 1) as [H4 | [H4 | H4]] by lra; auto.
     - assert (r = 1 \/ r = -1) as [H5 | H5] by solve_abs.
-      -- unfold geometric_sequence in H1. subst. replace (fun n : nat => c * 1^n) with (fun n : nat => c) in H3.
-         2 : { apply functional_extensionality. intros n. rewrite pow1. lra. } pose proof limit_of_const_sequence c as H6.
-         pose proof limit_of_sequence_unique a 0 c H3 H6. subst. apply H1.
-         apply limit_of_const_sequence in H3. subst. apply H1.
-
-  Admitted.
-
-  Lemma lemma_34_10_c : c > 0 -> r > 1 -> divergent_sequence a.
-  Proof.
-
+      -- unfold geometric_sequence in H1. assert (a = fun n : nat => c) as H6.
+          {  apply functional_extensionality. intros n. rewrite H1, H5. rewrite pow1. lra. } 
+          rewrite H6 in H3. pose proof limit_of_const_sequence c as H7. assert (c = 0) as H8.
+         { apply limit_of_sequence_unique with (a := a); rewrite H6; auto. } lra.
+      -- apply oscillating_on_parity_sequence_divergent with (a := (fun n : nat => -c * r^n)) in H2 as H6.
+         * replace 0 with (-c * 0) in H3 by lra. apply limit_of_sequence_mul_const_rev with (a := (fun n : nat => r^n)) (L := -c * 0) in H2.
+           2 : { repeat rewrite Rmult_0_r in *. rewrite H1 in H3. auto. }
+           rewrite divergent_sequence_iff' in H6. specialize (H6 0). exfalso. apply H6.
+           replace 0 with (-c * 0) by lra. apply limit_of_sequence_mul_const. rewrite Rmult_0_r in H2. auto.
+         * intros n [k H6]. rewrite H6, H5. rewrite pow_add. rewrite pow_mult. simpl. rewrite Rmult_1_r.
+           replace (-1 * -1) with 1 by lra. rewrite pow1. lra.
+         * intros n [k H6]. rewrite H6, H5. rewrite pow_mult. simpl. replace (-1 * (-1 * 1)) with 1 by lra. rewrite pow1. lra.
+    - assert (r > 1 -> divergent_sequence a) as H5.
+      {
+        intros H5. assert (c < 0 \/ c > 0) as [H6 | H6] by lra.
+         * apply geometric_sequence_unbounded_below in H1; auto. apply unbounded_below_divergent_sequence in H1.
+           rewrite divergent_sequence_iff' in H1. specialize (H1 0). tauto.
+         * apply geometric_sequence_unbounded_above in H1; auto. apply unbounded_above_divergent_sequence in H1.
+           rewrite divergent_sequence_iff' in H1. specialize (H1 0). tauto.
+      }
+      assert (r < -1 \/ r > 1) as [H6 | H6] by solve_abs.
+      -- admit.
+      -- specialize (H5 H6). rewrite divergent_sequence_iff' in H5. specialize (H5 0). tauto.
   Admitted.
 
 End section_34_10.
