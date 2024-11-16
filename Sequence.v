@@ -71,6 +71,10 @@ Definition a_eventually_bounded_above_by_b (a b : sequence) : Prop :=
 Definition a_eventually_bounded_below_by_b (a b : sequence) : Prop :=
   exists (N : R), forall n : nat, INR n > N -> a n >= b n.
 
+Notation "⟦ 'lim' 'n' → ∞ ⟧ a '=' L" := 
+  (limit_of_sequence a L)
+  (at level 70, a at level 0, no associativity, format "⟦  'lim'  'n'  →  ∞  ⟧  a  '='  L").
+
 Lemma divergent_sequence_iff : forall a, divergent_sequence a <-> ~ convergent_sequence a.
 Proof.
   intros a. split.
@@ -106,7 +110,7 @@ Proof.
   - rewrite H2 in H1. rewrite Rinv_0 in H1. lra.
 Qed.
 
-Theorem theorem_34_12 : limit_of_sequence (fun n => 1 / INR n) 0.
+Theorem theorem_34_12 : ⟦ lim n → ∞ ⟧ (fun n => 1 / INR n) = 0.
 Proof.
   intros ε H1. exists (/ ε). intros n H2. assert (/ ε > 0) as H3 by (apply Rinv_pos; auto).
   rewrite Rminus_0_r. unfold Rabs. destruct (Rcase_abs (1 / INR n)) as [H4 | H4].
