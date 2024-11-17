@@ -2,6 +2,10 @@ Require Import Imports.
 
 Open Scope R_scope.
 
+Notation "'∑' i n f" := (sum_f i n f)
+  (at level 45, i at level 0, n at level 0,
+   format "'∑'  i  n  f").
+
 Lemma sum_f_R0_f_Sn : forall f n,
   sum_f_R0 f (S n) = sum_f_R0 f n + f (S n).
 Proof.
@@ -113,6 +117,12 @@ Proof.
   intros. unfold sum_f. replace (n2 - n1)%nat with 0%nat by lia.
   unfold sum_f_R0. simpl. reflexivity.
 Qed.
+
+Ltac sum_simpl :=
+  first [ rewrite sum_f_i_Sn_f; try lia; sum_simpl
+        | rewrite sum_f_n_n 
+        | rewrite sum_f_Sn_n; try lia ]; 
+  simpl; field_simplify.
 
 Lemma sum_f_const : forall c i n,
   sum_f i n (fun _ => c) = c * INR (n - i + 1)%nat.
@@ -331,10 +341,10 @@ Lemma sum_f_mult : forall l1 l2 m n (f g : nat -> R),
 Proof.
   intros l1 l2 m n f g H1 H2. 
    induction m as [| k IH].
-  - destruct l1. repeat rewrite sum_f_0_0. rewrite r_mult_sum_f_i_n_f. apply sum_f_equiv; try lia. intros k H. lra.
+  - destruct l1. repeat sum_simpl. rewrite r_mult_sum_f_i_n_f. apply sum_f_equiv; try lia. intros k H. lra.
     repeat rewrite sum_f_Sn_n; try lia.
   - assert ((l1 = S k)%nat \/ (l1 <= k)%nat) as [H3 | H3] by lia.
-    -- rewrite <- H3. repeat rewrite sum_f_n_n. rewrite r_mult_sum_f_i_n_f. apply sum_f_equiv; try lia. intros k0 H. lra.
+    -- rewrite <- H3. repeat sum_simpl. rewrite r_mult_sum_f_i_n_f. apply sum_f_equiv; try lia. intros k0 H. lra.
     -- pose proof H3 as H4. apply IH in H3. assert ((l1 = k)%nat \/ (l1 < k)%nat) as [H5 | H5] by lia.
        --- rewrite H5. repeat rewrite sum_f_i_Sn_f; try lia. rewrite H5 in H3. rewrite <- H3.
            replace (fun j : nat => f (S k) * g j) with (fun j : nat => g j * f (S k)) by (apply functional_extensionality; intros; lra).

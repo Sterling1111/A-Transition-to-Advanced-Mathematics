@@ -39,12 +39,12 @@ Definition arithmetic_sequence (a : sequence) (c d : R) : Prop :=
 Definition geometric_sequence (a : sequence) (c r : R) : Prop :=
   a = (fun n => c * (r ^ n)).
 
-Definition limit_of_sequence (a : sequence) (L : R) : Prop :=
+Definition lim_s (a : sequence) (L : R) : Prop :=
   forall ε : R, ε > 0 ->
     exists N : R, forall n : nat, INR n > N -> |a n - L| < ε.
 
 Definition convergent_sequence (a : sequence) : Prop :=
-  exists (L : R), limit_of_sequence a L.
+  exists (L : R), lim_s a L.
 
 Definition not_limit_of_sequence (a : sequence) (L : R) : Prop :=
   exists ε : R, ε > 0 /\
@@ -71,9 +71,9 @@ Definition a_eventually_bounded_above_by_b (a b : sequence) : Prop :=
 Definition a_eventually_bounded_below_by_b (a b : sequence) : Prop :=
   exists (N : R), forall n : nat, INR n > N -> a n >= b n.
 
-Notation "⟦ 'lim' 'n' → ∞ ⟧ a '=' L" := 
-  (limit_of_sequence a L)
-  (at level 70, a at level 0, no associativity, format "⟦  'lim'  'n'  →  ∞  ⟧  a  '='  L").
+Notation "⟦ 'lim_s' ⟧ a '=' L" := 
+  (lim_s a L)
+    (at level 70, a at level 0, no associativity, format "⟦  'lim_s'  ⟧  a  '='  L").
 
 Lemma divergent_sequence_iff : forall a, divergent_sequence a <-> ~ convergent_sequence a.
 Proof.
@@ -86,7 +86,7 @@ Proof.
     apply not_all_ex_not in H2 as [n H2]. exists n. apply imply_to_and in H2; nra.
 Qed.
 
-Lemma not_limit_of_sequence_iff : forall a L, not_limit_of_sequence a L <-> ~ limit_of_sequence a L.
+Lemma not_limit_of_sequence_iff : forall a L, not_limit_of_sequence a L <-> ~ ⟦ lim_s ⟧ a = L.
 Proof.
   intros a L. split.
   - intros [ε [H1 H2]] H3. specialize (H3 ε H1) as [N H3]. specialize (H2 N) as [n [H4 H5]].
@@ -98,7 +98,7 @@ Proof.
     exists n. assert (N >= N2) as H4. { unfold N. solve_max. } split; solve_abs.
 Qed.
 
-Lemma divergent_sequence_iff' : forall a, divergent_sequence a <-> forall L, ~limit_of_sequence a L.
+Lemma divergent_sequence_iff' : forall a, divergent_sequence a <-> forall L, ~ ⟦ lim_s ⟧ a = L.
 Proof.
   intros a. split.
   - intros H1 L H2. apply divergent_sequence_iff in H1. apply H1. exists L. apply H2.
@@ -129,7 +129,7 @@ Proof.
   - rewrite H2 in H1. rewrite Rinv_0 in H1. lra.
 Qed.
 
-Theorem theorem_34_12 : ⟦ lim n → ∞ ⟧ (fun n => 1 / INR n) = 0.
+Theorem theorem_34_12 : ⟦ lim_s ⟧ (fun n => 1 / INR n) = 0.
 Proof.
   intros ε H1. exists (/ ε). intros n H2. assert (/ ε > 0) as H3 by (apply Rinv_pos; auto).
   rewrite Rminus_0_r. unfold Rabs. destruct (Rcase_abs (1 / INR n)) as [H4 | H4].
@@ -145,7 +145,7 @@ Proof.
     field_simplify in H2; try nra. 
 Qed.
 
-Proposition proposition_34_13 : limit_of_sequence (fun n => 1 - 3 / INR n) 1.
+Proposition proposition_34_13 : ⟦ lim_s ⟧ (fun n => 1 - 3 / INR n) = 1.
 Proof.
   intros ε H1. exists (3 / ε). intros n H2.
   replace (1 - 3 / INR n - 1) with (- 3 / INR n) by lra.
@@ -164,7 +164,7 @@ Proof.
   intros n [k H1]. rewrite H1. apply Nat.even_odd.
 Qed.
 
-Proposition proposition_34_15 : limit_of_sequence (fun n => if Nat.even n then 0 else 1 / INR n) 0.
+Proposition proposition_34_15 : ⟦ lim_s ⟧ (fun n => if Nat.even n then 0 else 1 / INR n) = 0.
 Proof.
   intros ε H1. pose proof theorem_34_12 ε H1 as [N H2]. exists N. intros n H3.
   pose proof Nat.Even_or_Odd n as [H4 | H4].
@@ -189,7 +189,7 @@ Proof.
   intros x y z H1. unfold Rmax in H1. destruct (Rle_dec x y); lra.
 Qed.
 
-Proposition Proposition_34_19 : limit_of_sequence (fun n => INR (n + 3) / INR (2 * n - 21)) (1/2).
+Proposition Proposition_34_19 : ⟦ lim_s ⟧ (fun n => INR (n + 3) / INR (2 * n - 21)) = 1/2.
 Proof.
   intros ε H1. set (N := Rmax (21/2) ((27 + 42 * ε) / (4 * ε))). exists N.
   intros n H2. apply Rmax_Rgt in H2 as [H2 H3].
@@ -432,7 +432,7 @@ Proof.
 Qed.
 
 Lemma sequence_squeeze_lower : forall a b LB,
-  limit_of_sequence a LB -> a_eventually_bounded_below_by_b a b -> lower_bound b LB -> limit_of_sequence b LB.
+  ⟦ lim_s ⟧ a = LB -> a_eventually_bounded_below_by_b a b -> lower_bound b LB -> ⟦ lim_s ⟧ b = LB.
 Proof.
   intros a b LB H1 [N1 H2] H3 ε H4. specialize (H1 ε H4) as [N2 H1]. exists (Rmax N1 N2). intros n H5.
   specialize (H1 n ltac:(apply Rmax_Rgt in H5; lra)). specialize (H2 n ltac:(apply Rmax_Rgt in H5; lra)).
@@ -440,7 +440,7 @@ Proof.
 Qed.
 
 Lemma sequence_squeeze_upper : forall a b UB,
-  limit_of_sequence a UB -> a_eventually_bounded_above_by_b a b -> upper_bound b UB -> limit_of_sequence b UB.
+  ⟦ lim_s ⟧ a = UB -> a_eventually_bounded_above_by_b a b -> upper_bound b UB -> ⟦ lim_s ⟧ b = UB.
 Proof.
   intros a b UB H1 [N1 H2] H3 ε H4. specialize (H1 ε H4) as [N2 H1]. exists (Rmax N1 N2). intros n H5.
   specialize (H1 n ltac:(apply Rmax_Rgt in H5; lra)). specialize (H2 n ltac:(apply Rmax_Rgt in H5; lra)).
@@ -448,7 +448,7 @@ Proof.
 Qed.
 
 Lemma sequence_squeeze : forall a b c L,
-  limit_of_sequence a L -> limit_of_sequence c L -> a_eventually_bounded_below_by_b b a -> a_eventually_bounded_above_by_b b c -> limit_of_sequence b L.
+  ⟦ lim_s ⟧ a = L -> ⟦ lim_s ⟧ c = L -> a_eventually_bounded_below_by_b b a -> a_eventually_bounded_above_by_b b c -> ⟦ lim_s ⟧ b = L.
 Proof.
   intros a b c L H1 H2 [N3 H3] [N4 H4] ε H5. specialize (H1 ε H5) as [N1 H1]. specialize (H2 ε H5) as [N2 H2].
   set (N := Rmax (Rmax N1 N2) (Rmax N3 N4)). assert (N >= N1 /\ N >= N2 /\ N >= N3 /\ N >= N4) as [H6 [H7 [H8 H9]]] by (unfold N; solve_max).
@@ -554,13 +554,13 @@ Proof.
 Qed.
 
 Lemma limit_of_const_sequence : forall c,
-  limit_of_sequence (fun _ => c) c.
+  ⟦ lim_s ⟧ (fun _ => c) = c.
 Proof.
   intros; exists 0; solve_abs.
 Qed.
 
 Lemma limit_of_sequence_add : forall a b L1 L2,
-  limit_of_sequence a L1 -> limit_of_sequence b L2 -> limit_of_sequence (fun n => a n + b n) (L1 + L2).
+  ⟦ lim_s ⟧ a = L1 -> ⟦ lim_s ⟧ b = L2 -> ⟦ lim_s ⟧ (fun n => a n + b n) = L1 + L2.
 Proof.
   intros a b L1 L2 H1 H2 ε H3. specialize (H1 (ε/2) ltac:(lra)) as [N1 H1]. specialize (H2 (ε/2) ltac:(lra)) as [N2 H2].
   exists (Rmax N1 N2). intros n H4. specialize (H1 n ltac:(apply Rmax_Rgt in H4; lra)). specialize (H2 n ltac:(apply Rmax_Rgt in H4; lra)).
@@ -568,7 +568,7 @@ Proof.
 Qed.
 
 Lemma limit_of_sequence_sub : forall a b L1 L2,
-  limit_of_sequence a L1 -> limit_of_sequence b L2 -> limit_of_sequence (fun n => a n - b n) (L1 - L2).
+  ⟦ lim_s ⟧ a = L1 -> ⟦ lim_s ⟧ b = L2 -> ⟦ lim_s ⟧ (fun n => a n - b n) = L1 - L2.
 Proof.
   intros a b L1 L2 H1 H2 ε H3. specialize (H1 (ε/2) ltac:(lra)) as [N1 H1]. specialize (H2 (ε/2) ltac:(lra)) as [N2 H2].
   exists (Rmax N1 N2). intros n H4. specialize (H1 n ltac:(apply Rmax_Rgt in H4; lra)). specialize (H2 n ltac:(apply Rmax_Rgt in H4; lra)).
@@ -576,7 +576,7 @@ Proof.
 Qed.
 
 Lemma limit_of_sequence_mul_const : forall a c L,
-  limit_of_sequence a L -> limit_of_sequence (fun n => c * a n) (c * L).
+  ⟦ lim_s ⟧ a = L -> ⟦ lim_s ⟧ (fun n => c * a n) = (c * L).
 Proof.
   intros a c L H1 ε H2. assert (c = 0 \/ c <> 0) as [H3 | H3] by lra.
   - exists 0. solve_abs.
@@ -586,7 +586,7 @@ Proof.
 Qed.
 
 Lemma limit_of_sequence_mul_const_rev : forall a c L,
-  c <> 0 -> limit_of_sequence (fun n => c * a n) (c * L) -> limit_of_sequence a L.
+  c <> 0 -> ⟦ lim_s ⟧ (fun n => c * a n) = c * L -> ⟦ lim_s ⟧ a = L.
 Proof.
   intros a c L H1 H2 ε H3. specialize (H2 (ε * |c|) ltac:(solve_abs)) as [N H2].
   exists N. intros n H4. specialize (H2 n ltac:(apply H4)); solve_abs.
@@ -654,7 +654,7 @@ Proof.
 Qed.
 
 Lemma limit_of_sequence_reciprocal_unbounded_below_decreasing : forall a b,
-  (forall n, b n = 1 / a n) -> unbounded_below b -> decreasing b -> limit_of_sequence a 0.
+  (forall n, b n = 1 / a n) -> unbounded_below b -> decreasing b -> ⟦ lim_s ⟧ a = 0.
 Proof.
   intros a b H1 H2 H3 ε H4. specialize (H2 (- 1 / ε)) as [n H2].
   exists (INR n). intros m H5. pose proof classic (a m = 0) as [H6 | H6]; [solve_abs | ].
@@ -666,7 +666,7 @@ Proof.
 Qed.
 
 Lemma limit_of_sequence_reciprocal_unbounded_above_increasing : forall a b,
-  (forall n, b n = 1 / a n) -> unbounded_above b ->  increasing b -> limit_of_sequence a 0.
+  (forall n, b n = 1 / a n) -> unbounded_above b ->  increasing b -> ⟦ lim_s ⟧ a = 0.
 Proof.
   intros a b H1 H2 H3 ε H4. specialize (H2 (1 / ε)) as [n H2].
   exists (INR n). intros m H5. pose proof classic (a m = 0) as [H6 | H6]; [solve_abs | ].
@@ -678,7 +678,7 @@ Proof.
 Qed.
 
 Lemma sequence_convergence_comparison : forall a b L,
-  limit_of_sequence a L -> (forall n, |b n - L| <= |a n - L|) -> limit_of_sequence b L.
+  ⟦ lim_s ⟧ a = L -> (forall n, |b n - L| <= |a n - L|) -> ⟦ lim_s ⟧ b = L.
 Proof.
   intros a b L H1 H2 ε H3. specialize (H1 ε H3) as [N H1]. exists N. intros n H4.
   specialize (H2 n). specialize (H1 n ltac:(apply H4)). solve_abs.
@@ -688,7 +688,7 @@ Lemma oscillating_on_parity_sequence_divergent : forall a c,
   c <> 0 -> (forall n, Nat.Odd n -> a n = c) -> (forall n, Nat.Even n -> a n = -c) -> divergent_sequence a.
 Proof.
   intros a c H1 H2 H3. apply divergent_sequence_iff. intros [L H4].
-  unfold limit_of_sequence in H4. assert ((L <> c /\ L <> -c) \/ L = c \/ L = -c) as [H5 | [H5 | H5]] by lra.
+  unfold lim_s in H4. assert ((L <> c /\ L <> -c) \/ L = c \/ L = -c) as [H5 | [H5 | H5]] by lra.
   - specialize (H4 (Rabs (L - c) / 2) ltac:(solve_abs)) as [N H4].
     pose proof INR_unbounded N as [n H6]. pose proof Nat.Even_or_Odd n as [[k H7] | H7].
     -- specialize (H4 (n + 1)%nat ltac:(solve_INR)). specialize (H2 (n + 1)%nat ltac:(exists k; lia)). solve_abs.
@@ -715,7 +715,7 @@ Qed.
    
    Can use lra (linear real arithmetic) tactic to handle these inequalities. *)
 Lemma limit_of_sequence_unique : forall a L1 L2,
-  limit_of_sequence a L1 -> limit_of_sequence a L2 -> L1 = L2.
+  ⟦ lim_s ⟧ a = L1 -> ⟦ lim_s ⟧ a = L2 -> L1 = L2.
 Proof.
   intros a L1 L2 H1 H2. pose proof (classic (L1 = L2)) as [H3 | H3]; auto.
   specialize (H1 (|L1 - L2| / 2) ltac:(solve_abs)) as [N1 H1]. specialize (H2 (|L1 - L2| / 2) ltac:(solve_abs)) as [N2 H2].
@@ -726,13 +726,12 @@ Qed.
 Lemma two_seq_converge_to_same_limit: 
   forall (a b : sequence) (La Lb : R),
   (* Assuming a_n converges to La and b_n converges to Lb *)
-  limit_of_sequence a La -> limit_of_sequence b Lb -> ⟦ lim n → ∞ ⟧ (fun n => a n - b n) = 0 ->
+  ⟦ lim_s ⟧ a = La -> ⟦ lim_s ⟧ b = Lb -> ⟦ lim_s ⟧ (fun n => a n - b n) = 0 ->
   La = Lb.
 Proof.
   intros a b La Lb Ha Hb Hdiff.
 
-  unfold limit_of_sequence in Ha, Hb.
-  unfold limit_of_sequence in Hdiff.
+  unfold lim_s in Ha, Hb, Hdiff.
 
   set (eps := Rabs (La - Lb)).
   pose proof (Rtotal_order La Lb) as [Hlt|[Heq|Hgt]].
@@ -796,7 +795,7 @@ Proof.
 Qed.
 
 Lemma limit_of_sequence_unique' : forall a L1 L2,
-  limit_of_sequence a L1 -> limit_of_sequence a L2 -> L1 = L2.
+  ⟦ lim_s ⟧ a = L1 -> ⟦ lim_s ⟧ a = L2 -> L1 = L2.
 Proof.
   intros a L1 L2 H1 H2. apply two_seq_converge_to_same_limit with (a := a) (b := a); auto.
   replace (fun n => a n - a n) with (fun n : nat => 0) by (apply functional_extensionality; intros; lra).

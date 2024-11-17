@@ -53,18 +53,18 @@ Section section_34_1.
 End section_34_1.
 
 Section section_34_2.
-  Definition prop_34_2_a := limit_of_sequence (fun n => 3 - 4 / INR n) 3.
+  Definition prop_34_2_a := ⟦ lim_s ⟧ (fun n => 3 - 4 / INR n) = 3.
 
   Lemma prop_34_2_a_symbolic : prop_34_2_a = forall ε : ℝ, ε > 0 ⇒ (exists N : ℝ, forall n : ℕ, INR n > N ⇒ Rabs (3 - 4 / INR n - 3) < ε).
   Proof.
-    unfold prop_34_2_a, limit_of_sequence. reflexivity.
+    unfold prop_34_2_a, lim_s. reflexivity.
   Qed.
         
-  Definition prop_34_2_b := ~limit_of_sequence (fun n => 6) 3.
+  Definition prop_34_2_b := ~ ⟦ lim_s ⟧ (fun n => 6) = 3.
   
   Lemma prop_34_2_b_symbolic : prop_34_2_b = exists ε : ℝ, ε > 0 ⇒ forall N : ℝ, exists n : ℕ, INR n > N ⇒ Rabs (6 - 3) >= ε.
   Proof.
-    unfold prop_34_2_b, limit_of_sequence. apply EquivThenEqual. split.
+    unfold prop_34_2_b, lim_s. apply EquivThenEqual. split.
     - intros _. exists 1. intros _. intros N. exists 0%nat. intros _. rewrite Rabs_pos_eq; lra.
     - intros [ε H1] H2. specialize (H2 1 ltac:(lra)) as [N H2]. pose proof INR_unbounded N as [n H3].
       specialize (H2 n H3). rewrite Rabs_pos_eq in H2; lra.
@@ -89,7 +89,7 @@ Proof.
   intros a b x H1. unfold Rmax in H1. destruct (Rle_dec a b); lra.
 Qed.
 
-Lemma lemma_34_4 : limit_of_sequence (fun n => 2 / INR n ^ 2) 0.
+Lemma lemma_34_4 : ⟦ lim_s ⟧ (fun n => 2 / INR n ^ 2) = 0.
 Proof.
   apply sequence_squeeze_lower with (a := fun n => 1 / INR n).
   - apply theorem_34_12.
@@ -99,7 +99,7 @@ Proof.
     apply Rlt_le. apply Rdiv_lt_0_compat; try lra. apply pow2_gt_0. pose proof pos_INR n. solve_INR.
 Qed.
 
-Lemma lemma_34_5 : limit_of_sequence (fun n => INR (3 * n - 5) / INR (2 * n + 4)) (3 / 2).
+Lemma lemma_34_5 : ⟦ lim_s ⟧ (fun n => INR (3 * n - 5) / INR (2 * n + 4)) = 3 / 2.
 Proof.
   apply sequence_squeeze with (a := fun n => 3 / 2 - 6 * (1 / INR n)) (c := fun n => 3 / 2).
   - set (a := fun n : nat => 3 / 2). set (b := fun n : nat => 1 / INR n).
@@ -113,11 +113,11 @@ Proof.
     break_INR_simpl. apply Rmult_le_reg_r with (r := 2); try lra. apply Rmult_le_reg_r with (r := 2 * INR n + 4); field_simplify; nra.
 Qed.
 
-Lemma lemma_34_6_a : limit_of_sequence (fun n => (INR n + 1) / INR n) 1.
+Lemma lemma_34_6_a : ⟦ lim_s ⟧ (fun n => (INR n + 1) / INR n) = 1.
 Proof.
-  intros ε H1. assert (limit_of_sequence (fun n => INR n / INR n) 1) as H2.
+  intros ε H1. assert (lim_s (fun n => INR n / INR n) 1) as H2.
   { intros ε2 H2. exists 1. intros n H3. rewrite Rdiv_diag; solve_abs. }
-  assert (limit_of_sequence (fun n => 1 / INR n) 0) as H3 by apply theorem_34_12.
+  assert (lim_s (fun n => 1 / INR n) 0) as H3 by apply theorem_34_12.
   specialize (H2 ε H1) as [N1 H2]. specialize (H3 ε H1) as [N2 H3].
   exists (Rmax N1 (Rmax N2 1)). intros n H4. 
   assert (INR n > N1 /\ INR n > N2 /\ INR n > 1) as [H5 [H6 H7]] by solve_max.
@@ -130,12 +130,12 @@ Proof.
   exists 1. apply lemma_34_6_a.
 Qed.
 
-Lemma lemma_34_7 : forall c, limit_of_sequence (fun n => c) c.
+Lemma lemma_34_7 : forall c, ⟦ lim_s ⟧ (fun n => c) = c.
 Proof.
   apply limit_of_const_sequence.
 Qed.
 
-Lemma lemma_34_8 : ~ limit_of_sequence (fun n => INR n) 3.
+Lemma lemma_34_8 : ~ ⟦ lim_s ⟧ (fun n => INR n) = 3.
 Proof.
   intros H1. specialize (H1 1 ltac:(lra)) as [N H1]. pose proof INR_unbounded N as [n H2].
   specialize (H1 (max n 4)). assert (INR (max n 4) > N) as H3. 
@@ -145,7 +145,7 @@ Proof.
   specialize (H1 H3). solve_abs.
 Qed.
 
-Lemma lemma_34_9 : limit_of_sequence (fun n => sqrt (INR n ^ 2 + 1) - INR n) 0.
+Lemma lemma_34_9 : ⟦ lim_s ⟧ (fun n => sqrt (INR n ^ 2 + 1) - INR n) = 0.
 Proof.
   apply sequence_squeeze with (a := fun n => -1 * (1 / INR n)) (c := fun n => 1 / INR n).
   - replace 0 with (-1 * 0) by lra. apply limit_of_sequence_mul_const. apply theorem_34_12.
@@ -180,14 +180,14 @@ Section section_34_10.
     apply geometric_sequence_unbounded_above with (c := c) (r := r); auto.
   Qed.
 
-  Lemma lemma_34_10_a : |r| < 1 -> limit_of_sequence a 0.
+  Lemma lemma_34_10_a : |r| < 1 -> ⟦ lim_s ⟧ a = 0.
   Proof.
     intros H2. unfold geometric_sequence in H1.
     assert (c = 0 \/ c <> 0) as [H3 | H3] by lra.
     - subst. replace (fun n : nat => 0 * r ^ n) with (fun n : nat => 0).
       2 : { apply functional_extensionality. intros n. lra. }
       apply limit_of_const_sequence.
-    - assert (forall a c r, a = (fun n : ℕ => c * r ^ n) -> |r| < 1 -> c <> 0 -> r > 0 -> ⟦ lim n → ∞ ⟧ a = 0) as H4.
+    - assert (forall a c r, a = (fun n : ℕ => c * r ^ n) -> |r| < 1 -> c <> 0 -> r > 0 -> ⟦ lim_s ⟧ a = 0) as H4.
       {
         clear. intros a c r H1 H2 H3 H4. assert (r < 1) as H5 by solve_abs. set (b := fun n => (1 / c) * (1 / r)^n).
         assert (forall n, b n = 1 / (a n)) as H6.
@@ -242,7 +242,7 @@ Section section_34_10.
          specialize (H4 (fun n : ℕ => c * (-r) ^ n) c (-r)) as H8. apply H8; solve_abs. apply functional_extensionality. intros n. reflexivity.
   Qed.
 
-  Lemma lemma_34_10_b : c <> 0 -> limit_of_sequence a 0 -> |r| < 1.
+  Lemma lemma_34_10_b : c <> 0 -> ⟦ lim_s ⟧ a = 0 -> |r| < 1.
   Proof.
     intros H2 H3. assert (|r| = 1 \/ |r| < 1 \/ |r| > 1) as [H4 | [H4 | H4]] by lra; auto.
     - assert (r = 1 \/ r = -1) as [H5 | H5] by solve_abs.
@@ -258,7 +258,7 @@ Section section_34_10.
          * intros n [k H6]. rewrite H6, H5. rewrite pow_add. rewrite pow_mult. simpl. rewrite Rmult_1_r.
            replace (-1 * -1) with 1 by lra. rewrite pow1. lra.
          * intros n [k H6]. rewrite H6, H5. rewrite pow_mult. simpl. replace (-1 * (-1 * 1)) with 1 by lra. rewrite pow1. lra.
-    - assert (forall a c r, geometric_sequence a c r -> c <> 0 -> ⟦ lim n → ∞ ⟧ a = 0 -> r > 1 -> divergent_sequence a) as H5.
+    - assert (forall a c r, geometric_sequence a c r -> c <> 0 -> ⟦ lim_s ⟧ a = 0 -> r > 1 -> divergent_sequence a) as H5.
       {
         clear. intros a c r H1 H2 H3 H4. apply unbounded_above_divergent_sequence.
         intros H5. assert (c < 0 \/ c > 0) as [H6 | H6] by lra.
@@ -269,7 +269,7 @@ Section section_34_10.
       assert (r < -1 \/ r > 1) as [H6 | H6] by solve_abs.
       -- set (b := fun n => c * (-r)^n). 
          assert (geometric_sequence b c (-r)) as H7. { apply functional_extensionality. auto. }
-         assert (⟦ lim n → ∞ ⟧ b = 0) as H8.
+         assert (⟦ lim_s ⟧ b = 0) as H8.
          { 
             apply sequence_convergence_comparison with (a := a); auto. intros n. rewrite H1. unfold b.
             repeat rewrite Rminus_0_r. repeat rewrite Rabs_mult. repeat rewrite <- RPow_abs. solve_abs.
