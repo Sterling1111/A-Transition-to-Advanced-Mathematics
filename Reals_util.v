@@ -48,3 +48,9 @@ Proof. intros; nra. Qed.
 Lemma Rmult_ge_le_reg_neg_l :
   forall r r1 r2, r * r1 <= r * r2 -> r < 0 -> r1 >= r2.
 Proof. intros; nra. Qed.
+
+Lemma Rabs_triang_3 : forall r1 r2 r3 : R,
+  Rabs (r1 + r2 + r3) <= Rabs r1 + Rabs r2 + Rabs r3.
+Proof.
+  solve_abs.
+Qed.

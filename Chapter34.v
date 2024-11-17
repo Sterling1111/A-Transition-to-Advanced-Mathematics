@@ -258,17 +258,24 @@ Section section_34_10.
          * intros n [k H6]. rewrite H6, H5. rewrite pow_add. rewrite pow_mult. simpl. rewrite Rmult_1_r.
            replace (-1 * -1) with 1 by lra. rewrite pow1. lra.
          * intros n [k H6]. rewrite H6, H5. rewrite pow_mult. simpl. replace (-1 * (-1 * 1)) with 1 by lra. rewrite pow1. lra.
-    - assert (r > 1 -> divergent_sequence a) as H5.
+    - assert (forall a c r, geometric_sequence a c r -> c <> 0 -> ⟦ lim n → ∞ ⟧ a = 0 -> r > 1 -> divergent_sequence a) as H5.
       {
+        clear. intros a c r H1 H2 H3 H4. apply unbounded_above_divergent_sequence.
         intros H5. assert (c < 0 \/ c > 0) as [H6 | H6] by lra.
          * apply geometric_sequence_unbounded_below in H1; auto. apply unbounded_below_divergent_sequence in H1.
            rewrite divergent_sequence_iff' in H1. specialize (H1 0). tauto.
-         * apply geometric_sequence_unbounded_above in H1; auto. apply unbounded_above_divergent_sequence in H1.
-           rewrite divergent_sequence_iff' in H1. specialize (H1 0). tauto.
+         * apply geometric_sequence_unbounded_above in H1; auto.
       }
       assert (r < -1 \/ r > 1) as [H6 | H6] by solve_abs.
-      -- admit.
-      -- specialize (H5 H6). rewrite divergent_sequence_iff' in H5. specialize (H5 0). tauto.
-  Admitted.
+      -- set (b := fun n => c * (-r)^n). 
+         assert (geometric_sequence b c (-r)) as H7. { apply functional_extensionality. auto. }
+         assert (⟦ lim n → ∞ ⟧ b = 0) as H8.
+         { 
+            apply sequence_convergence_comparison with (a := a); auto. intros n. rewrite H1. unfold b.
+            repeat rewrite Rminus_0_r. repeat rewrite Rabs_mult. repeat rewrite <- RPow_abs. solve_abs.
+         }
+         specialize (H5 b c (-r) H7 H2 H8 ltac:(lra)). rewrite divergent_sequence_iff' in H5. specialize (H5 0). tauto.
+      -- specialize (H5 a c r H1 H2 H3 H6). rewrite divergent_sequence_iff' in H5. specialize (H5 0). tauto.
+  Qed.
 
 End section_34_10.

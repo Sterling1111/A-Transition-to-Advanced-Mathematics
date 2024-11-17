@@ -3,7 +3,7 @@ Require Import Imports Reals_util Completeness Chapter13.
 Open Scope R_scope.
 
 Notation "| x |" := (Rabs x) 
-  (at level 20, x at level 99, format "| x |", no associativity) : R_scope.
+  (at level 200, x at level 0, format "| x |", no associativity) : R_scope.
 
 Definition sequence := nat -> R.
 
@@ -684,14 +684,6 @@ Proof.
   specialize (H2 n). specialize (H1 n ltac:(apply H4)). solve_abs.
 Qed.
 
-Lemma sequence_divergence_comparison : forall a b,
-  divergent_sequence a -> (forall n, |b n| = |a n|) -> divergent_sequence b.
-Proof.
-  intros a b H1 H2. rewrite divergent_sequence_iff in *. intros [L H3].
-  apply H1. exists L. intros ε H4. specialize (H3 ε H4) as [N H3]. exists N. intros n H5.
-  specialize (H3 n H5). specialize (H2 n). admit.
-Admitted.
-
 Lemma oscillating_on_parity_sequence_divergent : forall a c,
   c <> 0 -> (forall n, Nat.Odd n -> a n = c) -> (forall n, Nat.Even n -> a n = -c) -> divergent_sequence a.
 Proof.
@@ -711,8 +703,102 @@ Proof.
     -- specialize (H4 n ltac:(solve_INR)). specialize (H2 n H7). solve_abs.
 Qed.
 
+(* |L1 - L2| = |(L1 - a(n)) + (a(n) - L2)|  (* Rewrite difference *)
+   ≤ |L1 - a(n)| + |a(n) - L2|               (* Triangle inequality *)
+   = |-(a(n) - L1)| + |a(n) - L2|            (* Rabs property *)
+   = |a(n) - L1| + |a(n) - L2|               (* Rabs property *)
+   < |L1 - L2|/2 + |L1 - L2|/2               (* Use H1 and H2 *)
+   = |L1 - L2|                                (* Basic algebra *)
+
+   This gives us |L1 - L2| < |L1 - L2|, which is a contradiction.
+   Therefore L1 = L2.
+   
+   Can use lra (linear real arithmetic) tactic to handle these inequalities. *)
 Lemma limit_of_sequence_unique : forall a L1 L2,
   limit_of_sequence a L1 -> limit_of_sequence a L2 -> L1 = L2.
 Proof.
-  intros a L1 L2 H1 H2. 
-Admitted.
+  intros a L1 L2 H1 H2. pose proof (classic (L1 = L2)) as [H3 | H3]; auto.
+  specialize (H1 (|L1 - L2| / 2) ltac:(solve_abs)) as [N1 H1]. specialize (H2 (|L1 - L2| / 2) ltac:(solve_abs)) as [N2 H2].
+  set (N := Rmax N1 N2). pose proof INR_unbounded N as [n H4]. specialize (H1 n ltac:(unfold N in *; solve_max)).
+  specialize (H2 n ltac:(unfold N in *; solve_max)). solve_abs.
+Qed.
+
+Lemma two_seq_converge_to_same_limit: 
+  forall (a b : sequence) (La Lb : R),
+  (* Assuming a_n converges to La and b_n converges to Lb *)
+  limit_of_sequence a La -> limit_of_sequence b Lb -> ⟦ lim n → ∞ ⟧ (fun n => a n - b n) = 0 ->
+  La = Lb.
+Proof.
+  intros a b La Lb Ha Hb Hdiff.
+
+  unfold limit_of_sequence in Ha, Hb.
+  unfold limit_of_sequence in Hdiff.
+
+  set (eps := Rabs (La - Lb)).
+  pose proof (Rtotal_order La Lb) as [Hlt|[Heq|Hgt]].
+
+  - assert (Heps_pos : 0 < eps) by (apply Rabs_pos_lt; lra).
+    assert (Heps_div_4_pos : eps / 4 > 0) by lra.
+      
+    destruct (Ha (eps / 4) Heps_div_4_pos) as [Na HNa].
+    destruct (Hb (eps / 4) Heps_div_4_pos) as [Nb HNb].
+    destruct (Hdiff (eps / 4) Heps_div_4_pos) as [Nc HNc].
+
+    set (N := Rmax (Rmax Na Nb) Nc).
+    pose proof INR_unbounded N as [n Hn].
+
+    assert (INR n > Na /\ INR n > Nb /\ INR n > Nc) as [Hna [Hnb Hnc]] by (unfold N in *; solve_max).
+
+    assert (Hnaeps : ((eps / 4) > Rabs (a n - La))). { apply HNa. auto. }
+    assert (Hnbeps : ((eps / 4) > Rabs (b n - Lb))). { apply HNb. auto. }
+    assert (Hndeps : ((eps / 4) > Rabs (a n - b n))). { rewrite <- Rminus_0_r with (r := a n - b n). apply HNc. auto. }
+    assert (Heps_eq : eps = Rabs((La - a n) + (b n - Lb) + (a n - b n))).
+    { unfold eps. assert ((La - a n) + (b n - Lb) + (a n - b n) = La - Lb) by lra. rewrite H. reflexivity. }
+    assert (Heps_lte : eps <= Rabs (La - a n) + Rabs (b n - Lb) + Rabs (a n - b n)).
+    { rewrite Heps_eq. apply Rabs_triang_3. } 
+    assert (Heps_lte_eq : Rabs (La - a n) + Rabs (b n - Lb) + Rabs (a n - b n) = Rabs (a n - La) + Rabs (b n - Lb) + Rabs (a n - b n)).
+    { rewrite Rabs_minus_sym. rewrite Rabs_minus_sym with (x := a n) (y := b n). reflexivity. }
+
+    rewrite Heps_lte_eq in Heps_lte.
+    assert (Heps_lte_lt : Rabs (a n - La) + Rabs (Lb - b n) + Rabs (b n - a n) < (eps / 4) + (eps / 4) + (eps / 4)) by lra.
+    replace (eps / 4 + eps / 4 + eps / 4) with (3 * eps / 4) in Heps_lte_lt by lra.
+    assert (H_contra : eps < 3 * eps / 4) by lra. lra.
+
+  - assumption.
+
+  - assert (Heps_pos : 0 < eps) by (apply Rabs_pos_lt; lra).
+    assert (Heps_div_4_pos : eps / 4 > 0) by lra.
+      
+    destruct (Ha (eps / 4) Heps_div_4_pos) as [Na HNa].
+    destruct (Hb (eps / 4) Heps_div_4_pos) as [Nb HNb].
+    destruct (Hdiff (eps / 4) Heps_div_4_pos) as [Nc HNc].
+
+    set (N := Rmax (Rmax Na Nb) Nc).
+
+    pose proof INR_unbounded N as [n Hn].
+
+    assert (INR n > Na /\ INR n > Nb /\ INR n > Nc) as [Hna [Hnb Hnc]] by (unfold N in *; solve_max).
+
+    assert (Hnaeps : ((eps / 4) > Rabs (a n - La))). { apply HNa. apply Hna. }
+    assert (Hnbeps : ((eps / 4) > Rabs (b n - Lb))). { apply HNb. apply Hnb. }
+    assert (Hndeps : ((eps / 4) > Rabs (a n - b n))). { rewrite <- Rminus_0_r with (r := a n - b n). apply HNc. apply Hnc. }
+    assert (Heps_eq : eps = Rabs((La - a n) + (b n - Lb) + (a n - b n))).
+    { unfold eps. assert ((La - a n) + (b n - Lb) + (a n - b n) = La - Lb) by lra. rewrite H. reflexivity. }
+    assert (Heps_lte : eps <= Rabs (La - a n) + Rabs (b n - Lb) + Rabs (a n - b n)).
+    { rewrite Heps_eq. apply Rabs_triang_3. } 
+    assert (Heps_lte_eq : Rabs (La - a n) + Rabs (b n - Lb) + Rabs (a n - b n) = Rabs (a n - La) + Rabs (b n - Lb) + Rabs (a n - b n)).
+    { rewrite Rabs_minus_sym. rewrite Rabs_minus_sym with (x := a n) (y := b n). reflexivity. }
+
+    rewrite Heps_lte_eq in Heps_lte.
+    assert (Heps_lte_lt : Rabs (a n - La) + Rabs (Lb - b n) + Rabs (b n - a n) < (eps / 4) + (eps / 4) + (eps / 4)) by lra.
+    replace (eps / 4 + eps / 4 + eps / 4) with (3 * eps / 4) in Heps_lte_lt by lra.
+    assert (H_contra : eps < 3 * eps / 4) by lra. lra.
+Qed.
+
+Lemma limit_of_sequence_unique' : forall a L1 L2,
+  limit_of_sequence a L1 -> limit_of_sequence a L2 -> L1 = L2.
+Proof.
+  intros a L1 L2 H1 H2. apply two_seq_converge_to_same_limit with (a := a) (b := a); auto.
+  replace (fun n => a n - a n) with (fun n : nat => 0) by (apply functional_extensionality; intros; lra).
+  apply limit_of_const_sequence.
+Qed.
