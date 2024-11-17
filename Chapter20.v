@@ -93,6 +93,19 @@ Admitted.
 
 End section_20_1.
 
+Section yuckk.
+  Let A := {x : R | x <> 0}.
+  Let Rel : Relation A := fun x y => proj1_sig x * proj1_sig y > 0.
+
+  Lemma eating_cats : Equivalence Rel.
+  Proof.
+    constructor.
+    - intros x. unfold Rel. destruct x; simpl. nra.
+    - intros x y. unfold Rel. destruct x, y; simpl. nra.
+    - intros x y z. unfold Rel. destruct x, y, z; simpl. nra.
+  Qed.
+End yuckk.
+
 Definition disjoint_pieces {A} (P : Ensemble (Ensemble A)) : Prop :=
   forall E1 E2, E1 ∈ P -> E2 ∈ P -> E1 ⋂ E2 = ∅.
 Definition nonempty_pieces {A} (P : Ensemble (Ensemble A)) : Prop :=
