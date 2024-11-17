@@ -29,44 +29,44 @@ Definition limit_left (f : ℝ -> ℝ) (D : Ensemble ℝ) (a L : ℝ) : Prop :=
   ∀ ε, ε > 0 ⇒
     ∃ δ, ∀ x, x ∈ D ⇒ 0 < a - x < δ ⇒ |f x - L| < ε.
 
-Notation "⟦ 'lim' 'x' → a ⟧ f '=' L" := 
+Notation "⟦ 'lim' a ⟧ f '=' L" := 
   (limit f (Full_set ℝ) a L) 
-  (at level 70, f at level 0, no associativity, format "⟦  'lim'  'x'  →  a  ⟧  f  '='  L").
+  (at level 70, f at level 0, no associativity, format "⟦  'lim'  a  ⟧  f  '='  L").
 
-Notation "⟦ 'lim' 'x' → +∞ ⟧ f '=' L" := 
+Notation "⟦ 'lim' ∞ ⟧ f '=' L" := 
   (limit_pos_inf f L)
-  (at level 70, f at level 0, no associativity, format "⟦  'lim'  'x'  →  +∞  ⟧  f  '='  L").
+  (at level 70, f at level 0, no associativity, format "⟦  'lim' ∞  ⟧  f  '='  L").
 
-Notation "⟦ 'lim' 'x' → -∞ ⟧ f '=' L" := 
+Notation "⟦ 'lim' -∞ ⟧ f '=' L" := 
   (limit_neg_inf f L)
-  (at level 70, f at level 0, no associativity, format "⟦  'lim'  'x'  →  -∞  ⟧  f  '='  L").
+  (at level 70, f at level 0, no associativity, format "⟦  'lim'  -∞  ⟧  f  '='  L").
 
-Notation "⟦ 'lim' 'x' → a ⁺ ⟧ f '=' L" := 
+Notation "⟦ 'lim' a ⁺ ⟧ f '=' L" := 
   (limit_right f (Full_set ℝ) a L)
-  (at level 70, f at level 0, no associativity, format "⟦  'lim'  'x'  →  a ⁺  ⟧  f  '='  L").
+  (at level 70, f at level 0, no associativity, format "⟦  'lim'  a ⁺  ⟧  f  '='  L").
 
-Notation "⟦ 'lim' 'x' → a ⁻ ⟧ f '=' L" := 
+Notation "⟦ 'lim' a ⁻ ⟧ f '=' L" := 
   (limit_left f (Full_set ℝ) a L)
-  (at level 70, f at level 0, no associativity, format "⟦  'lim'  'x'  →  a ⁻  ⟧  f  '='  L").
+  (at level 70, f at level 0, no associativity, format "⟦  'lim'  a ⁻  ⟧  f  '='  L").
 
 Section testing_dogs.
   Let f : R -> R := (fun x => x).
 
-  Lemma limit_of_linear_function : ⟦ lim x → 0 ⟧ f = 0.
+  Lemma limit_of_linear_function : ⟦ lim 0 ⟧ f = 0.
   Proof.
     intros ε H1. exists ε. intros x H2 H3. replace (f x - 0) with x by (unfold f; lra). solve_abs.
   Qed.
 
-  Lemma limit_of_linear_function_right : forall a, ⟦ lim x → a⁺ ⟧ f = a.
+  Lemma limit_of_linear_function_right : forall a, ⟦ lim a⁺ ⟧ f = a.
   Proof.
     intros a ε H1. exists ε. intros x H2 H3. replace (f x - a) with (x - a) by (unfold f; lra). solve_abs.
   Qed.
 End testing_dogs.
 
-Lemma limit_of_linear_function' : ⟦ lim x → 0 ⟧  (fun x => x) = 0.
+Lemma limit_of_linear_function' : ⟦ lim 0 ⟧  (fun x => x) = 0.
 Proof.
   intros ε H1. exists ε. intros x H2 H3. replace (x - 0) with x by lra. solve_abs.
 Qed.
 
 Definition continuous (f : ℝ -> ℝ) (D : Ensemble ℝ) : Prop :=
-  ∀ a, a ∈ D ⇒ ⟦ lim x → a ⟧ f = f a.
+  ∀ a, a ∈ D ⇒ ⟦ lim a ⟧ f = f a.
