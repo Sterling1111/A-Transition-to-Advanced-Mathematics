@@ -5,12 +5,8 @@ Open Scope R_scope.
 
 Ltac compare_elems e1 e2 := 
   let e1' := eval simpl in e1 in
-  let e2' := eval simpl in e2 in
-  first [
-    field_simplify; try nra |
-    field_simplify; try nia |  
-    congruence
-  ].
+  let e2' := eval simpl in e2 in 
+  field_simplify; try nra; try nia.
 
 (* Compare two lists recursively element by element *)
 Ltac compare_lists_step :=
@@ -27,7 +23,7 @@ Ltac compare_lists_step :=
       fail "Lists" l1 "and" l2 "have different lengths or structures"
   end.
 
-Ltac prove_lists_equal :=
+Ltac auto_list :=
   intros; compute;
   try solve [reflexivity];
   compare_lists_step.
@@ -39,16 +35,16 @@ Section section_34_1.
   Definition d : sequence := fun n => (3 / 5) * (2 / 3) ^ n.
 
   Lemma lemma_34_1_a : map a (seq 0 6) = [5; 2; -1; -4; -7; -10].
-  Proof. prove_lists_equal. Qed.
+  Proof. auto_list. Qed.
 
   Lemma lemma_34_1_b : map b (seq 0 6) = [4; 8; 16; 32; 64; 128].
-  Proof. prove_lists_equal. Qed.
+  Proof. auto_list. Qed.
 
   Lemma lemma_34_1_c : map c (seq 0 6) = [2/4; 5/4; 8/4; 11/4; 14/4; 17/4].
-  Proof. prove_lists_equal. Qed.
+  Proof. auto_list. Qed.
 
   Lemma lemma_34_1_d : map d (seq 0 6) = [3/5; 2/5; 4/15; 8/45; 16/135; 32/405].
-  Proof. prove_lists_equal. Qed.
+  Proof. auto_list. Qed.
 
 End section_34_1.
 
