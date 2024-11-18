@@ -99,10 +99,10 @@ Section yuckk.
 
   Lemma eating_cats : Equivalence Rel.
   Proof.
-    constructor.
-    - intros x.  unfold Rel. destruct x; simpl. nra.
-    - intros x y H1. unfold Rel in *. nra.
-    - intros x y z H1 H2. unfold Rel in *. destruct x, y, z; simpl in *. nra.
+    unfold Rel; constructor; [intros x | intros x y H1 | intros x y z H1 H2].
+    - destruct x. simpl. nra.
+    - nra.
+    - nra.
   Qed.
 End yuckk.
 
