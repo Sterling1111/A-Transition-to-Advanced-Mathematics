@@ -115,13 +115,6 @@ Section section_35_5.
 
   Open Scope nat_scope.
   
-  Lemma num_terms_in_t_n : forall n, 
-    (n > 0)%nat -> f2 n - f1 n = 2 ^ (n -1) - 1.
-  Proof.
-    intros n H1. unfold f1, f2. destruct n as [| n]; try lia.
-    simpl. rewrite Nat.add_0_r. rewrite Nat.sub_0_r. nia.
-  Qed.
-
   Lemma f1_le_f2 : forall n, 
     f1 n <= f2 n.
   Proof.
