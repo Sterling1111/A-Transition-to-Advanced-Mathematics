@@ -1,4 +1,4 @@
-Require Import Imports Reals_util Completeness Chapter13.
+Require Import Imports Reals_util Completeness Chapter13 Sums.
 
 Open Scope R_scope.
 
@@ -19,11 +19,17 @@ Definition bounded_below (a : sequence) : Prop :=
 Definition bounded_above (a : sequence) : Prop := 
   exists UB : R, forall n : nat, UB >= a n.
 
+Definition bounded (a : sequence) : Prop :=
+  bounded_below a /\ bounded_above a.
+
 Definition unbounded_above (a : sequence) : Prop :=
   forall UB : R, exists n : nat, a n > UB.
 
 Definition unbounded_below (a : sequence) : Prop :=
   forall LB : R, exists n : nat, a n < LB.
+
+Definition unbounded (a : sequence) : Prop :=
+  unbounded_above a \/ unbounded_below a.
 
 Definition eventually_decreasing (a : sequence) : Prop :=
   exists (N : nat),
@@ -111,6 +117,39 @@ Proof.
   - intros H1 [UB H2]. destruct H1 with UB as [n H3]. specialize (H2 n). lra.
   - intros H1 UB. unfold bounded_above in H1. apply not_ex_all_not with (n := UB) in H1.
     apply not_all_ex_not in H1 as [n H1]. exists n. nra.
+Qed.
+
+Lemma unbounded_below_iff : forall a, unbounded_below a <-> ~ bounded_below a.
+Proof.
+  intros a. split.
+  - intros H1 [LB H2]. destruct H1 with LB as [n H3]. specialize (H2 n). lra.
+  - intros H1 LB. unfold bounded_below in H1. apply not_ex_all_not with (n := LB) in H1.
+    apply not_all_ex_not in H1 as [n H1]. exists n. nra.
+Qed.
+
+Lemma bounded_below_iff : forall a, bounded_below a <-> ~ unbounded_below a.
+Proof.
+  intros a. split.
+  - apply contra_2_reverse. intros H1. apply NNPP in H1. apply unbounded_below_iff; auto.
+  - apply contra_2_reverse. intros H1 H2. apply H2. apply unbounded_below_iff; auto.
+Qed.
+
+Lemma bounded_above_iff : forall a, bounded_above a <-> ~ unbounded_above a.
+Proof.
+  intros a. split.
+  - apply contra_2_reverse. intros H1. apply NNPP in H1. apply unbounded_above_iff; auto.
+  - apply contra_2_reverse. intros H1 H2. apply H2. apply unbounded_above_iff; auto.
+Qed.
+
+Lemma bounded_iff : forall a, bounded a <-> ~ unbounded a.
+Proof.
+  intros a. split.
+  - intros [H1 H2] H3. destruct H3 as [H3 | H3]. 
+    -- apply bounded_above_iff in H2. auto.
+    -- apply bounded_below_iff in H1. auto.
+  - intros H1. split.
+    -- apply bounded_below_iff. intros H2. apply H1. right. auto.
+    -- apply bounded_above_iff. intros H2. apply H1. left. auto.
 Qed.
 
 Lemma Rinv_lt_0 : forall r, 
@@ -456,36 +495,6 @@ Proof.
   solve_abs.
 Qed.
 
-Lemma exists_max_of_sequence_on_interval : forall (a : sequence) (i j : nat),
-  (i <= j)%nat -> exists n : nat, (i <= n <= j)%nat /\ forall m : nat, (i <= m <= j)%nat -> a m <= a n.
-Proof.
-  intros a i j H1. induction j.
-  - assert (i = 0)%nat by lia. subst. exists 0%nat. split; try lia.
-    intros m H2. replace m with 0%nat by lia. lra.
-  - assert (i = S j \/ i <= j)%nat as [H2 | H2] by lia.
-    -- subst. exists (S j). split; try lia. intros m H3. replace m with (S j) by lia. lra.
-    -- specialize (IHj H2) as [n [H3 H4]]. assert (a (S j) >= a n \/ a (S j) < a n) as [H5 | H5] by lra.
-       + exists (S j). split; try lia. intros m H6. specialize (H4 m). assert (m = S j \/ m <= j)%nat as [H7 | H7] by lia;
-         subst; try lra. specialize (H4 ltac:(lia)). lra.
-       + exists n. split; try lia. intros m H6. specialize (H4 m). assert (m = S j \/ m <= j)%nat as [H7 | H7] by lia;
-         subst; try lra. specialize (H4 ltac:(lia)). lra.
-Qed.
-
-Lemma exists_min_of_sequence_on_interval : forall (a : sequence) (i j : nat),
-  (i <= j)%nat -> exists n : nat, (i <= n <= j)%nat /\ forall m : nat, (i <= m <= j)%nat -> a n <= a m.
-Proof.
-  intros a i j H1. induction j.
-  - assert (i = 0)%nat by lia. subst. exists 0%nat. split; try lia.
-    intros m H2. replace m with 0%nat by lia. lra.
-  - assert (i = S j \/ i <= j)%nat as [H2 | H2] by lia.
-    -- subst. exists (S j). split; try lia. intros m H3. replace m with (S j) by lia. lra.
-    -- specialize (IHj H2) as [n [H3 H4]]. assert (a (S j) <= a n \/ a (S j) > a n) as [H5 | H5] by lra.
-       + exists (S j). split; try lia. intros m H6. specialize (H4 m). assert (m = S j \/ m <= j)%nat as [H7 | H7] by lia;
-         subst; try lra. specialize (H4 ltac:(lia)). lra.
-       + exists n. split; try lia. intros m H6. specialize (H4 m). assert (m = S j \/ m <= j)%nat as [H7 | H7] by lia;
-         subst; try lra. specialize (H4 ltac:(lia)). lra.
-Qed.
-
 Lemma unbounded_above_divergent_sequence : forall a,
   unbounded_above a -> divergent_sequence a.
 Proof.
@@ -512,6 +521,23 @@ Proof.
   - specialize (H5 n1 ltac:(lia)). pose proof H2 as H8.
     specialize (H2 n1 ltac:(lra)). apply lt_INR in H7.
     specialize (H8 n3 ltac:(lra)). solve_abs.
+Qed.
+
+Lemma bounded_above_by_bound_above_sequence : forall a b,
+  bounded_above b -> a_bounded_above_by_b a b -> bounded_above a.
+Proof.
+  intros a b H1 H2. unfold bounded_above in H1. unfold a_bounded_above_by_b in H2.
+  destruct H1 as [UB H1]. exists UB. intros n. specialize (H1 n). specialize (H2 n). lra. 
+Qed.
+
+Lemma convergent_bounded : forall a,
+  convergent_sequence a -> bounded a.
+Proof.
+  intros a H1. split.
+  - pose proof classic (bounded_below a) as [H2 | H2]; auto. rewrite bounded_below_iff in H2. apply NNPP in H2.
+    apply unbounded_below_divergent_sequence in H2. apply divergent_sequence_iff in H2. contradiction.
+  - pose proof classic (bounded_above a) as [H2 | H2]; auto. rewrite bounded_above_iff in H2. apply NNPP in H2.
+    apply unbounded_above_divergent_sequence in H2. apply divergent_sequence_iff in H2. contradiction.
 Qed.
 
 Lemma unbounded_increasing_sequence_divergent : forall a,
@@ -713,7 +739,7 @@ Qed.
    This gives us |L1 - L2| < |L1 - L2|, which is a contradiction.
    Therefore L1 = L2.
    
-   Can use lra (linear real arithmetic) tactic to handle these inequalities. *)
+   solve_abs can solve this problem at a certain point so just use that *)
 Lemma limit_of_sequence_unique : forall a L1 L2,
   ⟦ lim_s ⟧ a = L1 -> ⟦ lim_s ⟧ a = L2 -> L1 = L2.
 Proof.

@@ -1,4 +1,4 @@
-Require Import Imports.
+Require Import Imports Reals_util.
 
 Open Scope R_scope.
 
@@ -459,4 +459,56 @@ Lemma sum_f_nth_cons_7 : forall (l : list R) (r : R) (f : R -> R),
 Proof.
   intros l r f H1.
   rewrite sum_f_Si; try lia. rewrite sum_f_nth_cons_6; try lia. simpl. lra.
+Qed.
+
+Lemma exists_max_of_sequence_on_interval : forall (a : nat -> R) (i j : nat),
+  (i <= j)%nat -> exists n : nat, (i <= n <= j)%nat /\ forall m : nat, (i <= m <= j)%nat -> a m <= a n.
+Proof.
+  intros a i j H1. induction j.
+  - assert (i = 0)%nat by lia. subst. exists 0%nat. split; try lia.
+    intros m H2. replace m with 0%nat by lia. lra.
+  - assert (i = S j \/ i <= j)%nat as [H2 | H2] by lia.
+    -- subst. exists (S j). split; try lia. intros m H3. replace m with (S j) by lia. lra.
+    -- specialize (IHj H2) as [n [H3 H4]]. assert (a (S j) >= a n \/ a (S j) < a n) as [H5 | H5] by lra.
+       + exists (S j). split; try lia. intros m H6. specialize (H4 m). assert (m = S j \/ m <= j)%nat as [H7 | H7] by lia;
+         subst; try lra. specialize (H4 ltac:(lia)). lra.
+       + exists n. split; try lia. intros m H6. specialize (H4 m). assert (m = S j \/ m <= j)%nat as [H7 | H7] by lia;
+         subst; try lra. specialize (H4 ltac:(lia)). lra.
+Qed.
+
+Lemma exists_min_of_sequence_on_interval : forall (a : nat -> R) (i j : nat),
+  (i <= j)%nat -> exists n : nat, (i <= n <= j)%nat /\ forall m : nat, (i <= m <= j)%nat -> a n <= a m.
+Proof.
+  intros a i j H1. induction j.
+  - assert (i = 0)%nat by lia. subst. exists 0%nat. split; try lia.
+    intros m H2. replace m with 0%nat by lia. lra.
+  - assert (i = S j \/ i <= j)%nat as [H2 | H2] by lia.
+    -- subst. exists (S j). split; try lia. intros m H3. replace m with (S j) by lia. lra.
+    -- specialize (IHj H2) as [n [H3 H4]]. assert (a (S j) <= a n \/ a (S j) > a n) as [H5 | H5] by lra.
+       + exists (S j). split; try lia. intros m H6. specialize (H4 m). assert (m = S j \/ m <= j)%nat as [H7 | H7] by lia;
+         subst; try lra. specialize (H4 ltac:(lia)). lra.
+       + exists n. split; try lia. intros m H6. specialize (H4 m). assert (m = S j \/ m <= j)%nat as [H7 | H7] by lia;
+         subst; try lra. specialize (H4 ltac:(lia)). lra.
+Qed.
+
+Lemma sum_f_ge : forall f i n,
+  (i <= n)%nat -> (forall n, f n >= f (S n)) -> sum_f i n f >= INR (n - i + 1) * f n.
+Proof.
+  intros f i n H1 H2. induction n as [| k IH].
+  - replace i with 0%nat by lia. sum_simpl. lra.
+  - assert (i = S k \/ i <= k)%nat as [H3 | H3] by lia.
+    -- rewrite H3. sum_simpl. solve_INR.
+    -- specialize (IH H3). rewrite sum_f_i_Sn_f; try lia. specialize (H2 k).
+       assert (INR (k - i + 1) * f k + f (S k) >= INR (S k - i + 1) * f (S k)).
+       { solve_INR. apply INR_le in H3. lia. } nra.
+Qed.
+
+Lemma sum_f_combine : forall f i n1 n2,
+  (i <= n1 < n2)%nat -> sum_f i n2 f = sum_f i n1 f + sum_f (S n1) n2 f.
+Proof.
+  intros f i n1 n2 H1. induction n2 as [| k IH]; try lia.
+  assert (n1 = k \/ n1 < k)%nat as [H2 | H2] by lia.
+  - subst. sum_simpl. lra.
+  - specialize (IH ltac:(lia)). rewrite sum_f_i_Sn_f; try lia. rewrite IH.
+    rewrite sum_f_i_Sn_f; try lia. lra.
 Qed.

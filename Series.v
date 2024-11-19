@@ -2,8 +2,6 @@ Require Import Imports Sums Sequence Reals_util Chapter34.
 
 Open Scope R_scope.
 
-Notation S := Datatypes.S.
-
 Definition partial_sum (a : sequence) (n : nat) := ∑ 0 n a.
 
 Definition series_converges (a : sequence) : Prop :=

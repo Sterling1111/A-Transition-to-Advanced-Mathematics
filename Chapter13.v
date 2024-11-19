@@ -4,6 +4,14 @@ Import SetNotations.
 
 Open Scope R_scope.
 
+Proposition proposition_13_5 : forall n,  
+  sum_f 0 n (fun i => INR i) = (INR n * (INR n + 1)) / 2.
+Proof.
+  intros n. induction n as [| k IH].
+  - compute. lra.
+  - rewrite sum_f_i_Sn_f; try lia. rewrite IH. solve_INR.
+Qed.
+
 Lemma lemma_13_1 : forall (n : ℕ),
   sum_f 0 n (fun i => INR (2 * i - 1)) = INR (n^2).
 Proof.
@@ -89,34 +97,6 @@ Proof.
                (1 - r ^(k+1) + r * r^k) by nra.
        replace (1 - r * (r * r ^ k) + r * (r * r ^ k)) with 1 by nra.
        replace (k+1)%nat with (S k) by lia. simpl. lra.
-Qed.
-
-Lemma Rpow_gt_0 : forall k r,
-  r > 0 -> r ^ k > 0.
-Proof.
-  intros k r H1. induction k as [| k' IH].
-  - simpl. lra.
-  - simpl. nra.
-Qed.
-
-Lemma Rpow_lt_1 : forall r n,
-  0 < r < 1 -> (n > 0)%nat -> r ^ n < 1.
-Proof.
-  intros r n [H1 H2] H3. induction n as [| k IH].
-  - lia.
-  - simpl. destruct k.
-    -- simpl. lra.
-    -- assert (r ^ S k < 1) by (apply IH; lia). nra.
-Qed.
-
-Lemma Rpow_gt_1 : forall r n,
-  r > 1 -> (n > 0)%nat -> r ^ n > 1.
-Proof.
-  intros r n H1 H2. induction n as [| k IH].
-  - lia.
-  - simpl. destruct k.
-    -- simpl. lra.
-    -- assert (r ^ S k > 1) by (apply IH; lia). nra.
 Qed.
 
 Lemma lemma_13_6 : forall n h,

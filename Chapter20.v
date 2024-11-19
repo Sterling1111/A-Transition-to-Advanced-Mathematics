@@ -64,7 +64,7 @@ Section section_20_1.
 
   Let R : Relation A := ⦃ (1,1),(1,2),(1,3),(1,4),(2,3),(2,5),(2,6),(3,5),(4,5),(4,6) ⦄.
 
-  Definition S (n : A) : Ensemble A := (fun x => (R n x)).
+  Let S (n : A) : Ensemble A := (fun x => (R n x)).
 
   Lemma lemma_20_1_a : R 1 1.
   Proof.

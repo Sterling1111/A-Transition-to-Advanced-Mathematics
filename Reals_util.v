@@ -12,6 +12,8 @@ Ltac break_INR :=
       rewrite S_INR
   | [ |- context[INR (?n - ?m)] ] =>
       rewrite minus_INR
+  | [ |- context[INR (?n ^ ?m)] ] =>
+      rewrite pow_INR
   end.
 
 Ltac break_INR_simpl :=
@@ -53,4 +55,48 @@ Lemma Rabs_triang_3 : forall r1 r2 r3 : R,
   Rabs (r1 + r2 + r3) <= Rabs r1 + Rabs r2 + Rabs r3.
 Proof.
   solve_abs.
+Qed.
+
+Lemma n_lt_pow2_n : forall n, INR n < 2 ^ n.
+Proof.
+  induction n as [| k IH].
+  - simpl. lra.
+  - solve_INR. assert (1 <= 2 ^ k).
+    { clear; induction k; simpl; lra. } solve_INR.
+Qed.
+
+Lemma Rpow_gt_0 : forall k r,
+  r > 0 -> r ^ k > 0.
+Proof.
+  intros k r H1. induction k as [| k' IH].
+  - simpl. lra.
+  - simpl. nra.
+Qed.
+
+Lemma Rpow_lt_1 : forall r n,
+  0 < r < 1 -> (n > 0)%nat -> r ^ n < 1.
+Proof.
+  intros r n [H1 H2] H3. induction n as [| k IH].
+  - lia.
+  - simpl. destruct k.
+    -- simpl. lra.
+    -- assert (r ^ S k < 1) by (apply IH; lia). nra.
+Qed.
+
+Lemma Rpow_gt_1 : forall r n,
+  r > 1 -> (n > 0)%nat -> r ^ n > 1.
+Proof.
+  intros r n H1 H2. induction n as [| k IH].
+  - lia.
+  - simpl. destruct k.
+    -- simpl. lra.
+    -- assert (r ^ S k > 1) by (apply IH; lia). nra.
+Qed.
+
+Lemma Rdiv_pow_distr : forall r1 r2 n,
+  r2 > 0 -> (r1 / r2) ^ n = r1 ^ n / r2 ^ n.
+Proof.
+  intros r1 r2 n H1. induction n as [| k IH].
+  - simpl. lra.
+  - simpl. rewrite IH. field. pose proof Rpow_gt_0 k r2 as H2; nra.
 Qed.
