@@ -3,14 +3,20 @@ Import SetNotations.
 
 Open Scope R_scope.
 
-Notation "∀ x , P" := (forall x, P)
+Notation "'∀' x , P" := (forall x, P)
+  (at level 200, x ident, P at level 200, only parsing).
+
+Notation "'∃' x , P" := (exists x, P)
   (at level 200, x ident, P at level 200).
+
+Notation "∀ x : T , P" := (forall x : T, P)
+  (at level 200, x ident, T at level 200, P at level 200, only parsing).
 
 Notation "∃ x , P" := (exists x, P)
-  (at level 200, x ident, P at level 200).
+  (at level 200, x ident, P at level 200, only parsing).
 
-Notation "'∀' x : T , P" := (forall x : T, P)
-  (at level 200, x ident, T at level 200, P at level 200).
+Notation "∃ x : T , P" := (exists x : T, P)
+  (at level 200, x ident, T at level 200, P at level 200, only parsing).
 
 Definition encloses (D : Ensemble R) (a : R) : Prop :=
   exists b c, b < a < c /\ (fun x => b < x < c) ⊆ D.
@@ -28,6 +34,9 @@ Notation "⟦ 'lim' a ⟧ f '=' L" :=
   (limit f (Full_set ℝ) a L) 
     (at level 70, f at level 0, no associativity, format "⟦  'lim'  a  ⟧  f  '='  L").
 
+Notation "⟦ 'lim' a ⟧ f D '=' L" := 
+  (limit f D a L) 
+    (at level 70, f at level 0, D at level 0, no associativity, format "⟦  'lim'  a  ⟧  f  D  '='  L").
 
 (*
 Definition limit_pos_inf (f : ℝ -> ℝ) (L : ℝ) : Prop :=
@@ -72,9 +81,7 @@ Lemma limit_of_function_unique : forall f D a L1 L2,
   ⟦ lim a ⟧ f D = L1 -> ⟦ lim a ⟧ f D = L2 -> L1 = L2.
 Proof.
   intros f D a L1 L2 H1 H2. pose proof (classic (L1 = L2)) as [H3 | H3]; auto.
-  specialize (H1 (|L1 - L2| / 2) ltac:(solve_abs)) as [δ1 H1]. specialize (H2 (|L1 - L2| / 2) ltac:(solve_abs)) as [δ2 H2].
-  set (N := Rmax N1 N2). pose proof INR_unbounded N as [n H4]. specialize (H1 n ltac:(unfold N in *; solve_max)).
-  specialize (H2 n ltac:(unfold N in *; solve_max)). solve_abs.
+  destruct H1 as [_ H1], H2 as [_ H2].
 Qed.
 
 Definition continuous (f : ℝ -> ℝ) (D : Ensemble ℝ) : Prop :=
