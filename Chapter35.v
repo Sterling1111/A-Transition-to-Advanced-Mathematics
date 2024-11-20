@@ -200,8 +200,8 @@ Section section_35_5.
       }
       apply le_INR in H2. assert (INR n > N) as H3 by solve_max. lra.
     - pose proof lemma_35_5_b (2 *n) as H2.
-    replace (1 + INR (2 * n) / 2) with (1 + INR n) in H2 by solve_INR.
-    assert (INR n > L) as H3 by solve_max. solve_abs.
+      replace (1 + INR (2 * n) / 2) with (1 + INR n) in H2 by solve_INR.
+      assert (INR n > L) as H3 by solve_max. solve_abs.
   Qed.
 
 End section_35_5.
