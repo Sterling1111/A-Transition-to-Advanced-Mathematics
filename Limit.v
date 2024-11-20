@@ -9,10 +9,27 @@ Notation "∀ x , P" := (forall x, P)
 Notation "∃ x , P" := (exists x, P)
   (at level 200, x ident, P at level 200).
 
-Definition limit (f : ℝ -> ℝ) (D : Ensemble R) (a L : ℝ) : Prop :=
-  ∀ ε, ε > 0 ⇒
-    ∃ δ, ∀ x, x ∈ D ⇒ 0 < |x - a| < δ ⇒ |f x - L| < ε.
+Notation "'∀' x : T , P" := (forall x : T, P)
+  (at level 200, x ident, T at level 200, P at level 200).
 
+Definition encloses (D : Ensemble R) (a : R) : Prop :=
+  exists b c, b < a < c /\ (fun x => b < x < c) ⊆ D.
+
+Record Rsub (D : Ensemble R) := {
+  x :> R;
+  cond : x ∈ D
+}.
+
+Definition limit (D : Ensemble R) (f : Rsub D -> R) (a : Rsub D) (L : R) : Prop :=
+  encloses D a /\
+    (∀ ε, ε > 0 ⇒ ∃ δ, ∀ x : Rsub D, 0 < |x - a| < δ ⇒ |f x - L| < ε).
+
+Notation "⟦ 'lim' a ⟧ f '=' L" := 
+  (limit f (Full_set ℝ) a L) 
+    (at level 70, f at level 0, no associativity, format "⟦  'lim'  a  ⟧  f  '='  L").
+
+
+(*
 Definition limit_pos_inf (f : ℝ -> ℝ) (L : ℝ) : Prop :=
   ∀ ε, ε > 0 ⇒
     ∃ N, ∀ x, x > N ⇒ |f x - L| < ε.
@@ -29,9 +46,9 @@ Definition limit_left (f : ℝ -> ℝ) (D : Ensemble ℝ) (a L : ℝ) : Prop :=
   ∀ ε, ε > 0 ⇒
     ∃ δ, ∀ x, x ∈ D ⇒ 0 < a - x < δ ⇒ |f x - L| < ε.
 
-Notation "⟦ 'lim' a ⟧ f '=' L" := 
-  (limit f (Full_set ℝ) a L) 
-  (at level 70, f at level 0, no associativity, format "⟦  'lim'  a  ⟧  f  '='  L").
+Notation "⟦ 'lim' a ⟧ f D '=' L" := 
+  (limit f D a L) 
+  (at level 70, f at level 0, D at level 0, no associativity, format "⟦  'lim'  a  ⟧  f  D  '='  L").
 
 Notation "⟦ 'lim' ∞ ⟧ f '=' L" := 
   (limit_pos_inf f L)
@@ -49,23 +66,15 @@ Notation "⟦ 'lim' a ⁻ ⟧ f '=' L" :=
   (limit_left f (Full_set ℝ) a L)
   (at level 70, f at level 0, no associativity, format "⟦  'lim'  a ⁻  ⟧  f  '='  L").
 
-Section testing_dogs.
-  Let f : R -> R := (fun x => x).
+*)
 
-  Lemma limit_of_linear_function : ⟦ lim 0 ⟧ f = 0.
-  Proof.
-    intros ε H1. exists ε. intros x H2 H3. replace (f x - 0) with x by (unfold f; lra). solve_abs.
-  Qed.
-
-  Lemma limit_of_linear_function_right : forall a, ⟦ lim a⁺ ⟧ f = a.
-  Proof.
-    intros a ε H1. exists ε. intros x H2 H3. replace (f x - a) with (x - a) by (unfold f; lra). solve_abs.
-  Qed.
-End testing_dogs.
-
-Lemma limit_of_linear_function' : ⟦ lim 0 ⟧  (fun x => x) = 0.
+Lemma limit_of_function_unique : forall f D a L1 L2,
+  ⟦ lim a ⟧ f D = L1 -> ⟦ lim a ⟧ f D = L2 -> L1 = L2.
 Proof.
-  intros ε H1. exists ε. intros x H2 H3. replace (x - 0) with x by lra. solve_abs.
+  intros f D a L1 L2 H1 H2. pose proof (classic (L1 = L2)) as [H3 | H3]; auto.
+  specialize (H1 (|L1 - L2| / 2) ltac:(solve_abs)) as [δ1 H1]. specialize (H2 (|L1 - L2| / 2) ltac:(solve_abs)) as [δ2 H2].
+  set (N := Rmax N1 N2). pose proof INR_unbounded N as [n H4]. specialize (H1 n ltac:(unfold N in *; solve_max)).
+  specialize (H2 n ltac:(unfold N in *; solve_max)). solve_abs.
 Qed.
 
 Definition continuous (f : ℝ -> ℝ) (D : Ensemble ℝ) : Prop :=
