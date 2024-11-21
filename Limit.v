@@ -31,7 +31,7 @@ Definition limit (D : Ensemble R) (f : Rsub D -> R) (a : Rsub D) (L : R) : Prop 
     (∀ ε, ε > 0 ⇒ ∃ δ, δ > 0 /\ ∀ x : Rsub D, 0 < |x - a| < δ ⇒ |f x - L| < ε).
 
 Notation "⟦ 'lim' a ⟧ f '=' L" := 
-  (limit f (Full_set ℝ) a L) 
+  (limit (Full_set ℝ) f a L) 
     (at level 70, f at level 0, no associativity, format "⟦  'lim'  a  ⟧  f  '='  L").
 
 Notation "⟦ 'lim' a ⟧ f D '=' L" := 
@@ -77,15 +77,34 @@ Notation "⟦ 'lim' a ⁻ ⟧ f '=' L" :=
 
 *)
 
-Lemma limit_of_function_unique : forall D f a L1 L2,
+Lemma limit_of_function_unique' : forall D f a L1 L2,
   ⟦ lim a ⟧ f D = L1 -> ⟦ lim a ⟧ f D = L2 -> L1 = L2.
 Proof.
   intros D f a L1 L2 [[b [c [H1 H2]]] H3] [_ H4]. pose proof (classic (L1 = L2)) as [H5 | H5]; auto.
-  assert (c > a) as H0. { nra. } specialize (H3 (|L1 - L2| / 2) ltac:(solve_abs)) as [δ1 [H6 H7]].
+  specialize (H3 (|L1 - L2| / 2) ltac:(solve_abs)) as [δ1 [H6 H7]].
   specialize (H4 (|L1 - L2| / 2) ltac:(solve_abs)) as [δ2 [H8 H9]].
-  set (δ := Rmin δ1 δ2). assert (δ > 0) as H10 by (unfold δ; solve_min).
-  set (y := Rmin (a + δ / 2) c). assert (y ∈ D) as H11. { apply H2. unfold In. unfold y; solve_min. }
-  set (x := mkRsub D y H11). assert (H12 : y <= a + δ1 / 2). { unfold y. unfold δ. solve_min. }
-  assert (0 < |x - a| < δ1) by admit. assert (0 < |x - a| < δ2) by admit. specialize (H7 x ltac:(auto)).
-  specialize (H9 x ltac:(auto)). solve_abs.
-Admitted.
+  set (δ := Rmin δ1 δ2). set (y := Rmin (a + δ / 2) c).
+  assert (δ > 0) as H10 by (unfold δ; solve_min).
+  assert (y ∈ D) as H11. { apply H2. unfold In. unfold y. solve_min. }
+  set (x := mkRsub D y H11). assert (δ <= δ1 /\ δ <= δ2) as [H12 H13] by (unfold δ; solve_min).
+  assert (y <= c /\ y <= a + δ / 2) as [H14 H15] by (unfold y; solve_min).
+  assert (y > a) as H16 by (unfold y; solve_min). assert (0 < |y - a| < δ) as H19 by solve_abs.
+  assert (0 < |x - a| < δ1 /\ 0 < |x - a| < δ2) as [H20 H21] by (unfold x, δ; simpl; solve_abs).
+  specialize (H9 x ltac:(auto)). specialize (H7 x ltac:(auto)).
+  (* instead of all this we could just do solve_abs *)
+  assert (|L1 - L2| < |L1 - L2|).
+  {
+    assert (|(L1 - f x + (f x - L2))| <= |L1 - f x| + |f x - L2|) as H22 by (apply Rabs_triang).
+    rewrite Rabs_minus_sym in H22. 
+    assert (|f x - L1| + |f x - L2| < |L1 - L2| / 2 + |L1 - L2| / 2) as H23 by lra.
+    field_simplify in H23. rewrite Rmult_div_r in H23; auto.
+    replace (L1 - f x + (f x - L2)) with (L1 - L2) in H22 by lra. lra.
+  } lra.
+Qed.
+
+Lemma limit_of_function_unique : forall f a L1 L2,
+  ⟦ lim a ⟧ f = L1 -> ⟦ lim a ⟧ f = L2 -> L1 = L2.
+Proof.
+  intros f a L1 L2 H1 H2. apply (limit_of_function_unique' (Full_set ℝ) f a L1 L2); auto.
+Qed.
+
