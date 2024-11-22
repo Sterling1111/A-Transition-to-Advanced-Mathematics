@@ -8,7 +8,7 @@ Ltac solve_lim :=
     set (b := mkRsub (Full_set R) a ltac:(apply Full_intro));
     let result := eval cbv beta in (f b) in
     replace rhs with result by (simpl; lra); simpl; clear b;
-    repeat (try apply limit_plus; try apply limit_mult; try apply limit_const; try apply limit_id)  
+    repeat first [ apply limit_plus | apply limit_minus | apply limit_mult | apply limit_const | apply limit_id ]
   end.
 
 Lemma lemma_36_1 : ⟦ lim 4 ⟧ (fun x => 2 * x + 3) = 11.
