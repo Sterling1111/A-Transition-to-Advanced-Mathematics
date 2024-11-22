@@ -51,3 +51,11 @@ Import EqNotations.
 (* Open common scopes *)
 Open Scope R_scope.
 Open Scope nat_scope.
+
+(* this could create inconsistency so in general dont do it. 
+   However for this project I prefer convinience over consistency *)
+
+Axiom univalence : forall (A B : Type), (A = B) <-> exists (f : A -> B) (g : B -> A),
+  (forall x, g (f x) = x) /\ (forall y, f (g y) = y).
+
+Axiom EquivThenEqual: prop_extensionality.

@@ -4,14 +4,6 @@ Import SetNotations.
 
 Require Export Chapter19.
 
-(* this could create inconsistency so in general dont do it. 
-   However for this project I prefer convinience over consistency *)
-
-Axiom univalence : forall (A B : Type), (A = B) <-> exists (f : A -> B) (g : B -> A),
-  (forall x, g (f x) = x) /\ (forall y, f (g y) = y).
-
-Axiom EquivThenEqual: prop_extensionality.
-
 Lemma Relation_is_Ensemble : forall A, Relation A = Ensemble (A * A).
 Proof.
   intros A.

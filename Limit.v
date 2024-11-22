@@ -26,7 +26,7 @@ Record Rsub (D : Ensemble R) := mkRsub {
   cond : x ∈ D
 }.
 
-Definition limit (D : Ensemble R) (f : Rsub D -> R) (a : Rsub D) (L : R) : Prop :=
+Definition limit (D : Ensemble R) (f : Rsub D -> R) (a L : R) : Prop :=
   encloses D a /\
     (∀ ε, ε > 0 ⇒ ∃ δ, δ > 0 /\ ∀ x : Rsub D, 0 < |x - a| < δ ⇒ |f x - L| < ε).
 
@@ -76,6 +76,11 @@ Notation "⟦ 'lim' a ⁻ ⟧ f '=' L" :=
   (at level 70, f at level 0, no associativity, format "⟦  'lim'  a ⁻  ⟧  f  '='  L").
 
 *)
+
+Lemma Full_set_encloses : forall a, encloses (Full_set ℝ) a.
+Proof.
+  intros a. exists (a - 1), (a + 1). split. lra. intros x _. apply Full_intro.
+Qed.
 
 Lemma lemma_1_20 : forall x x0 y y0 ε,
   |x - x0| < ε / 2 -> |y - y0| < ε / 2 -> |(x + y) - (x0 + y0)| < ε /\ |(x - y) - (x0 - y0)| < ε.
@@ -161,6 +166,11 @@ Proof.
 Qed. 
 
 Notation "f + g" := (fun x => f x + g x) (at level 50, left associativity) : function_scope.
+Notation "f - g" := (fun x => f x - g x) (at level 50, left associativity) : function_scope.
+Notation "f ∙ g" := (fun x => f x * g x) (at level 40, left associativity) : function_scope.
+Notation "f / g" := (fun x => f x / g x) (at level 40, left associativity) : function_scope.
+Notation "f ∘ g" := (fun x => f (g x)) (at level 40, left associativity) : function_scope.
+Notation "c * f" := (fun x => c * f x) (at level 40, left associativity) : function_scope.
 
 Lemma limit_of_function_unique' : forall D f a L1 L2,
   ⟦ lim a ⟧ f D = L1 -> ⟦ lim a ⟧ f D = L2 -> L1 = L2.
@@ -197,10 +207,64 @@ Lemma limit_plus : forall f1 f2 a L1 L2,
   ⟦ lim a ⟧ f1 = L1 -> ⟦ lim a ⟧ f2 = L2 -> ⟦ lim a ⟧ (f1 + f2) = L1 + L2.
 Proof.
   intros f1 f2 a L1 L2 [_ H1] [_ H2]. split.
-  - exists (a-1), (a+1). split. lra. intros x _. apply Full_intro.
+  - apply Full_set_encloses.
   - intros ε H3. specialize (H1 (ε / 2) ltac:(lra)) as [δ1 [H4 H5]].
     specialize (H2 (ε / 2) ltac:(lra)) as [δ2 [H6 H7]]. set (δ := Rmin δ1 δ2).
     assert (δ > 0) as H8 by (unfold δ; solve_min). exists δ. split. lra.
     intros x H9. assert (0 < |x - a| < δ1 /\ 0 < |x - a| < δ2) as [H10 H11] by (unfold δ in H9; solve_min).
     specialize (H5 x H10). specialize (H7 x H11). apply lemma_1_20; auto.
+Qed.
+
+Theorem Rsub_Full_set_equiv : @eq Type (Rsub (Full_set R)) R.
+Proof.
+  apply univalence. exists (fun x => x). exists (fun x => mkRsub (Full_set R) x ltac:(apply Full_intro)).
+  split.
+  - intros x. destruct x; simpl. replace (cond0) with (Full_intro R x0); auto.
+    destruct cond0. apply proof_irrelevance.
+  - intros y. reflexivity.
+Qed.
+
+Lemma limit_const : forall a c,
+  ⟦ lim a ⟧ (fun _ => c) = c.
+Proof.
+  intros a c. split; try apply Full_set_encloses. intros ε H1. exists 1. split; solve_abs.
+Qed.
+
+Lemma limit_id : forall a,
+  ⟦ lim a ⟧ (fun x => x) = a.
+Proof.
+  intros a. split; try apply Full_set_encloses. intros ε H1. exists ε. split; solve_abs.
+Qed.
+
+Open Scope function_scope.
+
+Lemma f_minus_plus : forall (f1 f2 : Rsub (Full_set R) -> R),
+  (f1 - f2)= f1 + ((-1) * f2)%function.
+Proof.
+  intros f1 f2. apply functional_extensionality. intros x. unfold Rminus. lra.
+Qed.
+
+Close Scope function_scope.
+
+Lemma limit_minus : forall f1 f2 a L1 L2,
+  ⟦ lim a ⟧ f1 = L1 -> ⟦ lim a ⟧ f2 = L2 -> ⟦ lim a ⟧ (f1 - f2) = L1 - L2.
+Proof.
+   intros f1 f2 a L1 L2 H1 [_ H2]. rewrite f_minus_plus. unfold Rminus. apply limit_plus. auto.
+   split; try apply Full_set_encloses. intros ε H3. specialize (H2 ε H3) as [δ [H4 H5]].
+   exists δ. split; auto. intros x H6. apply H5 in H6. solve_abs.
+Qed.
+
+Lemma limit_mult : forall f1 f2 a L1 L2,
+  ⟦ lim a ⟧ f1 = L1 -> ⟦ lim a ⟧ f2 = L2 -> ⟦ lim a ⟧ (f1 ∙ f2) = L1 * L2.
+Proof.
+  intros f1 f2 a L1 L2 [_ H1] [_ H2]. split.
+  - apply Full_set_encloses.
+  - intros ε H3. assert (ε / (2 * ((|L2|) + 1)) > 0 /\ ε / (2 * ((|L1|) + 1)) > 0) as [H4 H5].
+    { split; apply Rdiv_pos_pos; solve_abs. }
+    specialize (H1 (Rmin (ε / (2 * ((|L2|) + 1))) 1) ltac:(solve_min)) as [δ1 [H6 H7]].
+    specialize (H2 (ε / (2 * ((|L1|) + 1))) ltac:(solve_min)) as [δ2 [H8 H9]].
+    set (δ := Rmin δ1 δ2). assert (δ > 0) as H10 by (unfold δ; solve_min). exists δ. split. lra.
+    intros x H11. assert (0 < |x - a| < δ1 /\ 0 < |x - a| < δ2) as [H12 H13] by (unfold δ in H11; solve_min).
+    specialize (H7 x H12). specialize (H9 x H13).
+    apply lemma_1_21; auto.
 Qed.

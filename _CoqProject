@@ -14,6 +14,7 @@ Binomial.v
 Prime.v
 Sequence.v
 Series.v
+Limit.v
 Chapter6.v
 Chapter7.v
 Chapter8.v
@@ -31,3 +32,4 @@ Chapter19.v
 Chapter20.v
 Chapter34.v
 Chapter35.v
+Chapter36.v
