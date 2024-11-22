@@ -106,3 +106,13 @@ Proof.
   - simpl. lra.
   - simpl. rewrite IH. field. pose proof Rpow_gt_0 k r2 as H2; nra.
 Qed.
+
+Lemma Rdiv_lt_1: forall a b : R, a < b -> b > 0 -> a / b < 1.
+Proof.
+  intros a b H1 H2.
+  apply Rmult_lt_compat_r with (r := 1/b) in H1.
+  - replace (a * (1 / b)) with (a / b) in H1 by lra.
+    replace (b * (1 / b)) with 1 in H1 by (field; lra).
+    apply H1.
+  - apply Rdiv_pos_pos. lra. apply H2.
+Qed.  
