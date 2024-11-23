@@ -30,6 +30,10 @@ Definition limit (D : Ensemble R) (f : Rsub D -> R) (a L : R) : Prop :=
   encloses D a /\
     (∀ ε, ε > 0 ⇒ ∃ δ, δ > 0 /\ ∀ x : Rsub D, 0 < |x - a| < δ ⇒ |f x - L| < ε).
 
+Notation "L '=' ⟦ 'lim' a ⟧ f" :=
+  (limit (Full_set ℝ) f a L)
+    (at level 70, f at level 0, no associativity, format "L  '='  ⟦  'lim'  a  ⟧  f").
+
 Notation "⟦ 'lim' a ⟧ f '=' L" := 
   (limit (Full_set ℝ) f a L) 
     (at level 70, f at level 0, no associativity, format "⟦  'lim'  a  ⟧  f  '='  L").
@@ -128,13 +132,13 @@ Proof.
 Qed.
 
 Lemma lemma_1_22 : forall y y0 ε,
-  y0 <> 0 -> |y - y0| < Rmin (|y0 / 2|) ((ε * |y0|^2) / 2) -> y <> 0 /\ |1 / y - 1 / y0| < ε.
+  y0 <> 0 -> |y - y0| < Rmin (|y0| / 2) ((ε * |y0|^2) / 2) -> y <> 0 /\ |1 / y - 1 / y0| < ε.
 Proof.
   intros y y0 eps H1 H2. assert (H3 : y <> 0).
-  - assert (H4 : Rabs (y - y0) < Rabs (y0 / 2)). { apply Rlt_gt in H2. apply Rmin_Rgt_l in H2. lra. } solve_abs.
+  - assert (H4 : Rabs (y - y0) < Rabs (y0 / 2)). { apply Rlt_gt in H2. apply Rmin_Rgt_l in H2. solve_abs. } solve_abs.
   - split.
     -- apply H3.
-    -- assert (H4 : Rabs (y - y0) < Rabs (y0 / 2)). { apply Rlt_gt in H2. apply Rmin_Rgt_l in H2. lra. }
+    -- assert (H4 : Rabs (y - y0) < Rabs (y0 / 2)). { apply Rlt_gt in H2. apply Rmin_Rgt_l in H2. solve_abs. }
        assert (H5 : Rabs (y - y0) < (eps * (Rabs y0)^2) / 2). { apply Rlt_gt in H2. apply Rmin_Rgt_l in H2. lra. }
        assert (H6 : Rabs y > Rabs y0 / 2) by solve_abs.
        assert (H7 : Rabs y > 0) by solve_abs. assert (H8 : Rabs y0 > 0) by solve_abs.
@@ -165,12 +169,40 @@ Proof.
        nra.
 Qed. 
 
-Notation "f + g" := (fun x => f x + g x) (at level 50, left associativity) : function_scope.
-Notation "f - g" := (fun x => f x - g x) (at level 50, left associativity) : function_scope.
-Notation "f ∙ g" := (fun x => f x * g x) (at level 40, left associativity) : function_scope.
-Notation "f / g" := (fun x => f x / g x) (at level 40, left associativity) : function_scope.
-Notation "f ∘ g" := (fun x => f (g x)) (at level 40, left associativity) : function_scope.
-Notation "c * f" := (fun x => c * f x) (at level 40, left associativity) : function_scope.
+Definition f_plus (D : Ensemble R) f1 f2 (x:Rsub D) : R := f1 x + f2 x.
+Definition f_opp (D : Ensemble R) f (x:Rsub D) : R := - f x.
+Definition f_mult (D : Ensemble R) f1 f2 (x:Rsub D) : R := f1 x * f2 x.
+Definition f_mult_c (D : Ensemble R) (a:R) f (x:Rsub D) : R := a * f x.
+Definition f_minus (D : Ensemble R) f1 f2 (x:Rsub D) : R := f1 x - f2 x.
+Definition f_div (D : Ensemble R) f1 f2 (x:Rsub D) : R := f1 x / f2 x.
+Definition f_div_c (D : Ensemble R) (a:R) f (x:Rsub D) : R := a / f x.
+Definition f_comp (D1 D2 : Ensemble R) (f1 : (Rsub D2) -> R) (f2 : (Rsub D1) -> (Rsub D2))  (x:Rsub D1) : R := f1 (f2 x).
+Definition f_inv (D : Ensemble R) f (x:Rsub D) : R := / f x.
+Definition f_mirr (D : Ensemble R) f (x:Rsub D) : R := f (- x).
+
+Declare Scope f_scope.
+Delimit Scope f_scope with f.
+
+Arguments f_plus {D} f1%_F f2%_F x%_R.
+Arguments f_opp {D} f%_F x%_R.
+Arguments f_mult {D} f1%_F f2%_F x%_R.
+Arguments f_mult_c {D} a%_R f%_F x%_R.
+Arguments f_minus {D} f1%_F f2%_F x%_R.
+Arguments f_div {D} f1%_F f2%_F x%_R.
+Arguments f_div_c {D} a%_R f%_F x%_R.
+Arguments f_comp {D1 D2} f1%_F f2%_F x%_R.
+Arguments f_inv {D} f%_F x%_R.
+Arguments f_mirr {D} f%_F x%_R.
+
+Infix "+" := f_plus : f_scope.
+Notation "- x" := (f_opp x) : f_scope.
+Infix "∙" := f_mult (at level 40) : f_scope.
+Infix "-" := f_minus : f_scope.
+Infix "/" := f_div : f_scope.
+Infix "*" := f_mult_c : f_scope.
+Notation "/ x" := (f_inv x) : f_scope.
+Notation "f1 'o' f2" := (f_comp f1 f2)
+  (at level 20, right associativity) : f_scope.
 
 Lemma limit_of_function_unique' : forall D f a L1 L2,
   ⟦ lim a ⟧ f D = L1 -> ⟦ lim a ⟧ f D = L2 -> L1 = L2.
@@ -204,7 +236,7 @@ Proof.
 Qed.
 
 Lemma limit_plus : forall f1 f2 a L1 L2,
-  ⟦ lim a ⟧ f1 = L1 -> ⟦ lim a ⟧ f2 = L2 -> ⟦ lim a ⟧ (f1 + f2) = L1 + L2.
+  ⟦ lim a ⟧ f1 = L1 -> ⟦ lim a ⟧ f2 = L2 -> ⟦ lim a ⟧ ((f1 + f2)%f) = (L1 + L2).
 Proof.
   intros f1 f2 a L1 L2 [_ H1] [_ H2]. split.
   - apply Full_set_encloses.
@@ -236,26 +268,22 @@ Proof.
   intros a. split; try apply Full_set_encloses. intros ε H1. exists ε. split; solve_abs.
 Qed.
 
-Open Scope function_scope.
-
 Lemma f_minus_plus : forall (f1 f2 : Rsub (Full_set R) -> R),
-  (f1 - f2)= f1 + ((-1) * f2)%function.
+  (f1 - f2 = f1 + (- f2)%f)%f.
 Proof.
-  intros f1 f2. apply functional_extensionality. intros x. unfold Rminus. lra.
+  intros f1 f2. apply functional_extensionality. intros x. unfold f_minus, f_plus, f_opp. lra.
 Qed.
 
-Close Scope function_scope.
-
 Lemma limit_minus : forall f1 f2 a L1 L2,
-  ⟦ lim a ⟧ f1 = L1 -> ⟦ lim a ⟧ f2 = L2 -> ⟦ lim a ⟧ (f1 - f2) = L1 - L2.
+  ⟦ lim a ⟧ f1 = L1 -> ⟦ lim a ⟧ f2 = L2 -> ⟦ lim a ⟧ ((f1 - f2)%f) = L1 - L2.
 Proof.
    intros f1 f2 a L1 L2 H1 [_ H2]. rewrite f_minus_plus. unfold Rminus. apply limit_plus. auto.
    split; try apply Full_set_encloses. intros ε H3. specialize (H2 ε H3) as [δ [H4 H5]].
-   exists δ. split; auto. intros x H6. apply H5 in H6. solve_abs.
+   exists δ. split; auto. intros x H6. apply H5 in H6. unfold f_opp. solve_abs.
 Qed.
 
 Lemma limit_mult : forall f1 f2 a L1 L2,
-  ⟦ lim a ⟧ f1 = L1 -> ⟦ lim a ⟧ f2 = L2 -> ⟦ lim a ⟧ (f1 ∙ f2) = L1 * L2.
+  ⟦ lim a ⟧ f1 = L1 -> ⟦ lim a ⟧ f2 = L2 -> ⟦ lim a ⟧ ((f1 ∙ f2)%f) = L1 * L2.
 Proof.
   intros f1 f2 a L1 L2 [_ H1] [_ H2]. split.
   - apply Full_set_encloses.
@@ -267,4 +295,28 @@ Proof.
     intros x H11. assert (0 < |x - a| < δ1 /\ 0 < |x - a| < δ2) as [H12 H13] by (unfold δ in H11; solve_min).
     specialize (H7 x H12). specialize (H9 x H13).
     apply lemma_1_21; auto.
+Qed.
+
+Lemma limit_inv : forall f a L,
+  ⟦ lim a ⟧ f = L -> L <> 0 -> ⟦ lim a ⟧ (fun x => / f x) = / L.
+Proof.
+  intros f a L [_ H1] H2. split.
+  - apply Full_set_encloses.
+  - intros ε H3. assert (|L| / 2 > 0) as H4 by solve_abs. assert (ε * |L|^2 / 2 > 0) as H5.
+    { apply Rmult_lt_0_compat. apply pow2_gt_0 in H2. solve_abs. apply Rinv_pos; lra. }
+    specialize (H1 (Rmin (|L| / 2) (ε * |L|^2 / 2)) ltac:(solve_min)) as [δ [H6 H7]].
+    exists δ. split. lra. intros x H8. specialize (H7 x H8). repeat rewrite <- Rdiv_1_l. apply lemma_1_22; auto.
+Qed.
+
+Lemma limit_div : forall f1 f2 a L1 L2,
+  ⟦ lim a ⟧ f1 = L1 -> ⟦ lim a ⟧ f2 = L2 -> L2 <> 0 -> ⟦ lim a ⟧ ((f1 / f2)%f) = L1 / L2.
+Proof.
+  intros f1 f2 a L1 L2 H1 H2 H3. replace (f1 / f2)%f with (f1 ∙ (f_inv f2))%f by reflexivity.
+  unfold Rdiv. apply limit_mult; auto. apply limit_inv; auto.
+Qed.
+
+Lemma limit_mirr : forall f a L,
+  L = ⟦ lim a ⟧ f <-> ⟦ lim a ⟧ f = L.
+Proof.
+  intros f a L. split; intros H1; auto.
 Qed.
