@@ -30,10 +30,6 @@ Definition limit (D : Ensemble R) (f : Rsub D -> R) (a L : R) : Prop :=
   encloses D a /\
     (∀ ε, ε > 0 ⇒ ∃ δ, δ > 0 /\ ∀ x : Rsub D, 0 < |x - a| < δ ⇒ |f x - L| < ε).
 
-Notation "L '=' ⟦ 'lim' a ⟧ f" :=
-  (limit (Full_set ℝ) f a L)
-    (at level 70, f at level 0, no associativity, format "L  '='  ⟦  'lim'  a  ⟧  f").
-
 Notation "⟦ 'lim' a ⟧ f '=' L" := 
   (limit (Full_set ℝ) f a L) 
     (at level 70, f at level 0, no associativity, format "⟦  'lim'  a  ⟧  f  '='  L").
@@ -176,6 +172,7 @@ Definition f_mult_c (D : Ensemble R) (a:R) f (x:Rsub D) : R := a * f x.
 Definition f_minus (D : Ensemble R) f1 f2 (x:Rsub D) : R := f1 x - f2 x.
 Definition f_div (D : Ensemble R) f1 f2 (x:Rsub D) : R := f1 x / f2 x.
 Definition f_div_c (D : Ensemble R) (a:R) f (x:Rsub D) : R := a / f x.
+Definition f_pow (D : Ensemble R) f n (x:Rsub D) : R := f x ^ n.
 Definition f_comp (D1 D2 : Ensemble R) (f1 : (Rsub D2) -> R) (f2 : (Rsub D1) -> (Rsub D2))  (x:Rsub D1) : R := f1 (f2 x).
 Definition f_inv (D : Ensemble R) f (x:Rsub D) : R := / f x.
 Definition f_mirr (D : Ensemble R) f (x:Rsub D) : R := f (- x).
@@ -183,22 +180,24 @@ Definition f_mirr (D : Ensemble R) f (x:Rsub D) : R := f (- x).
 Declare Scope f_scope.
 Delimit Scope f_scope with f.
 
-Arguments f_plus {D} f1%_F f2%_F x%_R.
-Arguments f_opp {D} f%_F x%_R.
-Arguments f_mult {D} f1%_F f2%_F x%_R.
-Arguments f_mult_c {D} a%_R f%_F x%_R.
-Arguments f_minus {D} f1%_F f2%_F x%_R.
-Arguments f_div {D} f1%_F f2%_F x%_R.
-Arguments f_div_c {D} a%_R f%_F x%_R.
-Arguments f_comp {D1 D2} f1%_F f2%_F x%_R.
-Arguments f_inv {D} f%_F x%_R.
-Arguments f_mirr {D} f%_F x%_R.
+Arguments f_plus {D} f1%_f f2%_f x%_R.
+Arguments f_opp {D} f%_f x%_R.
+Arguments f_mult {D} f1%_f f2%_f x%_R.
+Arguments f_mult_c {D} a%_R f%_f x%_R.
+Arguments f_minus {D} f1%_f f2%_f x%_R.
+Arguments f_div {D} f1%_f f2%_f x%_R.
+Arguments f_div_c {D} a%_R f%_f x%_R.
+Arguments f_comp {D1 D2} f1%_f f2%_f x%_R.
+Arguments f_inv {D} f%_f x%_R.
+Arguments f_mirr {D} f%_f x%_R.
+Arguments f_pow {D} f%_f n%_nat x%_R.
 
 Infix "+" := f_plus : f_scope.
 Notation "- x" := (f_opp x) : f_scope.
 Infix "∙" := f_mult (at level 40) : f_scope.
 Infix "-" := f_minus : f_scope.
 Infix "/" := f_div : f_scope.
+Infix "^" := f_pow (at level 30) : f_scope.
 Infix "*" := f_mult_c : f_scope.
 Notation "/ x" := (f_inv x) : f_scope.
 Notation "f1 'o' f2" := (f_comp f1 f2)
@@ -277,7 +276,7 @@ Qed.
 Lemma limit_minus : forall f1 f2 a L1 L2,
   ⟦ lim a ⟧ f1 = L1 -> ⟦ lim a ⟧ f2 = L2 -> ⟦ lim a ⟧ ((f1 - f2)%f) = L1 - L2.
 Proof.
-   intros f1 f2 a L1 L2 H1 [_ H2]. rewrite f_minus_plus. unfold Rminus. apply limit_plus. auto.
+   intros f1 f2 a L1 L2 H1 [_ H2]. rewrite f_minus_plus. unfold Rminus. apply limit_plus; auto.
    split; try apply Full_set_encloses. intros ε H3. specialize (H2 ε H3) as [δ [H4 H5]].
    exists δ. split; auto. intros x H6. apply H5 in H6. unfold f_opp. solve_abs.
 Qed.
@@ -298,14 +297,15 @@ Proof.
 Qed.
 
 Lemma limit_inv : forall f a L,
-  ⟦ lim a ⟧ f = L -> L <> 0 -> ⟦ lim a ⟧ (fun x => / f x) = / L.
+  ⟦ lim a ⟧ f = L -> L <> 0 -> ⟦ lim a ⟧ ((/ f)%f) = / L.
 Proof.
   intros f a L [_ H1] H2. split.
   - apply Full_set_encloses.
   - intros ε H3. assert (|L| / 2 > 0) as H4 by solve_abs. assert (ε * |L|^2 / 2 > 0) as H5.
     { apply Rmult_lt_0_compat. apply pow2_gt_0 in H2. solve_abs. apply Rinv_pos; lra. }
     specialize (H1 (Rmin (|L| / 2) (ε * |L|^2 / 2)) ltac:(solve_min)) as [δ [H6 H7]].
-    exists δ. split. lra. intros x H8. specialize (H7 x H8). repeat rewrite <- Rdiv_1_l. apply lemma_1_22; auto.
+    exists δ. split. lra. intros x H8. specialize (H7 x H8). repeat rewrite <- Rdiv_1_l. unfold f_inv.
+    rewrite <- Rdiv_1_l. apply lemma_1_22; auto.
 Qed.
 
 Lemma limit_div : forall f1 f2 a L1 L2,
@@ -315,8 +315,44 @@ Proof.
   unfold Rdiv. apply limit_mult; auto. apply limit_inv; auto.
 Qed.
 
-Lemma limit_mirr : forall f a L,
-  L = ⟦ lim a ⟧ f <-> ⟦ lim a ⟧ f = L.
+Lemma limit_pow : forall f a L n,
+  ⟦ lim a ⟧ f = L ⇒ ⟦ lim a ⟧ ((f ^ n)%f) = L ^ n.
 Proof.
-  intros f a L. split; intros H1; auto.
+  intros f a L n H1. induction n as [| n IH].
+  - rewrite pow_O. replace ((fun x0 : Rsub (Full_set ℝ) => f x0 ^ 0)) with (fun x0 : Rsub (Full_set ℝ) => 1).
+    2 : { extensionality x. rewrite pow_O. reflexivity. } apply limit_const.
+  - simpl. apply limit_mult; auto.
 Qed.
+
+Lemma lim_equality_substitution : forall f a L1 L2,
+  L1 = L2 -> ⟦ lim a ⟧ f = L1 -> ⟦ lim a ⟧ f = L2.
+Proof.
+  intros f a L1 L2 H1 [_ H2]. split.
+  - apply Full_set_encloses.
+  - intros ε H3. specialize (H2 ε H3) as [δ [H4 H5]].
+    exists δ; split; auto. intros x. specialize (H5 x). solve_abs.
+Qed.
+
+Ltac solve_lim :=
+  try solve_R;
+  match goal with
+  | [ |- ⟦ lim ?a ⟧ ?f = ?rhs ] =>
+    set (b := mkRsub (Full_set R) a ltac:(apply Full_intro));
+    let L2' := eval cbv beta in (f b) in
+    let L2 := eval simpl in L2' in
+    clear b;
+    let H := fresh "H" in 
+    assert (⟦ lim a ⟧ f = L2) as H by 
+    (repeat first [ 
+                     apply limit_div
+                     | apply limit_pow
+                     | apply limit_mult
+                     | apply limit_inv
+                     | apply limit_plus
+                     | apply limit_minus
+                     | apply limit_const
+                     | apply limit_id
+                     | solve_R
+                 ]);
+    apply (lim_equality_substitution f a L2 rhs); solve_R
+  end.

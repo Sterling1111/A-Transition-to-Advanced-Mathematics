@@ -42,7 +42,7 @@ Ltac solve_min :=
   try intros; repeat unfold Rmin in *; repeat destruct Rle_dec in *; repeat unfold Nat.min; repeat destruct le_dec; try nra; try field; try nia.
 
 Ltac solve_R :=
-  try solve_INR; try solve_abs; try solve_max; try solve_min.
+  try solve_INR; try solve_abs; try solve_max; try solve_min; try tauto; auto.
 
 Lemma pow2_gt_0 : forall r, r <> 0 -> r ^ 2 > 0.
 Proof.

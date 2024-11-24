@@ -461,6 +461,16 @@ Proof.
   rewrite sum_f_Si; try lia. rewrite sum_f_nth_cons_6; try lia. simpl. lra.
 Qed.
 
+Lemma sum_f_nth_cons_8 : forall (l : list R) (r : R) (f : nat -> R),
+  (length l > 0)%nat -> sum_f 0 (length l) (fun i => (nth i (r :: l) 0) * f i) = f 0%nat * r + sum_f 0 (length l - 1) (fun i => nth i l 0 * f (i + 1)%nat).
+Proof.
+  intros l r f H1.
+  rewrite sum_f_Si; try lia. rewrite sum_f_reindex' with (s := 1%nat) (i := 0%nat). replace (length l - 1 + 1)%nat with (length l) by lia.
+  replace (nth 0 (r :: l) 0) with r by reflexivity. rewrite Rmult_comm. rewrite Rplus_comm. apply Rplus_eq_compat_l with (r := f 0%nat * r).
+  apply sum_f_equiv; try lia. intros k H2. replace (r :: l) with ([r] ++ l) by reflexivity. rewrite app_nth2; try (simpl; lia). simpl.
+  replace (k - 1 + 1)%nat with k by lia. reflexivity.
+Qed.
+
 Lemma exists_max_of_sequence_on_interval : forall (a : nat -> R) (i j : nat),
   (i <= j)%nat -> exists n : nat, (i <= n <= j)%nat /\ forall m : nat, (i <= m <= j)%nat -> a m <= a n.
 Proof.
