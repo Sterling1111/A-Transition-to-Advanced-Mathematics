@@ -2,6 +2,9 @@ Require Import Imports.
 
 Open Scope R_scope.
 
+Notation "| x |" := (Rabs x) 
+  (at level 200, x at level 0, format "| x |", no associativity) : R_scope.
+
 Ltac break_INR :=
   repeat match goal with
   | [ |- context[INR (?n + ?m)] ] =>

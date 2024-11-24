@@ -1,4 +1,5 @@
-Require Import Imports Limit Sums Chapter36.
+Require Import Imports Limit Sums Chapter36 Reals_util Sets.
+Import SetNotations.
 
 Definition continuous_at_a (D : Ensemble R) (f : Rsub D -> R) (a : Rsub D) : Prop :=
   ⟦ lim a ⟧ f D = f a.
@@ -11,6 +12,51 @@ Example example_37_2 : forall c d,
 Proof.
   intros c d a. apply lemma_36_2.
 Qed.
+
+Section section_37_3.
+  Let f (x : R) : R :=
+    match Rle_dec 0 x, Rle_dec x 1 with
+    | left _, left _ => 1
+    | _, _ => 0
+    end.
+
+  Lemma f_spec : forall x,
+    (0 <= x <= 1)%R -> f x = 1 /\ (x < 0 \/ x > 1)%R -> f x = 0.
+  Proof.
+    intros x H1 [H2 H3]. unfold f. destruct (Rle_dec 0 x), (Rle_dec x 1); simpl in *; lra.
+  Qed.
+
+  Let a := mkRsub (Full_set R) 1 ltac:(apply Full_intro).
+
+  Example example_37_3 : ~ continuous_at_a (Full_set R) f a.
+  Proof.
+    intros [H1 H2]. simpl in H2. specialize (H2 (1/2) ltac:(lra)) as [δ [H3 H4]].
+    set (x := mkRsub (Full_set R) (1 + δ/2) ltac:(apply Full_intro)).
+    specialize (H4 x ltac:(simpl; solve_abs)). replace (f x) with 0 in H4.
+    2 : { unfold f. destruct (Rle_dec 0 x), (Rle_dec x 1); simpl in *; lra. }
+    replace (f 1) with 1 in H4. 2 : { unfold f. destruct (Rle_dec 0 1), (Rle_dec 1 1); simpl in *; lra. }
+    solve_abs.
+  Qed.
+End section_37_3.
+
+Section section_37_4.
+  Let f : Rsub (fun x => 0 <= x) -> R := fun x => x.
+  Let D : Ensemble R := fun x => 0 <= x.
+  
+  Lemma H1 : 0 ∈ D.
+  Proof.
+    unfold D. unfold In. lra.
+  Qed.
+
+  Let a := mkRsub (fun x => 0 <= x) 0 H1.
+
+  Example example_37_4 : ~ continuous_at_a D f a.
+  Proof.
+    intros [[b [c [H1 H2]]] _]. simpl in H1. specialize (H2 (b / 2) ltac:(unfold In; lra)).
+    unfold In, D in H2. lra.
+  Qed.
+
+End section_37_4.
 
 Definition polynomial (l : list R) : R -> R :=
   fun x => sum_f 0 (length l - 1) (fun i => nth i l 0 * x^(length l - 1 - i)).
