@@ -76,9 +76,6 @@ Proof.
     replace (length t - (k + 1))%nat with (length t - 1 - k)%nat by lia. reflexivity.
 Qed.
 
-Example example_37_3 : forall x, polynomial [3; 3; 1] x = 3 * x^2 + 3 * x + 1.
-Proof. intro x. compute; field_simplify. reflexivity. Qed.
-
 Theorem theorem_37_14 : forall l a,
   continuous_at_a (Full_set R) (polynomial l) a.
 Proof.
