@@ -58,8 +58,17 @@ Section section_37_4.
 
 End section_37_4.
 
+Definition polynomial' (l : list R) : (Rsub (Full_set (R))) -> R :=
+  fun x => sum_f 0 (length l - 1) (fun i => nth i l 0 * x^(length l - 1 - i)).
+
 Definition polynomial (l : list R) : R -> R :=
   fun x => sum_f 0 (length l - 1) (fun i => nth i l 0 * x^(length l - 1 - i)).
+
+Lemma poly_equiv : forall l, polynomial' l = polynomial l.
+Proof.
+  intros l. apply functional_extensionality. intros x. unfold polynomial, polynomial'.
+  apply sum_f_equiv; try lia. intros k H1. reflexivity.
+Qed.
 
 Lemma poly_nil : forall x, polynomial [] x = 0.
 Proof.
@@ -76,16 +85,13 @@ Proof.
     replace (length t - (k + 1))%nat with (length t - 1 - k)%nat by lia. reflexivity.
 Qed.
 
-Example example_37_3 : forall x, polynomial [3; 3; 1] x = 3 * x^2 + 3 * x + 1.
-Proof. intro x. compute; field_simplify. reflexivity. Qed.
-
 Theorem theorem_37_14 : forall l a,
   continuous_at_a (Full_set R) (polynomial l) a.
 Proof.
   intros l a. induction l as [| h t IH].
-  - replace ((fun x : Rsub (Full_set R) => polynomial [] x)) with (fun x : Rsub (Full_set R) => 0).
+  - replace (fun x : (Rsub (Full_set R)) => polynomial [] x) with (fun x : Rsub (Full_set R) => 0).
     2 : { extensionality x. rewrite poly_nil. reflexivity. } unfold continuous_at_a. solve_lim.
-  - replace ((fun x : Rsub (Full_set R) => polynomial (h :: t) x)) with (fun x : Rsub (Full_set R) => h * x^(length t) + polynomial t x).
+  - replace (fun x : Rsub (Full_set R) => polynomial (h :: t) x) with (fun x : Rsub (Full_set R) => h * x^(length t) + polynomial t x).
     2 : { extensionality x. rewrite poly_cons. reflexivity. } 
     unfold continuous_at_a. solve_lim.
 Qed.
@@ -98,5 +104,6 @@ Qed.
 
 Lemma poly_c_example : continuous_on (Full_set R) (fun x => 5*x^5 + 4*x^4 + 3*x^3 + 2*x^2 + x + 1).
 Proof.
-  unfold continuous_on. intros a. unfold continuous_at_a. solve_lim.
+  replace (fun x : Rsub (Full_set R) => 5 * x ^ 5 + 4 * x ^ 4 + 3 * x ^ 3 + 2 * x ^ 2 + x + 1) with (polynomial' [5; 4; 3; 2; 1; 1]).
+  2 : { extensionality x. compute; lra. } rewrite poly_equiv. apply theorem_37_14'.
 Qed.

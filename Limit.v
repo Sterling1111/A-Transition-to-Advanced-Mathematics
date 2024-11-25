@@ -337,10 +337,13 @@ Ltac solve_lim :=
   try solve_R;
   match goal with
   | [ |- ⟦ lim ?a ⟧ ?f = ?rhs ] =>
-    set (b := mkRsub (Full_set R) a ltac:(apply Full_intro));
+    let b :=
+      match type of a with
+      | R => constr:(mkRsub (Full_set R) a ltac:(apply Full_intro))
+      | _ => constr:(a)
+      end in
     let L2' := eval cbv beta in (f b) in
     let L2 := eval simpl in L2' in
-    clear b;
     let H := fresh "H" in 
     assert (⟦ lim a ⟧ f = L2) as H by 
     (repeat first [ 
