@@ -1,4 +1,4 @@
-Require Import Imports Sets WI_SI_WO Reals_util Sums.
+Require Import Imports Sets WI_SI_WO Reals_util Sums Notations.
 Require Export Chapter12.
 Import SetNotations.
 

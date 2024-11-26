@@ -1,22 +1,7 @@
-Require Import Imports Sequence Sets Chapter12 Reals_util Sequence.
+Require Import Imports Sequence Sets Chapter12 Reals_util Sequence Notations.
 Import SetNotations.
 
 Open Scope R_scope.
-
-Notation "'∀' x , P" := (forall x, P)
-  (at level 200, x ident, P at level 200, only parsing).
-
-Notation "'∃' x , P" := (exists x, P)
-  (at level 200, x ident, P at level 200).
-
-Notation "∀ x : T , P" := (forall x : T, P)
-  (at level 200, x ident, T at level 200, P at level 200, only parsing).
-
-Notation "∃ x , P" := (exists x, P)
-  (at level 200, x ident, P at level 200, only parsing).
-
-Notation "∃ x : T , P" := (exists x : T, P)
-  (at level 200, x ident, T at level 200, P at level 200, only parsing).
 
 Definition encloses (D : Ensemble R) (a : R) : Prop :=
   exists b c, b < a < c /\ (fun x => b <= x <= c) ⊆ D.
@@ -37,45 +22,6 @@ Notation "⟦ 'lim' a ⟧ f '=' L" :=
 Notation "⟦ 'lim' a ⟧ f D '=' L" := 
   (limit D f a L) 
     (at level 70, f at level 0, D at level 0, no associativity, format "⟦  'lim'  a  ⟧  f  D  '='  L").
-
-(*
-Definition limit_pos_inf (f : ℝ -> ℝ) (L : ℝ) : Prop :=
-  ∀ ε, ε > 0 ⇒
-    ∃ N, ∀ x, x > N ⇒ |f x - L| < ε.
-
-Definition limit_neg_inf (f : ℝ -> ℝ) (L : ℝ) : Prop :=
-  ∀ ε, ε > 0 ⇒
-    ∃ N, ∀ x, x < N ⇒ |f x - L| < ε.
-
-Definition limit_right (f : ℝ -> ℝ) (D : Ensemble ℝ) (a L : ℝ) : Prop :=
-  ∀ ε, ε > 0 ⇒
-    ∃ δ, ∀ x, x ∈ D ⇒ 0 < x - a < δ ⇒ |f x - L| < ε.
-
-Definition limit_left (f : ℝ -> ℝ) (D : Ensemble ℝ) (a L : ℝ) : Prop :=
-  ∀ ε, ε > 0 ⇒
-    ∃ δ, ∀ x, x ∈ D ⇒ 0 < a - x < δ ⇒ |f x - L| < ε.
-
-Notation "⟦ 'lim' a ⟧ f D '=' L" := 
-  (limit f D a L) 
-  (at level 70, f at level 0, D at level 0, no associativity, format "⟦  'lim'  a  ⟧  f  D  '='  L").
-
-Notation "⟦ 'lim' ∞ ⟧ f '=' L" := 
-  (limit_pos_inf f L)
-  (at level 70, f at level 0, no associativity, format "⟦  'lim' ∞  ⟧  f  '='  L").
-
-Notation "⟦ 'lim' -∞ ⟧ f '=' L" := 
-  (limit_neg_inf f L)
-  (at level 70, f at level 0, no associativity, format "⟦  'lim'  -∞  ⟧  f  '='  L").
-
-Notation "⟦ 'lim' a ⁺ ⟧ f '=' L" := 
-  (limit_right f (Full_set ℝ) a L)
-  (at level 70, f at level 0, no associativity, format "⟦  'lim'  a ⁺  ⟧  f  '='  L").
-
-Notation "⟦ 'lim' a ⁻ ⟧ f '=' L" := 
-  (limit_left f (Full_set ℝ) a L)
-  (at level 70, f at level 0, no associativity, format "⟦  'lim'  a ⁻  ⟧  f  '='  L").
-
-*)
 
 Lemma Full_set_encloses : forall a, encloses (Full_set ℝ) a.
 Proof.

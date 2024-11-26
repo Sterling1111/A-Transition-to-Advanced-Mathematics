@@ -4,6 +4,7 @@ Require Export Chapter9.
 Import SetNotations.
 
 Open Scope R_scope.
+Open Scope set_scope.
 
 Lemma lemma_10_1_a : 3 ∈ ⦃ 1, 2, 3, 4, 5, 6, 7 ⦄.
 Proof. autoset. Qed.

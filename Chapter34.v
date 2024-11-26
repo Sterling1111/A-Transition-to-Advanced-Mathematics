@@ -1,4 +1,4 @@
-Require Import Imports Sequence Reals_util.
+Require Import Imports Sequence Reals_util Notations.
 Require Export Chapter20.
 
 Open Scope R_scope.

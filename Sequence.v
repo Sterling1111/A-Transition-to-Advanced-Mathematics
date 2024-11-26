@@ -1,4 +1,4 @@
-Require Import Imports Reals_util Completeness Chapter13 Sums.
+Require Import Imports Reals_util Completeness Chapter13 Sums Notations.
 
 Open Scope R_scope.
 

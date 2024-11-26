@@ -192,3 +192,17 @@ Lemma lemma_6_7 : forall z1 : Z, Z.Odd z1 -> exists z2 z3 : Z, z1 = z2 ^ 2 - z3 
 Proof.
     intros z1 [k H1]. exists (k + 1), k; lia.
 Qed.
+
+Lemma Nat_even_false_Odd : forall n,
+  Nat.even n = false -> Nat.Odd n.
+Proof.
+  intros n H1. pose proof Nat.Even_or_Odd n as [H2 | H2]; auto.
+  apply Nat.even_spec in H2. rewrite H1 in H2. inversion H2.
+Qed.
+
+Lemma Nat_odd_false_Even : forall n,
+  Nat.odd n = false -> Nat.Even n.
+Proof.
+  intros n H1. pose proof Nat.Even_or_Odd n as [H2 | H2]; auto.
+  apply Nat.odd_spec in H2. rewrite H1 in H2. inversion H2.
+Qed.

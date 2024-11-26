@@ -1,17 +1,7 @@
-Require Import Imports Sets.
+Require Import Imports Sets Notations.
 Require Export Chapter11.
 
 Import SetNotations.
-
-Notation ℕ := nat.
-Notation ℤ := Z.
-Notation ℚ := Q.
-Notation ℝ := R.
-
-(* Nicer notation for logical implication *)
-Notation "A ⇒ B" := (A -> B) (at level 99, right associativity) : type_scope.
-(* Define notation for logical equivalence (if and only if) *)
-Notation "A ⟺ B" := (A <-> B) (at level 99, no associativity) : type_scope.
 
 Open Scope Z_scope.
 

@@ -1,4 +1,4 @@
-Require Import Imports QRT Prime.
+Require Import Imports QRT Prime Notations.
 
 Require Export Chapter18.
 

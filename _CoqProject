@@ -2,6 +2,7 @@
 -arg -w -arg "-uniform-inheritance,-ambiguous-paths"
 
 Imports.v
+Notations.v
 Reals_util.v
 Complex.v
 Completeness.v
@@ -15,7 +16,7 @@ Prime.v
 Sequence.v
 Series.v
 Limit.v
-Function.v
+Functions.v
 Chapter6.v
 Chapter7.v
 Chapter8.v

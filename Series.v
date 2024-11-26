@@ -1,4 +1,4 @@
-Require Import Imports Sums Sequence Reals_util Chapter34.
+Require Import Imports Sums Sequence Reals_util Chapter34 Notations.
 
 Open Scope R_scope.
 

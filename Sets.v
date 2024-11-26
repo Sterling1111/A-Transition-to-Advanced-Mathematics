@@ -50,7 +50,25 @@ Notation "ℙ( A )" := (Power_set A) (at level 20, format "ℙ( A )") : set_scop
 Definition Finite_set {U : Type} (A : Ensemble U) : Prop :=
   exists (l : list U), list_to_ensemble l = A.
 
+Definition Infinite_set {U : Type} (A : Ensemble U) : Prop :=
+  ~ Finite_set A.
+
+Open Scope set_scope.
+
+Record subType {A : Type} (E : Ensemble A) : Type := mkSubType {
+  val : A;
+  property : val ∈ E
+}.
+
+Definition cardinal_le {A B : Type} (X : Ensemble A) (Y : Ensemble B) : Prop :=
+  (Finite_set X /\ Infinite_set Y) \/ (exists n m, ‖ X ‖ = n /\ ‖ Y ‖ = m /\ n <= m)
+  \/ (exists f : (subType X) -> (subType Y), injective _ _ f).
+
+Notation "‖ X ‖ <= ‖ Y ‖" := (cardinal_le X Y) (at level 70, format "‖ X ‖  <=  ‖ Y ‖") : set_scope.
+
 End SetNotations.
+
+Close Scope set_scope.
 
 Import SetNotations.
 
@@ -637,7 +655,7 @@ Proof.
         apply Union_is_finite; auto.
   - intros H1. induction H1 as [| A H1 IH].
     -- exists []. rewrite list_to_ensemble_nil. reflexivity.
-    -- destruct IH as [l H2]. exists (x :: l). unfold Add. rewrite <- H2. autoset.
+    -- destruct IH as [l H2]. unfold Finite_set. exists (x :: l). unfold Add. rewrite <- H2. autoset.
 Qed.
 
 Lemma not_in_minus_eq : forall (U : Type) (A : Ensemble U) (x : U),
