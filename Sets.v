@@ -2,6 +2,18 @@ Require Import Imports Binomial.
 
 Import ListNotations Binomial.Choose_Notations.
 
+Definition injective {A B : Type} (f : A -> B) : Prop :=
+  forall x y : A, f x = f y -> x = y.
+
+Definition surjective {A B : Type} (f : A -> B) : Prop :=
+  forall y : B, exists x : A, f x = y.
+
+Definition bijective {A B : Type} (f : A -> B) : Prop :=
+  injective f /\ surjective f.
+
+Definition image {A B : Type} (f : A -> B) : Ensemble B :=
+  fun y : B => exists x : A,  f x = y.
+
 Declare Scope set_scope.
 Delimit Scope set_scope with set.
 
@@ -60,11 +72,21 @@ Record subType {A : Type} (E : Ensemble A) : Type := mkSubType {
   property : val ∈ E
 }.
 
-Definition cardinal_le {A B : Type} (X : Ensemble A) (Y : Ensemble B) : Prop :=
-  (Finite_set X /\ Infinite_set Y) \/ (exists n m, ‖ X ‖ = n /\ ‖ Y ‖ = m /\ n <= m)
-  \/ (exists f : (subType X) -> (subType Y), injective _ _ f).
+Definition cardinal_eq {A B : Type} (X : Ensemble A) (Y : Ensemble B) : Prop :=
+  exists f : (subType X) -> (subType Y), bijective f.
 
+Definition cardinal_lt {A B : Type} (X : Ensemble A) (Y : Ensemble B) : Prop :=
+  (exists f : (subType X) -> (subType Y), injective f) /\
+  (~exists f : (subType X) -> (subType Y), bijective f).
+
+Definition cardinal_le {A B : Type} (X : Ensemble A) (Y : Ensemble B) : Prop :=
+  exists f : (subType X) -> (subType Y), injective f.
+
+Notation "‖ X ‖ = ‖ Y ‖" := (cardinal_eq X Y) (at level 70, format "‖ X ‖  =  ‖ Y ‖") : set_scope.
 Notation "‖ X ‖ <= ‖ Y ‖" := (cardinal_le X Y) (at level 70, format "‖ X ‖  <=  ‖ Y ‖") : set_scope.
+Notation "‖ X ‖ < ‖ Y ‖" := (cardinal_lt X Y) (at level 70, format "‖ X ‖  <  ‖ Y ‖") : set_scope.
+Notation "‖ X ‖ >= ‖ Y ‖" := (cardinal_le Y X) (at level 70, format "‖ X ‖  >=  ‖ Y ‖") : set_scope.
+Notation "‖ X ‖ > ‖ Y ‖" := (cardinal_lt Y X) (at level 70, format "‖ X ‖  >  ‖ Y ‖") : set_scope.
 
 End SetNotations.
 

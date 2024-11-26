@@ -1,4 +1,4 @@
-Require Import Imports Limit Sums Chapter36 Reals_util Sets.
+Require Import Imports Limit Sums Chapter36 Reals_util Sets Notations Functions.
 Import SetNotations.
 
 Definition continuous_at_a (D : Ensemble R) (f : Rsub D -> R) (a : Rsub D) : Prop :=
@@ -8,7 +8,7 @@ Definition continuous_on (D : Ensemble R) (f : Rsub D -> R) : Prop :=
   ∀ a : Rsub D, continuous_at_a D f a.
 
 Example example_37_2 : forall c d,
-  continuous_on (Full_set R) (fun x => c * x + d).
+  continuous_on R (fun x => c * x + d).
 Proof.
   intros c d a. apply lemma_36_2.
 Qed.
@@ -26,11 +26,11 @@ Section section_37_3.
     intros x H1 [H2 H3]. unfold f. destruct (Rle_dec 0 x), (Rle_dec x 1); simpl in *; lra.
   Qed.
 
-  Let a := mkRsub (Full_set R) 1 ltac:(apply Full_intro).
+  Let a := mkRsub R 1 ltac:(apply Full_intro).
 
-  Example example_37_3 : ~ continuous_at_a (Full_set R) f a.
+  Example example_37_3 : ~ continuous_at_a R f a.
   Proof.
-    intros [H1 H2]. simpl in H2. specialize (H2 (1/2) ltac:(lra)) as [δ [H3 H4]].
+    intros [H1 H2]. unfold Type_to_Ensemble in *. simpl in H2. specialize (H2 (1/2) ltac:(lra)) as [δ [H3 H4]].
     set (x := mkRsub (Full_set R) (1 + δ/2) ltac:(apply Full_intro)).
     specialize (H4 x ltac:(simpl; solve_abs)). replace (f x) with 0 in H4.
     2 : { unfold f. destruct (Rle_dec 0 x), (Rle_dec x 1); simpl in *; lra. }
@@ -58,7 +58,7 @@ Section section_37_4.
 
 End section_37_4.
 
-Definition polynomial' (l : list R) : (Rsub (Full_set (R))) -> R :=
+Definition polynomial' (l : list R) : (Rsub (Full_set R)) -> R :=
   fun x => sum_f 0 (length l - 1) (fun i => nth i l 0 * x^(length l - 1 - i)).
 
 Definition polynomial (l : list R) : R -> R :=
@@ -86,9 +86,9 @@ Proof.
 Qed.
 
 Theorem theorem_37_14 : forall l a,
-  continuous_at_a (Full_set R) (polynomial l) a.
+  continuous_at_a R (polynomial l) a.
 Proof.
-  intros l a. induction l as [| h t IH].
+  intros l a. unfold Type_to_Ensemble in *. induction l as [| h t IH].
   - replace (fun x : (Rsub (Full_set R)) => polynomial [] x) with (fun x : Rsub (Full_set R) => 0).
     2 : { extensionality x. rewrite poly_nil. reflexivity. } unfold continuous_at_a. solve_lim.
   - replace (fun x : Rsub (Full_set R) => polynomial (h :: t) x) with (fun x : Rsub (Full_set R) => h * x^(length t) + polynomial t x).
@@ -97,13 +97,13 @@ Proof.
 Qed.
 
 Theorem theorem_37_14' : forall l,
-  continuous_on (Full_set R) (polynomial l).
+  continuous_on R (polynomial l).
 Proof.
   intros l a. apply theorem_37_14.
 Qed.
 
-Lemma poly_c_example : continuous_on (Full_set R) (fun x => 5*x^5 + 4*x^4 + 3*x^3 + 2*x^2 + x + 1).
+Lemma poly_c_example : continuous_on R (fun x => 5*x^5 + 4*x^4 + 3*x^3 + 2*x^2 + x + 1).
 Proof.
-  replace (fun x : Rsub (Full_set R) => 5 * x ^ 5 + 4 * x ^ 4 + 3 * x ^ 3 + 2 * x ^ 2 + x + 1) with (polynomial' [5; 4; 3; 2; 1; 1]).
+  replace (fun x : Rsub R => 5 * x ^ 5 + 4 * x ^ 4 + 3 * x ^ 3 + 2 * x ^ 2 + x + 1) with (polynomial' [5; 4; 3; 2; 1; 1]).
   2 : { extensionality x. compute; lra. } rewrite poly_equiv. apply theorem_37_14'.
 Qed.
