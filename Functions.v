@@ -67,8 +67,6 @@ Lemma image_card : forall A B (f : A -> B),
   Finite_set A -> ‖ image f ‖ <= ‖ A ‖.
 Proof.
   intros A B f [l H1]. unfold cardinal_le, image. rewrite subType_Full_set.
-  set (g := map f l). set (E := list_to_ensemble g). exists E. split.
-
 Abort.
 
 Theorem theorem_28_1 : forall A B (f : A -> B),

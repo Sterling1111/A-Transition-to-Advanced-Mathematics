@@ -1023,5 +1023,4 @@ Lemma cardinal_eq_Finite : forall (U V : Type) (A : Ensemble U) (B : Ensemble V)
   Finite_set A -> Finite_set B -> ‖A‖ = ‖B‖ -> exists m n : nat, ‖A‖ = m /\ ‖B‖ = n /\ m = n.
 Proof.
   intros U V A B [l1 H1] [l2 H2] [f [H3 H4]]. exists (length l1), (length l2). repeat split.
-  - unfold injective in H3. unfold surjective
-Qed.
+Admitted.
