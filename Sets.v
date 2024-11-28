@@ -62,10 +62,27 @@ Notation "ℙ( A )" := (Power_set A) (at level 20, format "ℙ( A )") : set_scop
 Definition Finite_set {U : Type} (A : Ensemble U) : Prop :=
   exists (l : list U), list_to_ensemble l = A.
 
+Definition Finite_set' {U : Type} (A : Ensemble U) : Prop :=
+  exists (l : list U), NoDup l /\ list_to_ensemble l = A.
+
 Definition Infinite_set {U : Type} (A : Ensemble U) : Prop :=
   ~ Finite_set A.
 
 Open Scope set_scope.
+
+Lemma exists_no_Dup : forall (U : Type) (l : list U),
+  exists (l' : list U), NoDup l' /\ (forall x, List.In x l <-> List.In x l').
+Proof.
+  intros U l. induction l as [| h t [l' [IH1 IH2]]].
+  - exists []. split; [ apply NoDup_nil | intros; split; intros H1; inversion H1 ].
+  - pose proof classic (List.In h t) as [H1 | H1].
+    -- exists l'. split; auto. intros x. split; intros H2.
+       * apply IH2. destruct H2 as [H2 | H2]; auto. rewrite <- H2. auto.
+       * simpl. apply IH2 in H2. auto.
+    -- exists (h :: l'). split. 
+       * apply NoDup_cons; auto. intros H2. apply H1. apply IH2. auto.
+       * intros x. split; intros [H2 | H2]; solve [left; auto | right; apply IH2; auto].
+Qed.  
 
 Record subType {A : Type} (E : Ensemble A) : Type := mkSubType {
   val : A;
@@ -644,6 +661,15 @@ Proof.
     -- apply In_list_to_ensemble in H2. apply In_list_to_ensemble. apply H1; auto.
 Qed.
 
+Lemma Finite_set_iff_Finite_set' : forall (U : Type) (A : Ensemble U),
+  Finite_set A <-> Finite_set' A.
+Proof.
+  intros U A. split; intros [l H1].
+  - pose proof (exists_no_Dup _ l) as [l' [H2 H3]]. exists l'. split; auto.
+    rewrite <- H1. apply list_to_ensemble_eq_iff. intros x. specialize (H3 x). tauto.
+  - exists l. tauto.
+Qed.
+
 Lemma In_Power_set_def : forall (U : Type) (A B : Ensemble U),
   B ∈ ℙ(A) <-> B ⊆ A.
 Proof.
@@ -1019,8 +1045,30 @@ Qed.
 
 End num_subsets.
 
+Lemma list_to_ensemble_card_nodup : forall (U : Type) (l : list U),
+  NoDup l -> ‖list_to_ensemble l‖ = length l.
+Proof.
+  intros U l H1. induction l as [| h t IH].
+  - rewrite list_to_ensemble_nil. apply card_empty.
+  - rewrite list_to_ensemble_cons. replace (length (h :: t)) with (1 + length t). 2 : { simpl. lia. }
+    apply cardinal_Union. apply cardinal_Singleton. apply IH. apply NoDup_cons_iff in H1 as [H1 H2]. auto.
+    apply set_equal_def. intros x. split; intros H2; autoset. apply In_Intersection_def in H2 as [H2 H3].
+    apply In_singleton_def in H2. apply In_list_to_ensemble in H3. subst. apply NoDup_cons_iff in H1 as [H1 H4]; tauto.
+Qed.
+
 Lemma cardinal_eq_Finite : forall (U V : Type) (A : Ensemble U) (B : Ensemble V),
   Finite_set A -> Finite_set B -> ‖A‖ = ‖B‖ -> exists m n : nat, ‖A‖ = m /\ ‖B‖ = n /\ m = n.
 Proof.
-  intros U V A B [l1 H1] [l2 H2] [f [H3 H4]]. exists (length l1), (length l2). repeat split.
+  intros U V A B. repeat rewrite Finite_set_iff_Finite_set'. intros [l1 [H1 H2]] [l2 [H3 H4]] H5.
+  exists (length l1), (length l2). repeat split.
+  - rewrite <- H2. apply list_to_ensemble_card_nodup; auto.
+  - rewrite <- H4. apply list_to_ensemble_card_nodup; auto.
+  - induction l1.
+    -- rewrite list_to_ensemble_nil in H2. subst. destruct H5 as [f [H5 H6]].
+       pose proof classic ()
+       unfold surjective in H6.
+  
+  
+   apply list_to_ensemble_card_nodup in H1, H3. subst.
+    destruct H5 as [f [H5 H6]].
 Admitted.
