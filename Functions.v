@@ -4,17 +4,20 @@ Import SetNotations.
 Open Scope set_scope.
 
 Lemma eq_cardinality_Full_set : forall (A B : Type),
-  (exists f : A -> B, bijective f) -> ‖Full_set A‖ = ‖Full_set B‖.
+  ((exists f : A -> B, bijective f) /\ (exists (a : A) (b : B), True)) \/ ((Full_set A = ∅) /\ (Full_set B = ∅)) -> ‖Full_set A‖ = ‖Full_set B‖.
 Proof.
-  intros A B [f [H1 H2]]. unfold injective in H1. unfold surjective in H2.
-  unfold cardinal_eq.
+  intros A B [[[f [H1 H2]] [a [b _]]] | H2].
+  - unfold injective in H1. unfold surjective in H2. right; 
+  unfold cardinal_eq. repeat split. assert (H3 : a ∈ Full_set A) by apply Full_intro. intros H4. rewrite H4 in H3. autoset.
+  assert (H3 : b ∈ Full_set B) by apply Full_intro. intros H4. rewrite H4 in H3. autoset.
   exists (fun sa : subType (Full_set A) => mkSubType B (Full_set B) (f (val _ sa)) ltac:(apply Full_intro)).
   split.
-  - intros x y H3. destruct x as [x H4], y as [y H5]. simpl in *. specialize (H1 x y).
+  -- intros x y H3. destruct x as [x H4], y as [y H5]. simpl in *. specialize (H1 x y).
     specialize (H1 ltac:(inversion H3; reflexivity)). subst. replace H4 with H5.
     2 : { destruct H4, H5. reflexivity. } reflexivity.
-  - intros y. destruct y as [y H3]. specialize (H2 y) as [x H4]. exists (mkSubType A (Full_set A) x ltac:(apply Full_intro)).
+  -- intros y. destruct y as [y H3]. specialize (H2 y) as [x H4]. exists (mkSubType A (Full_set A) x ltac:(apply Full_intro)).
     simpl. destruct H3, H4. reflexivity.
+  - left. split; destruct H2; auto.
 Qed.
 
 Coercion Type_to_Ensemble (A : Type) : Ensemble A :=
@@ -47,9 +50,9 @@ Proof.
 Qed.
 
 Lemma eq_cardinality_Type : forall A B : Type,
-  (exists f : A -> B, bijective f) -> ‖A‖ = ‖B‖.
+  ((exists f : A -> B, bijective f) /\ (exists (a : A) (b : B), True)) \/ ((Full_set A = ∅) /\ (Full_set B = ∅)) -> ‖A‖ = ‖B‖.
 Proof.
-  intros A B [f H1]. apply eq_cardinality_Full_set. exists f. auto.
+  intros A B [[[f H1] [a [b _]]] | [H1 H2]]; apply eq_cardinality_Full_set; auto. left. split. exists f. auto. exists a, b. auto.
 Qed.
 
 Lemma subType_Full_set : forall A : Type,

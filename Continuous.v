@@ -102,8 +102,6 @@ Proof.
   intros l a. apply theorem_37_14.
 Qed.
 
-so he is going to take a class on AWS about his experience taking analysis 
-
 Lemma poly_c_example : continuous_on R (fun x => 5*x^5 + 4*x^4 + 3*x^3 + 2*x^2 + x + 1).
 Proof.
   replace (fun x : Rsub R => 5 * x ^ 5 + 4 * x ^ 4 + 3 * x ^ 3 + 2 * x ^ 2 + x + 1) with (polynomial' [5; 4; 3; 2; 1; 1]).

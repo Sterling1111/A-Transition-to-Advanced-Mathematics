@@ -14,7 +14,7 @@ Open Scope Z_scope.
 Theorem theorem_29_4 : ‖ ℕ ‖ = ‖ ℤ ‖.
 Proof.
   apply eq_cardinality_Type.
-  set (f := fun n : nat => if Nat.even n then Z.of_nat (n / 2) else - Z.of_nat (n / 2 + 1)).
+  set (f := fun n : nat => if Nat.even n then Z.of_nat (n / 2) else - Z.of_nat (n / 2 + 1)). left. split.
   exists f. split.
   - intros x y H1. unfold f in H1. destruct (Nat.even x) eqn:H2, (Nat.even y) eqn:H3.
     -- apply Nat.even_spec in H2 as [j H2], H3 as [k H3]; subst. apply Nat2Z.inj in H1.
@@ -34,6 +34,7 @@ Proof.
          + apply Nat.even_spec in H3 as [j H3]. lia.
          + apply Nat_even_false_Odd in H3 as [j H3]. rewrite H3. rewrite Nat.mul_comm.
            rewrite Nat.div_add_l; try lia. simpl. lia.
+  - exists 0%nat, 0%Z. auto.
 Qed.
 
 Theorem theorem_29_5 : ‖ ℕ ‖ = ‖ ℚ ‖.

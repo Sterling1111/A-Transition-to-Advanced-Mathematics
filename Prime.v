@@ -596,10 +596,17 @@ Proof.
   intros start len. unfold Zseq_pos. rewrite length_map. reflexivity.
 Qed.
 
-Lemma list_has_len : forall (l : list Z) (a : Z),
+Inductive count_occ {A : Type} (x : A) : list A -> nat -> Prop :=
+  | count_nil : count_occ x nil 0
+  | count_cons_eq : forall l n h, count_occ x l n -> x = h -> count_occ x (h :: l) (S n)
+  | count_cons_neq : forall l n h, count_occ x l n -> x <> h -> count_occ x (h :: l) n.
+
+
+
+Lemma list_has_len : forall (U : Type) (l : list U) (a : U),
   In a l -> (length l > 0)%nat.
 Proof.
-  intros l a. induction l as [| h l' IH].
+  intros U l a. induction l as [| h l' IH].
   - simpl. lia.
   - simpl. intros [H1 | H1]; lia.
 Qed.
@@ -639,16 +646,16 @@ Proof.
 Qed.
 
 Theorem longer_list:
-    forall l1 l2 : list Z,
-    (forall x : Z, In x l1 -> In x l2) ->
-    (exists x : Z, In x l2 /\ ~ In x l1) ->
+    forall U : Type, forall l1 l2 : list U,
+    (forall x, In x l1 -> In x l2) ->
+    (exists x, In x l2 /\ ~ In x l1) ->
     NoDup l1 ->
     (length l2 > length l1)%nat.
   Proof.
-    intros l1 l2 H1 H2 H3. generalize dependent l2.
+    intros U l1 l2 H1 H2 H3. generalize dependent l2.
     induction l1 as [| h l1' IH].
     - intros l2 H4 H5. simpl in *. destruct H5 as [x H5]. assert (exists a, In a l2) as [a H6].
-    { exists x. apply H5. } apply list_has_len in H6. lia.
+    { exists x. apply H5. } Search (In _ _). apply list_has_len in H6. lia.
     - intros l2 H4 [a [H5 H6]]. apply NoDup_cons_iff in H3. destruct H3 as [H3 H3'].
       specialize (IH H3' (remove_one Z.eq_dec a l2)). apply not_in_cons in H6 as [H6 H6'].
       assert (In h (remove_one Z.eq_dec a l2)) as H7.
@@ -658,13 +665,13 @@ Theorem longer_list:
       rewrite remove_one_len in H8. simpl. lia. tauto.
   Qed.
 
-Theorem pigeonhole_principle_Z : forall (l1 l2 : list Z),
+Theorem pigeonhole_principle_list : forall (U : Type) (l1 l2 : list U),
   (forall x, In x l1 -> In x l2) -> (length l2 < length l1)%nat ->
     ~ NoDup l1.
 Proof.
-  intros l1. induction l1 as [|a l1' IH].
+  intros U l1. induction l1 as [|a l1' IH].
   - simpl. lia.
-  - simpl. intros l2 H1 H2. destruct (in_dec Z.eq_dec a (l1')) as [H3 | H3].
+  - simpl. intros l2 H1 H2. pose proof classic (List.In a l1') as [H3 | H3].
     -- intros H4. apply NoDup_cons_iff in H4 as [H4 H5]. tauto.
     -- intros H4. apply IH with (l2 := l2).
        3 : { apply NoDup_cons_iff in H4. tauto. }

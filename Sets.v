@@ -89,8 +89,9 @@ Record subType {A : Type} (E : Ensemble A) : Type := mkSubType {
   property : val ∈ E
 }.
 
-Definition cardinal_eq {A B : Type} (X : Ensemble A) (Y : Ensemble B) : Prop :=
-  exists f : (subType X) -> (subType Y), bijective f.
+Definition cardinal_eq {U V : Type} (A : Ensemble U) (B : Ensemble V) :=
+  (A = ∅ /\ B = ∅) \/
+  (A ≠ ∅ /\ B ≠ ∅ /\ exists (f : subType A -> subType B), bijective f).
 
 Definition cardinal_lt {A B : Type} (X : Ensemble A) (Y : Ensemble B) : Prop :=
   (exists f : (subType X) -> (subType Y), injective f) /\
@@ -613,6 +614,15 @@ Proof.
   intros U. simpl. reflexivity.
 Qed.
 
+Lemma list_to_ensemble_not_empty_exists : forall (U : Type) (l : list U),
+  l ≠ nil <-> exists x, x ∈ list_to_ensemble l.
+Proof.
+  intros U l. split.
+  - intros H1. destruct l as [| h t]; try contradiction.
+    exists h. rewrite list_to_ensemble_cons. autoset.
+  - intros [x H1] H2. destruct l as [| h t]; [ autoset | inversion H2].
+Qed.
+
 Lemma list_to_ensemble_map_not_empty : forall (U V : Type) (l : list U) (f : U -> V),
   l ≠ nil -> list_to_ensemble (map f l) ≠ ∅.
 Proof.
@@ -1056,19 +1066,100 @@ Proof.
     apply In_singleton_def in H2. apply In_list_to_ensemble in H3. subst. apply NoDup_cons_iff in H1 as [H1 H4]; tauto.
 Qed.
 
+Lemma empty_domain_not_bijective : forall (U V : Type) (E : Ensemble V) (f : (subType (∅ : Ensemble U)) -> subType E),
+  E ≠ ∅ -> ~ bijective f.
+Proof.
+  intros U V E f H1 [_ H2]. unfold surjective in H1.
+  pose proof (not_Empty_In V E) as [H3 _]. specialize (H3 H1) as [x H3].
+  set (y := mkSubType V E x H3). specialize (H2 y) as [[val prop] H2]. autoset.
+Qed.
+
+Lemma empty_domain_neq : forall (U V : Type) (f : U -> (subType (∅ : Ensemble V))),
+  forall x y : U, f x ≠ f y.
+Proof.
+  intros U V f x y H1. destruct (f x) as [val prop]. autoset.
+Qed.
+
+Lemma empty_range_bijective : forall (U V : Type) (E : Ensemble U) (f : (subType E) -> subType (∅ : Ensemble V)),
+  bijective f.
+Proof.
+  intros U V E f. split.
+  - unfold injective. intros x y H2. exfalso. pose proof (empty_domain_neq (subType E) V f x y) as H3. auto.
+  - intros [val prop]. pose proof not_In_Empty V val as H2. autoset.
+Qed.
+
+Lemma empty_function_bijective : forall (U V : Type) (f : (subType (∅ : Ensemble U)) -> subType (∅ : Ensemble V)),
+  bijective f.
+Proof.
+  intros U V f. split.
+  - unfold injective. intros x y H1. exfalso. pose proof (empty_domain_neq (subType (∅ : Ensemble U)) V f x y) as H2. auto.
+  - intros [val prop]. pose proof not_In_Empty V val as H1. autoset.
+Qed.
+
+Lemma cardinal_finite_eq_list_with_length : forall (U : Type) (A : Ensemble U) (n : nat),
+  ‖A‖ = n -> exists l : list U, A = list_to_ensemble l /\ length l = n /\ NoDup l.
+Proof.
+  intros U A n H1. pose proof H1 as H2. apply cardinal_finite in H1. apply Finite_set_equiv_Finite in H1.
+  apply Finite_set_iff_Finite_set' in H1 as [l' [H1 H3]]. exists l'. split; auto. split; auto.
+  apply list_to_ensemble_card_nodup in H1. subst. apply cardinal_unicity with (U := U) (X := (list_to_ensemble l')); auto.
+Qed.
+
+Lemma subType_of_list_to_ensemble : forall (U : Type) (l : list U),
+  exists l' : list (subType (list_to_ensemble l)), forall x : subType (list_to_ensemble l), List.In x l'.
+Proof.
+  intros U l. 
+Admitted.
+
+Theorem Pigeonhole : forall (U V : Type) (A : Ensemble U) (B : Ensemble V)
+  (f : subType A -> subType B) (n m : nat),
+    ‖B‖ = n -> ‖A‖ = m -> 0 < n < m -> ~ injective f.
+Proof.
+  intros U V A B f n m H1 H2 [H3 H4] H5. apply cardinal_finite_eq_list_with_length in H1 as [l [H1 [H6 H7]]].
+  apply cardinal_finite_eq_list_with_length in H2 as [l' [H2 [H8 H9]]]. subst. unfold injective in H5.
+  pose proof (subType_of_list_to_ensemble U l') as [l1 H10]. pose proof (subType_of_list_to_ensemble V l) as [l2 H11].
+
+    
+
+
+
+Lemma cardinal_list_to_ensemble_subType : forall (U : Type) (l : list U) (A : Ensemble U) (n : nat),
+  (A = list_to_ensemble l) -> length l = n -> NoDup l -> ‖(fun x : subType A => (val A x) ∈ A)‖ = n.
+Proof.
+  intros U l A n H1 H2 H3. generalize dependent A. generalize dependent n. induction l as [| h t IH].
+  induction l as [| h t IH].
+  - intros n H1 A H2 H3. simpl in *. subst.
+    replace (fun x : subType ⦃⦄ => val ⦃⦄ x ∈ ⦃⦄) with (⦃⦄ : Ensemble (subType (⦃⦄ : Ensemble U))) by autoset.
+    apply card_empty.
+  - intros A n H1 H2 H3. simpl in *. subst.  
+    replace (fun x : subType (⦃h⦄ ⋃ list_to_ensemble t) => val (⦃h⦄ ⋃ list_to_ensemble t) x ∈ ⦃h⦄ ⋃ list_to_ensemble t) with
+            ((fun x : subType (⦃h⦄ ⋃ list_to_ensemble t) => val (⦃h⦄ ⋃ list_to_ensemble t) x ∈ ⦃h⦄) ⋃ (fun x : subType (⦃h⦄ ⋃ list_to_ensemble t) => val (⦃h⦄ ⋃ list_to_ensemble t) x ∈ list_to_ensemble t)).
+    2 : { admit. }
+    replace (S (length t)) with (1 + length t) by lia. apply cardinal_Union.
+    -- admit.
+    -- admit.
+    -- admit.
+Admitted.
+
 Lemma cardinal_eq_Finite : forall (U V : Type) (A : Ensemble U) (B : Ensemble V),
   Finite_set A -> Finite_set B -> ‖A‖ = ‖B‖ -> exists m n : nat, ‖A‖ = m /\ ‖B‖ = n /\ m = n.
 Proof.
-  intros U V A B. repeat rewrite Finite_set_iff_Finite_set'. intros [l1 [H1 H2]] [l2 [H3 H4]] H5.
-  exists (length l1), (length l2). repeat split.
-  - rewrite <- H2. apply list_to_ensemble_card_nodup; auto.
-  - rewrite <- H4. apply list_to_ensemble_card_nodup; auto.
-  - induction l1.
-    -- rewrite list_to_ensemble_nil in H2. subst. destruct H5 as [f [H5 H6]].
-       pose proof classic ()
-       unfold surjective in H6.
-  
-  
-   apply list_to_ensemble_card_nodup in H1, H3. subst.
-    destruct H5 as [f [H5 H6]].
+  intros U V A B. repeat rewrite Finite_set_iff_Finite_set'. intros [l1 [H1 H2]] [l2 [H3 H4]] [[H5 H6] | [H5 [H6 [f H7]]]].
+  - exists 0, 0. repeat split; auto. rewrite H5. apply card_empty. rewrite H6. apply card_empty.
+  - exists (length l1), (length l2). repeat split; try (subst; apply list_to_ensemble_card_nodup; auto).
+    set (A' := (fun x : subType A => (val A x) ∈ A)). set (B' := (fun y : subType B => (val B y) ∈ B)).
+    assert (‖A'‖ = (length l1)) as H8.
+    { assert (‖A‖ = length (l1)). { rewrite <- H2. apply list_to_ensemble_card_nodup. auto. } apply cardinal_unicity.
+    
+     assert (‖B'‖ = (length l2)) as H9 by admit.
+    pose proof (Pigeonhole (subType A) (subType B) A' f (length l1) H8 (length l2)) as H10.
+    assert (Im (subType A) (subType B) A' f = B') as H11 by admit. rewrite H11 in H10. clear H11.
+    specialize (H10 H9). unfold bijective in H7.
+    assert (length l1 < length l2 \/ length l1 = length l2 \/ length l1 > length l2) as [H11 | [H11 | H11]] by lia; auto.
+    -- exfalso. destruct H7 as [_ H7]. unfold surjective in H7. admit.
+    -- exfalso. destruct H7 as [H7 _]. unfold injective in H7. specialize (H10 ltac:(lia)). apply H10. intros x y H12. apply H7. auto.
+Admitted.
+
+Lemma cardinal_lt_Finite : forall (U V : Type) (A : Ensemble U) (B : Ensemble V),
+  Finite_set A -> Finite_set B -> ‖A‖ < ‖B‖ -> exists m n : nat, ‖A‖ = m /\ ‖B‖ = n /\ m < n.
+Proof.
 Admitted.
