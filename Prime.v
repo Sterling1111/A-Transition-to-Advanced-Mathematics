@@ -596,12 +596,36 @@ Proof.
   intros start len. unfold Zseq_pos. rewrite length_map. reflexivity.
 Qed.
 
-Inductive count_occ {A : Type} (x : A) : list A -> nat -> Prop :=
-  | count_nil : count_occ x nil 0
-  | count_cons_eq : forall l n h, count_occ x l n -> x = h -> count_occ x (h :: l) (S n)
-  | count_cons_neq : forall l n h, count_occ x l n -> x <> h -> count_occ x (h :: l) n.
+Inductive count_occ_of {A : Type} (x : A) : list A -> nat -> Prop :=
+  | count_nil : count_occ_of x nil 0
+  | count_cons_eq : forall l n h, count_occ_of x l n -> x = h -> count_occ_of x (h :: l) (S n)
+  | count_cons_neq : forall l n h, count_occ_of x l n -> x <> h -> count_occ_of x (h :: l) n.
 
+Lemma count_occ_of_cons : forall (A : Type) (l : list A) (x h : A) (n : nat),
+  count_occ_of x l n -> count_occ_of x (h :: l) n.
+Proof.
+Qed.
 
+Lemma exists_remove_one : forall (A : Type) (l : list A) (x : A) (n : nat),
+  In x l -> count_occ_of x l n -> exists l', count_occ_of x l' (n - 1)%nat /\
+    (forall y n, y <> x -> In y l -> count_occ_of y l n -> count_occ_of y l' n).
+Proof.
+  intros A l x n H1 H2. induction H2.
+  - inversion H1.
+  - destruct H1 as [H1 | H1].
+    -- exists l. split. replace (S n - 1)%nat with n by lia. auto. 
+       intros y n2 H3 H4 H5.
+    -- exists l'. split. lia. intros y n H3 H4 H5. apply count_cons_neq; auto.
+Admitted.
+
+Lemma count_occ_of_In : forall (A : Type) (l : list A) (x : A) (n : nat),
+  count_occ_of x l n -> (n > 0)%nat -> In x l.
+Proof.
+  intros A l x n H1 H2. induction H1.
+  - lia.
+  - simpl. left. auto.
+  - simpl. right. apply IHcount_occ_of. lia.
+Qed.
 
 Lemma list_has_len : forall (U : Type) (l : list U) (a : U),
   In a l -> (length l > 0)%nat.
