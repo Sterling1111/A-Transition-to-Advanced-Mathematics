@@ -602,21 +602,17 @@ Inductive count_occ_of {A : Type} (x : A) : list A -> nat -> Prop :=
   | count_cons_neq : forall l n h, count_occ_of x l n -> x <> h -> count_occ_of x (h :: l) n.
 
 Lemma count_occ_of_cons : forall (A : Type) (l : list A) (x h : A) (n : nat),
-  count_occ_of x l n -> count_occ_of x (h :: l) n.
+  count_occ_of x l n -> (x = h -> count_occ_of x (h :: l) (S n)) /\ (x <> h -> count_occ_of x (h :: l) n).
 Proof.
+  intros A l x h n H1. induction H1 as [| l n h' H1 [IH1 IH2] | l n h' H1 [IH1 IH2]].
+  - split; intros H1; subst; repeat (constructor; auto).
+  - split; intro H2.
+    -- specialize (IH1 H2). subst. constructor; auto.
+    -- specialize (IH2 H2). subst. apply count_cons_neq; auto. apply count_cons_eq; auto.
+  - split; intros H2.
+    -- specialize (IH1 H2). subst. apply count_cons_eq; auto. apply count_cons_neq; auto.
+    -- specialize (IH2 H2). subst. apply count_cons_neq; auto. apply count_cons_neq; auto.
 Qed.
-
-Lemma exists_remove_one : forall (A : Type) (l : list A) (x : A) (n : nat),
-  In x l -> count_occ_of x l n -> exists l', count_occ_of x l' (n - 1)%nat /\
-    (forall y n, y <> x -> In y l -> count_occ_of y l n -> count_occ_of y l' n).
-Proof.
-  intros A l x n H1 H2. induction H2.
-  - inversion H1.
-  - destruct H1 as [H1 | H1].
-    -- exists l. split. replace (S n - 1)%nat with n by lia. auto. 
-       intros y n2 H3 H4 H5.
-    -- exists l'. split. lia. intros y n H3 H4 H5. apply count_cons_neq; auto.
-Admitted.
 
 Lemma count_occ_of_In : forall (A : Type) (l : list A) (x : A) (n : nat),
   count_occ_of x l n -> (n > 0)%nat -> In x l.
@@ -625,6 +621,93 @@ Proof.
   - lia.
   - simpl. left. auto.
   - simpl. right. apply IHcount_occ_of. lia.
+Qed.
+
+Lemma In_count_occ_of : forall (A : Type) (l : list A) (x : A) (n : nat),
+  In x l -> count_occ_of x l n -> (n > 0)%nat.
+Proof.
+  intros A l x n H1 H2. induction H2.
+  - inversion H1.
+  - destruct H1 as [H1 | H1].
+    -- subst. lia.
+    -- specialize (IHcount_occ_of H1). lia.
+  - apply IHcount_occ_of. destruct H1; auto; subst; contradiction.
+Qed.
+
+Lemma not_In_count_occ_of : forall (A : Type) (l : list A) (x : A),
+  ~ In x l -> count_occ_of x l 0.
+Proof.
+  intros A l x H1. induction l as [| h t IH].
+  - constructor.
+  - constructor.
+    -- apply IH. intros H2. apply H1. right. auto.
+    -- intros H2. apply H1. left. auto.
+Qed.
+
+Lemma count_occ_of_unicity : forall (A : Type) (l : list A) (x : A) (n1 n2 : nat),
+  count_occ_of x l n1 -> count_occ_of x l n2 -> n1 = n2.
+Proof.
+  intros A l x n1 n2 H1. revert n2. induction H1.
+  - intros n2 H2. inversion H2; auto.
+  - intros n2 H2. inversion H2; subst; try contradiction. rewrite (IHcount_occ_of n0); auto.
+  - intros n2 H2. inversion H2; subst; try contradiction. rewrite (IHcount_occ_of n2); auto.
+Qed.
+
+Lemma count_occ_cons_neq : forall (A : Type) (l : list A) (x h : A) (n : nat),
+  count_occ_of x l n -> x <> h -> count_occ_of x (h :: l) n.
+Proof.
+  intros A l x h n H1 H2. induction H1.
+  - constructor; auto. constructor.
+  - apply count_cons_neq; auto. apply count_cons_eq; auto.
+  - apply count_cons_neq; auto. apply count_cons_neq; auto.
+Qed.
+
+Lemma count_occ_cons_eq : forall (A : Type) (l : list A) (x h : A) (n : nat),
+  count_occ_of x l n -> x = h -> count_occ_of x (h :: l) (S n).
+Proof.
+  intros A l x h n H1 H2. induction H1.
+  - constructor; auto. constructor.
+  - apply count_cons_eq; auto. apply count_cons_eq; auto.
+  - apply count_cons_eq; auto. apply count_cons_neq; auto.
+Qed.
+
+Lemma exists_count_occ_of : forall (A : Type) (l : list A) (x : A),
+  In x l -> exists n, count_occ_of x l n /\ (n > 0)%nat.
+Proof.
+  intros A l x H1. induction l as [| h l' IH].
+  - inversion H1.
+  - destruct H1 as [H1 | H1].
+    -- pose proof classic (In x l') as [H2 | H2].
+       * specialize (IH H2) as [n [H3 _]]. exists (S n). split; try lia. apply count_occ_cons_eq; auto.
+       * exists 1%nat. subst. constructor; auto. apply not_In_count_occ_of in H2; auto. constructor; auto.
+    -- pose proof classic (x = h) as [H2 | H2].
+       * specialize (IH H1) as [n H3]. exists (S n). split; try lia. apply count_occ_cons_eq; tauto.
+       * specialize (IH H1) as [n H3]. exists n. split; try lia. apply count_occ_cons_neq; tauto.
+Qed.
+
+Lemma exists_remove_one : forall (A : Type) (l : list A) (x : A) (n : nat),
+  In x l -> count_occ_of x l n -> exists l', count_occ_of x l' (n - 1)%nat /\
+    (forall y n', y <> x -> count_occ_of y l n' -> count_occ_of y l' n').
+Proof.
+  intros A l x n H1 H2. induction H2.
+  - inversion H1.
+  - destruct H1 as [H1 | H1].
+    -- exists l. split. replace (S n - 1)%nat with n by lia. auto. 
+       intros y n2 H3 H4. inversion H4; auto; subst; contradiction.
+    -- specialize (IHcount_occ_of H1) as [l' [H3 H4]].
+       exists (h :: l'). split; subst.
+       * apply count_occ_of_cons with (h := h) in H3 as [H3 _]. specialize (H3 eq_refl). auto.
+         assert (n = 0 \/ n > 0)%nat as [H5 | H5] by lia.
+         ** apply In_count_occ_of with (n := n) in H1; auto. lia.
+         ** replace (S n - 1)%nat with (S (n - 1))%nat by lia. auto.
+       * intros y n2 H5 H6. specialize (H4 y n2 H5). apply count_occ_of_cons; auto. apply H4. inversion H6; auto. subst; contradiction.
+  - destruct H1 as [H1 | H1]; subst; try contradiction. specialize (IHcount_occ_of H1) as [l' [H3 H4]].
+    exists (h :: l'). split; subst.
+    -- apply count_occ_of_cons with (h := h) in H3 as [_ H3]. apply H3. auto.
+    -- intros y n2 H5 H6. pose proof classic (y = h) as [H7 | H7].
+       * subst. inversion H6; auto; subst; try contradiction. specialize (H4 h n0 H5 H8).
+         apply count_occ_of_cons with (h := h) in H4 as [H4 _]. apply H4. auto.
+       * apply count_occ_of_cons; auto. apply H4; auto. inversion H6; auto; subst; contradiction.
 Qed.
 
 Lemma list_has_len : forall (U : Type) (l : list U) (a : U),
@@ -647,10 +730,10 @@ Proof.
     -- simpl. simpl in H. tauto.
 Qed.
 
-Lemma in_notin_neq : forall (l : list Z) x1 x2,
+Lemma in_notin_neq : forall (A : Type) (l : list A) x1 x2,
   In x1 l -> ~ (In x2 l) -> x1 <> x2.
 Proof.
-  intros l x1 x2 H1 H2. induction l as [| h l' IH].
+  intros A l x1 x2 H1 H2. induction l as [| h l' IH].
   - inversion H1.
   - simpl in *. destruct H1 as [H1 | H1].
     -- rewrite H1 in H2. tauto.
@@ -669,25 +752,68 @@ Proof.
        --- apply H.
 Qed.
 
+(*
+
+Lemma count_occ_eq_len : forall (A : Type) (l1 l2 : list A),
+  (forall x n, count_occ_of x l1 n <-> count_occ_of x l2 n) -> length l1 = length l2.
+Proof.
+  intros A l1. induction l1 as [| h1 t1 IH].
+  - intros l2 H1. simpl. destruct l2; auto. specialize (H1 a 0%nat). destruct H1 as [H1 H2].
+    assert (count_occ_of a [] 0%nat) as H3 by constructor. apply H1 in H3. inversion H3; contradiction. 
+  - intros l2 H1. destruct l2 as [| h2 t2].
+    + specialize (H1 h1). simpl in H1. destruct (eq_dec h1 h1); auto. lia. contradiction.
+    + simpl. f_equal. destruct (eq_dec h1 h2) as [H2 | H2].
+      * apply IH. intros x. specialize (H1 x). assert (h1 = x \/ h1 <> x) as [H3 | H3] by apply classic.
+        -- subst. rewrite count_occ_cons_eq in H1; rewrite count_occ_cons_eq in H1; auto.
+        -- rewrite count_occ_cons_neq in H1; rewrite count_occ_cons_neq in H1; auto. rewrite <- H2. auto.
+      * assert (length t2 = 0 \/ length t2 > 0) as [H3 | H3] by lia. 
+        -- rewrite length_zero_iff_nil in H3. subst. specialize (H1 h1). simpl in H1. destruct (eq_dec h1 h1); 
+            destruct (eq_dec h2 h1); try contradiction; try lia. exfalso. apply H2. auto.
+        -- specialize (IH (h2 :: (remove_one eq_dec h1 t2))). replace (length (h2 :: remove_one eq_dec h1 t2))
+           with (length t2) in IH. apply IH. intros x. destruct (eq_dec h2 x) as [H4 | H4].
+           ++ rewrite count_occ_cons_eq; auto. rewrite count_occ_remove_one_not_eq. specialize (H1 x).
+              rewrite <- H4 in H1. rewrite count_occ_cons_neq in H1; auto. rewrite count_occ_cons_eq in H1; auto.
+              rewrite <- H4. auto. intros H5. apply H2. rewrite H4, H5. auto.
+           ++ destruct (eq_dec h1 x) as [H5 | H5].
+              ** rewrite count_occ_cons_neq; auto. specialize (H1 x). rewrite <- H5 in H1. rewrite count_occ_cons_eq in H1; auto.
+                 rewrite count_occ_cons_neq in H1; auto. rewrite H5. rewrite remove_one_In. rewrite <- H5. lia.
+                 rewrite <- H5. rewrite (count_occ_In eq_dec). lia.
+              ** rewrite count_occ_cons_neq; auto. rewrite count_occ_remove_one_not_eq; auto. specialize (H1 x).
+                 rewrite count_occ_cons_neq in H1; auto. rewrite count_occ_cons_neq in H1; auto.
+           ++ simpl. rewrite remove_one_In_length. lia. specialize (H1 h1). rewrite count_occ_cons_eq in H1; auto.
+              rewrite count_occ_cons_neq in H1; auto. rewrite (count_occ_In eq_dec). lia.
+Qed.
+
+*)
+
 Theorem longer_list:
     forall U : Type, forall l1 l2 : list U,
     (forall x, In x l1 -> In x l2) ->
     (exists x, In x l2 /\ ~ In x l1) ->
     NoDup l1 ->
     (length l2 > length l1)%nat.
-  Proof.
-    intros U l1 l2 H1 H2 H3. generalize dependent l2.
-    induction l1 as [| h l1' IH].
-    - intros l2 H4 H5. simpl in *. destruct H5 as [x H5]. assert (exists a, In a l2) as [a H6].
-    { exists x. apply H5. } Search (In _ _). apply list_has_len in H6. lia.
-    - intros l2 H4 [a [H5 H6]]. apply NoDup_cons_iff in H3. destruct H3 as [H3 H3'].
-      specialize (IH H3' (remove_one Z.eq_dec a l2)). apply not_in_cons in H6 as [H6 H6'].
-      assert (In h (remove_one Z.eq_dec a l2)) as H7.
-      { apply remove_one_remains. apply (H4 h). simpl. lia. lia. }
-      assert (length (remove_one Z.eq_dec a l2) > length l1')%nat as H8.
-      { apply IH. intros x H8. apply remove_one_remains. apply (H4 x). simpl. tauto. 2 : { exists h. tauto. }  apply in_notin_neq with (l := l1') (x2 := a). apply H8. apply H6'. }
-      rewrite remove_one_len in H8. simpl. lia. tauto.
-  Qed.
+Proof.
+  intros U l1 l2 H1 H2 H3. generalize dependent l2.
+  induction l1 as [| h l1' IH].
+  - intros l2 H4 H5. simpl in *. destruct H5 as [x H5]. assert (exists a, In a l2) as [a H6].
+  { exists x. apply H5. } apply list_has_len in H6. lia.
+  - intros l2 H4 [a [H5 H6]]. apply NoDup_cons_iff in H3. destruct H3 as [H3 H3'].
+    pose proof (exists_count_occ_of U l2 a H5) as [n [H7 _]]. pose proof (exists_remove_one U l2 a n H5 H7) as [l2' [H8 H9]].
+    specialize (IH H3' l2'). apply not_in_cons in H6 as [H6 H6'].
+    assert (In h l2') as H10.
+    { 
+      specialize (H4 h ltac:(simpl; auto)). apply exists_count_occ_of in H4 as [n' [H10 H11]]. specialize (H9 h n' ltac:(auto) H10).
+      apply count_occ_of_In with (n := n'); auto. 
+    }
+    assert (length l2' > length l1')%nat as H11. 
+    { 
+      apply IH. 2 : { exists h; auto. } intros x H11. specialize (H4 x ltac:(simpl; auto)).
+      assert (x <> a) as H12. { apply in_notin_neq with (l := l1'); auto. }
+      pose proof (exists_count_occ_of U l2 x H4) as [n' [H13 H14]]. specialize (H9 x n' H12 H13). 
+      apply count_occ_of_In with (n := n'); auto.
+    }
+    admit.
+Admitted.
 
 Theorem pigeonhole_principle_list : forall (U : Type) (l1 l2 : list U),
   (forall x, In x l1 -> In x l2) -> (length l2 < length l1)%nat ->
@@ -711,7 +837,7 @@ Lemma in_list_1 : forall l,
 Proof.
   intros l H1 H2 H3 H4. destruct (in_dec Z.eq_dec 1 l) as [H5 | H5]. apply H5.
   set (l2 := Zseq_pos (seq 2 (Z.to_nat (max_list_Z l - 1)))). assert (~NoDup l) as H6.
-  - apply pigeonhole_principle_Z with (l2 := l2).
+  - apply pigeonhole_principle_list with (l2 := l2).
     2 : { assert (length l2 = Z.to_nat (max_list_Z l) - 1)%nat. { unfold l2. rewrite <- Zseq_len. rewrite length_seq. lia. } lia. }
     intros x H6. apply in_Zseq_pos. rewrite Forall_forall in H3. specialize (H3 x). tauto. apply in_seq.
     replace (2 + Z.to_nat (max_list_Z l - 1))%nat with (Z.to_nat (max_list_Z l) + 1)%nat by lia. pose proof H6 as H6'. pose proof H6 as H6''.

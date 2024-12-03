@@ -1104,40 +1104,21 @@ Proof.
   apply list_to_ensemble_card_nodup in H1. subst. apply cardinal_unicity with (U := U) (X := (list_to_ensemble l')); auto.
 Qed.
 
-Lemma subType_of_list_to_ensemble : forall (U : Type) (l : list U),
-  exists l' : list (subType (list_to_ensemble l)), forall x : subType (list_to_ensemble l), List.In x l'.
-Proof.
-  intros U l. 
-Admitted.
-
 Theorem Pigeonhole : forall (U V : Type) (A : Ensemble U) (B : Ensemble V)
   (f : subType A -> subType B) (n m : nat),
     ‖B‖ = n -> ‖A‖ = m -> 0 < n < m -> ~ injective f.
 Proof.
   intros U V A B f n m H1 H2 [H3 H4] H5. apply cardinal_finite_eq_list_with_length in H1 as [l [H1 [H6 H7]]].
   apply cardinal_finite_eq_list_with_length in H2 as [l' [H2 [H8 H9]]]. subst. unfold injective in H5.
-  pose proof (subType_of_list_to_ensemble U l') as [l1 H10]. pose proof (subType_of_list_to_ensemble V l) as [l2 H11].
-
-    
-
-
-
-Lemma cardinal_list_to_ensemble_subType : forall (U : Type) (l : list U) (A : Ensemble U) (n : nat),
-  (A = list_to_ensemble l) -> length l = n -> NoDup l -> ‖(fun x : subType A => (val A x) ∈ A)‖ = n.
-Proof.
-  intros U l A n H1 H2 H3. generalize dependent A. generalize dependent n. induction l as [| h t IH].
-  induction l as [| h t IH].
-  - intros n H1 A H2 H3. simpl in *. subst.
-    replace (fun x : subType ⦃⦄ => val ⦃⦄ x ∈ ⦃⦄) with (⦃⦄ : Ensemble (subType (⦃⦄ : Ensemble U))) by autoset.
-    apply card_empty.
-  - intros A n H1 H2 H3. simpl in *. subst.  
-    replace (fun x : subType (⦃h⦄ ⋃ list_to_ensemble t) => val (⦃h⦄ ⋃ list_to_ensemble t) x ∈ ⦃h⦄ ⋃ list_to_ensemble t) with
-            ((fun x : subType (⦃h⦄ ⋃ list_to_ensemble t) => val (⦃h⦄ ⋃ list_to_ensemble t) x ∈ ⦃h⦄) ⋃ (fun x : subType (⦃h⦄ ⋃ list_to_ensemble t) => val (⦃h⦄ ⋃ list_to_ensemble t) x ∈ list_to_ensemble t)).
-    2 : { admit. }
-    replace (S (length t)) with (1 + length t) by lia. apply cardinal_Union.
-    -- admit.
-    -- admit.
-    -- admit.
+  assert (forall x : (subType (list_to_ensemble l')), List.In (val (list_to_ensemble l') x) l') as H10.
+  { intros x. destruct x as [val prop]. simpl. apply In_list_to_ensemble. auto. }
+  assert (forall x : (subType (list_to_ensemble l)), List.In (val (list_to_ensemble l) x) l) as H11.
+  { intros x. destruct x as [val prop]. simpl. apply In_list_to_ensemble. auto. }
+  assert (forall x : subType (list_to_ensemble l'), List.In (val (list_to_ensemble l) (f x)) l) as H12.
+  { intros x. specialize (H11 (f x)). auto. }
+  assert (forall x y : subType (list_to_ensemble l'), (val (list_to_ensemble l) (f x) = val (list_to_ensemble l) (f y)) -> val (list_to_ensemble l') x = val (list_to_ensemble l') y) as H13.
+  { intros x y H13. replace y with x. 2 : { apply H5. destruct x, y.
+    auto. }
 Admitted.
 
 Lemma cardinal_eq_Finite : forall (U V : Type) (A : Ensemble U) (B : Ensemble V),
@@ -1146,20 +1127,9 @@ Proof.
   intros U V A B. repeat rewrite Finite_set_iff_Finite_set'. intros [l1 [H1 H2]] [l2 [H3 H4]] [[H5 H6] | [H5 [H6 [f H7]]]].
   - exists 0, 0. repeat split; auto. rewrite H5. apply card_empty. rewrite H6. apply card_empty.
   - exists (length l1), (length l2). repeat split; try (subst; apply list_to_ensemble_card_nodup; auto).
-    set (A' := (fun x : subType A => (val A x) ∈ A)). set (B' := (fun y : subType B => (val B y) ∈ B)).
-    assert (‖A'‖ = (length l1)) as H8.
-    { assert (‖A‖ = length (l1)). { rewrite <- H2. apply list_to_ensemble_card_nodup. auto. } apply cardinal_unicity.
-    
-     assert (‖B'‖ = (length l2)) as H9 by admit.
-    pose proof (Pigeonhole (subType A) (subType B) A' f (length l1) H8 (length l2)) as H10.
-    assert (Im (subType A) (subType B) A' f = B') as H11 by admit. rewrite H11 in H10. clear H11.
-    specialize (H10 H9). unfold bijective in H7.
-    assert (length l1 < length l2 \/ length l1 = length l2 \/ length l1 > length l2) as [H11 | [H11 | H11]] by lia; auto.
-    -- exfalso. destruct H7 as [_ H7]. unfold surjective in H7. admit.
-    -- exfalso. destruct H7 as [H7 _]. unfold injective in H7. specialize (H10 ltac:(lia)). apply H10. intros x y H12. apply H7. auto.
-Admitted.
-
-Lemma cardinal_lt_Finite : forall (U V : Type) (A : Ensemble U) (B : Ensemble V),
-  Finite_set A -> Finite_set B -> ‖A‖ < ‖B‖ -> exists m n : nat, ‖A‖ = m /\ ‖B‖ = n /\ m < n.
-Proof.
-Admitted.
+    assert (length l1 = length l2 \/ length l2 < length l1 \/ length l2 > length l1) as [H8 | [H8 | H8]] by lia; auto.
+    -- assert (length l2 = 0 \/ length l2 > 0) as [H9 | H9] by lia.
+       + apply length_zero_iff_nil in H9. subst. simpl in H6. autoset. 
+       + exfalso. apply (Pigeonhole U V A B f (length l2) (length l1)); subst. apply list_to_ensemble_card_nodup; auto.
+         apply list_to_ensemble_card_nodup; auto. lia. destruct H7 as [H7 _]. apply H7.
+    --
