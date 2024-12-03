@@ -1116,9 +1116,6 @@ Proof.
   { intros x. destruct x as [val prop]. simpl. apply In_list_to_ensemble. auto. }
   assert (forall x : subType (list_to_ensemble l'), List.In (val (list_to_ensemble l) (f x)) l) as H12.
   { intros x. specialize (H11 (f x)). auto. }
-  assert (forall x y : subType (list_to_ensemble l'), (val (list_to_ensemble l) (f x) = val (list_to_ensemble l) (f y)) -> val (list_to_ensemble l') x = val (list_to_ensemble l') y) as H13.
-  { intros x y H13. replace y with x. 2 : { apply H5. destruct x, y.
-    auto. }
 Admitted.
 
 Lemma cardinal_eq_Finite : forall (U V : Type) (A : Ensemble U) (B : Ensemble V),
@@ -1132,4 +1129,5 @@ Proof.
        + apply length_zero_iff_nil in H9. subst. simpl in H6. autoset. 
        + exfalso. apply (Pigeonhole U V A B f (length l2) (length l1)); subst. apply list_to_ensemble_card_nodup; auto.
          apply list_to_ensemble_card_nodup; auto. lia. destruct H7 as [H7 _]. apply H7.
-    --
+    -- admit.
+Admitted.
