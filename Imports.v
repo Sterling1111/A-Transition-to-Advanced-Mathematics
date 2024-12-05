@@ -35,6 +35,7 @@ From Coq Require Export
   Logic.Classical_Pred_Type
   Logic.Classical_Prop
   Logic.FunctionalExtensionality
+  Logic.ClassicalChoice
   
   (* Utilities *)
   Program

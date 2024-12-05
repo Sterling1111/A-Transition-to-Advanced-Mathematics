@@ -86,13 +86,14 @@ Admitted.
 End section_20_1.
 
 Section yuckk.
-  Let A := {x : R | x <> 0}.
-  Let Rel : Relation A := fun x y => proj1_sig x * proj1_sig y > 0.
+  Let E : Ensemble R := fun x => x <> 0.
+  Let A := subType E.
+  Let Rel : Relation A := fun x y : A => val E x * val E y > 0.
 
   Lemma eating_cats : Equivalence Rel.
   Proof.
     unfold Rel; constructor; [intros x | intros x y H1 | intros x y z H1 H2].
-    - destruct x. simpl. nra.
+    - destruct x. simpl. assert (val0 <> 0) as H1 by autoset. nra.
     - nra.
     - nra.
   Qed.

@@ -37,6 +37,44 @@ Proof.
   - exists 0%nat, 0%Z. auto.
 Qed.
 
+Lemma cardinal_eq_refl : forall (T : Type) (A : Ensemble T), ‖ A ‖ = ‖ A ‖.
+Proof.
+  intros T A. pose proof classic (A = ⦃⦄) as [H1 | H1]; [left | right; repeat split]; auto.
+  - exists (fun x => x). split.
+    -- intros x y H2. auto.
+    -- intros y. exists y. auto.
+Qed.
+
+Lemma cardinal_eq_sym : forall (T1 T2 : Type) (A : Ensemble T1) (B : Ensemble T2), ‖ A ‖ = ‖ B ‖ -> ‖ B ‖ = ‖ A ‖.
+Proof.
+  intros T1 T2 A B [[H1 H2] | [H1 [H2 [f [H3 H4]]]]]; [left | right; repeat split]; auto.
+  apply choice in H4 as [g H5]. exists g. split.
+  - intros x y H6. specialize (H5 (f (g x))) as H7. rewrite H6 in H7 at 2.
+    do 3 rewrite H5 in H7; auto.
+  - intros y. specialize (H3 y (g (f y))). specialize (H5 (f y)) as H6.
+    rewrite <- H6 in H3 at 1. exists (f y). rewrite H3; auto. rewrite H6. auto.
+Qed.
+
+Definition countably_infinite {T : Type} (A : Ensemble T) : Prop := ‖ A ‖ = ‖ ℕ ‖.
+Definition countable {T : Type} (A : Ensemble T) : Prop := Finite_set A \/ countably_infinite A.
+
+Theorem theorem_29_14 : forall (T : Type) (A B : Ensemble T),
+  ~Finite_set B -> B ⊆ A -> countably_infinite A -> countably_infinite B.
+Proof.
+  intros T A B H1 H2 [[_ H3] | [_ [_ [f [H3 H4]]]]].
+  - exfalso. apply (not_Empty_In ℕ ℕ); auto. exists 0%nat. constructor.
+  - unfold countably_infinite. (* apply cardinal_eq_sym *) unfold cardinal_eq. right. repeat split.
+    -- admit.
+    -- admit.
+    -- assert (H5 : forall x : subType B, val B x ∈ A) by (destruct x; autoset).
+       set (b_to_a := fun x : subType B => mkSubType T A (val B x) ltac:(apply (H5 x))).
+       set (g := fun x : subType B => f (b_to_a x)). exists g. split.
+       + intros x y H6. unfold injective in H3. destruct x, y. unfold g in H6. apply H3 in H6.
+         unfold b_to_a in H6. simpl in H6. inversion H6. subst. replace property0 with property1.
+         2 : { apply proof_irrelevance. } reflexivity.
+       + admit.
+Admitted.
+
 Theorem theorem_29_5 : ‖ ℕ ‖ = ‖ ℚ ‖.
 Proof.
 Admitted.
