@@ -114,7 +114,7 @@ Qed.
 Definition f_plus (D1 D2 : Ensemble ℝ)
                   (f1 : Rsub D1 ⇒ ℝ)
                   (f2 : Rsub D2 ⇒ ℝ)
-                  (x : Rsub (D1 ⋂ D2)) : ℝ :=
+                  (x : Rsub (D1 ⋂ D2)) : ℝ := 
   let val_x := val (D1 ⋂ D2) x in
   let prop_x_in_intersection := prop (D1 ⋂ D2) x in
   let prop_x_D1_D2 := proj1 (In_Intersection_def ℝ D1 D2 x) prop_x_in_intersection in
@@ -122,10 +122,24 @@ Definition f_plus (D1 D2 : Ensemble ℝ)
   let prop_x_D2 := proj2 prop_x_D1_D2 in
   f1 (mkRsub D1 val_x prop_x_D1) + f2 (mkRsub D2 val_x prop_x_D2).
 
-Definition f_opp (D : Ensemble R) f (x:Rsub D) : R := - f x.
+Definition f_minus (D1 D2 : Ensemble ℝ)
+                  (f1 : Rsub D1 ⇒ ℝ)
+                  (f2 : Rsub D2 ⇒ ℝ)
+                  (x : Rsub (D1 ⋂ D2)) : ℝ :=
+  let val_x := val (D1 ⋂ D2) x in
+  let prop_x_in_intersection := prop (D1 ⋂ D2) x in
+  let prop_x_D1_D2 := proj1 (In_Intersection_def ℝ D1 D2 x) prop_x_in_intersection in
+  let prop_x_D1 := proj1 prop_x_D1_D2 in
+  let prop_x_D2 := proj2 prop_x_D1_D2 in
+  f1 (mkRsub D1 val_x prop_x_D1) - f2 (mkRsub D2 val_x prop_x_D2).
+
+Definition f_opp (D : Ensemble ℝ) (f : Rsub D ⇒ ℝ) (x : Rsub D) : ℝ := - f x.
+
 Definition f_mult (D : Ensemble R) f1 f2 (x:Rsub D) : R := f1 x * f2 x.
+Print f_mult.
+Print f_plus.
 Definition f_mult_c (D : Ensemble R) (a:R) f (x:Rsub D) : R := a * f x.
-Definition f_minus (D : Ensemble R) f1 f2 (x:Rsub D) : R := f1 x - f2 x.
+
 Definition f_div (D : Ensemble R) f1 f2 (x:Rsub D) : R := f1 x / f2 x.
 Definition f_div_c (D : Ensemble R) (a:R) f (x:Rsub D) : R := a / f x.
 Definition f_pow (D : Ensemble R) f n (x:Rsub D) : R := f x ^ n.
@@ -140,7 +154,7 @@ Arguments f_plus {D1 D2} f1%_f f2%_f x%_R.
 Arguments f_opp {D} f%_f x%_R.
 Arguments f_mult {D} f1%_f f2%_f x%_R.
 Arguments f_mult_c {D} a%_R f%_f x%_R.
-Arguments f_minus {D} f1%_f f2%_f x%_R.
+Arguments f_minus {D1 D2} f1%_f f2%_f x%_R.
 Arguments f_div {D} f1%_f f2%_f x%_R.
 Arguments f_div_c {D} a%_R f%_f x%_R.
 Arguments f_comp {D1 D2} f1%_f f2%_f x%_R.
@@ -190,14 +204,6 @@ Proof.
   intros f a L1 L2 H1 H2. apply (limit_of_function_unique' (Full_set ℝ) f a L1 L2); auto.
 Qed.
 
-Lemma limit_plus' : forall D1 D2 f1 f2 (a : Rsub (D1 ⋂ D2)) L1 L2,
-  ⟦ lim a ⟧ f1 D1 = L1 -> ⟦ lim a ⟧ f2 D2 = L2 -> ⟦ lim a ⟧ ((f1 + f2)%f) (D1 ⋂ D2) = (L1 + L2).
-Proof.
-  intros D1 D2 f1 f2 a L1 L2 [_ H1] [_ H2]. split.
-  - admit.
-  - admit.
-Admitted.
-
 Lemma In_Full_set_Intersection : forall (T : Type) (x : T),
   x ∈ (Full_set T ⋂ Full_set T) -> x ∈ Full_set T.
 Proof.
@@ -210,47 +216,39 @@ Proof.
   intros T x. autoset.
 Qed.
 
-Coercion Full_set_intersection_to_Full_set (x : Rsub (Full_set ℝ ⋂ Full_set ℝ)) : Rsub (Full_set ℝ) :=
-  {| val := val (Full_set ℝ ⋂ Full_set ℝ) x;
-     prop := In_Full_set_Intersection ℝ (val (Full_set ℝ ⋂ Full_set ℝ) x) (prop (Full_set ℝ ⋂ Full_set ℝ) x) |}.
-
-Coercion Full_set_to_Full_set_intersection (x : Rsub (Full_set R)) : Rsub (Full_set ℝ ⋂ Full_set ℝ) :=
-  {| val := val (Full_set ℝ) x; prop := In_Full_set ℝ (val (Full_set ℝ) x) (prop (Full_set ℝ) x) |}.
-
-Lemma limit_plus : forall f1 f2 a L1 L2,
-  ⟦ lim a ⟧ f1 = L1 -> ⟦ lim a ⟧ f2 = L2 -> ⟦ lim a ⟧ ((f1 + f2)%f)(Full_set ℝ ⋂ Full_set ℝ) = (L1 + L2).
+Lemma f_subtype_independent (P : Ensemble R) (f : Rsub P ⇒ R) (x : R) (H1 H2 : In _ P x) :
+  f {| val := x; prop := H1 |} = f {| val := x; prop := H2 |}.
 Proof.
-  intros f1 f2 a L1 L2 [_ H1] [_ H2]. split.
-  - replace (Full_set ℝ ⋂ Full_set ℝ) with (Full_set ℝ) by autoset. apply Full_set_encloses.
-  - intros ε H3. specialize (H1 (ε / 2) ltac:(lra)) as [δ1 [H4 H5]].
-    specialize (H2 (ε / 2) ltac:(lra)) as [δ2 [H6 H7]]. set (δ := Rmin δ1 δ2).
-    assert (δ > 0) as H8 by (unfold δ; solve_min). exists δ. split. lra.
-    intros x H9. assert (0 < |x - a| < δ1 /\ 0 < |x - a| < δ2) as [H10 H11] by (unfold δ in H9; solve_min).
-    specialize (H5 x H10). specialize (H7 x H11).
-    assert (forall x, (f1 + f2)%f x = f1 x + f2 x).
-    { intros x'. unfold f_plus. destruct x, x'. simpl. destruct proj1, proj2.
-    assert (H1 : x ∈ Full_set ℝ). { autoset. }
-    replace (Full_intro ℝ x) with H1. 2 : { apply proof_irrelevance. }
-    pose proof univalence H1 prop1.
-    replace H1
-    apply In_Full_set_Intersection in prop1.
-    
-    replace (f1 {| val := x; prop := prop0 |}) with (f1 {| val := x; prop :=Full_intro ℝ x |}).
-    2 : { apply f_equal.
-    pose proof (In_Intersection_def ℝ (Full_set ℝ) (Full_set ℝ) x) as H_intersection_def.
-    pose proof (proj1 H_intersection_def prop0) as H_split.
-    destruct H_split as [H1 H2].
-    assert (Hprop : prop0 = Intersection_intro ℝ (Full_set ℝ) (Full_set ℝ) x H1 H2).
-{
-  destruct prop0. destruct H1, H2, i, i0. reflexivity.
-}
-unfold Full_set_intersection_to_Full_set.
-  rewrite <- (proj1 (In_Intersection_def ℝ (Full_set ℝ) (Full_set ℝ) x)
-                    (Intersection_intro ℝ (Full_set ℝ) (Full_set ℝ) x H1 H2)).
-  reflexivity.
-rewrite Hprop. reflexivity.
-     apply lemma_1_20; auto. 
-    -- destruct x in H5.
+  assert ({| val := x; prop := H1 |} = {| val := x; prop := H2 |}) as H3 by (f_equal; apply proof_irrelevance).
+  rewrite H3. reflexivity.
+Qed.
+
+Lemma limit_plus : forall D1 D2 f1 f2 a L1 L2,
+  encloses (D1 ⋂ D2) a -> ⟦ lim a ⟧ f1 D1 = L1 -> ⟦ lim a ⟧ f2 D2 = L2 -> ⟦ lim a ⟧ ((f1 + f2)%f)_ = (L1 + L2).
+Proof.
+  intros D1 D2 f1 f2 a L1 L2 H1 [_ H2] [_ H3]. split; auto.
+  intros ε H4. specialize (H2 (ε / 2) ltac:(lra)) as [δ1 [H5 H6]].
+  specialize (H3 (ε / 2) ltac:(lra)) as [δ2 [H7 H8]]. set (δ := Rmin δ1 δ2).
+  assert (δ > 0) as H9 by (unfold δ; solve_min). exists δ. split. lra.
+  intros x H10. assert (0 < |x - a| < δ1 /\ 0 < |x - a| < δ2) as [H11 H12] by (unfold δ in H10; solve_min).
+  assert (H13 : (val (D1 ⋂ D2) x) ∈ D1). { destruct x as [val [prop1 prop2]]. autoset. }
+  assert (H14 : (val (D1 ⋂ D2) x) ∈ D2). { destruct x as [val [prop1 prop2]]. autoset. }
+  destruct x as [x' prop]. set (x'' := mkRsub D1 x' H13). set (x''' := mkRsub D2 x'' H14).
+  specialize (H6 x'' H11). specialize (H8 x''' H12).
+  assert ((f1 + f2)%f ({| val := x'; prop := prop |}) = f1 x'' + f2 x''') as H2.
+  {
+    unfold f_plus. simpl. replace (f1 {| val := x'; prop := proj1 (proj1 (In_Intersection_def ℝ D1 D2 x') prop) |}) with (f1 x'').
+    2 : { apply f_subtype_independent. } replace (f2 {| val := x'; prop := proj2 (proj1 (In_Intersection_def ℝ D1 D2 x') prop) |}) with (f2 x''').
+    2 : { apply f_subtype_independent. } reflexivity.
+  }
+  rewrite H2. apply lemma_1_20; auto.
+Qed.
+
+Lemma limit_plus_Full_set : forall f1 f2 a L1 L2,
+  ⟦ lim a ⟧ f1 = L1 -> ⟦ lim a ⟧ f2 = L2 -> ⟦ lim a ⟧ ((f1 + f2)%f)_ = (L1 + L2).
+Proof.
+  intros f1 f2 a L1 L2 H1 H2. apply limit_plus; auto.
+  replace (Full_set ℝ ⋂ Full_set ℝ) with (Full_set ℝ) by autoset. apply Full_set_encloses.
 Qed.
 
 Theorem Rsub_Full_set_equiv : @eq Type (Rsub (Full_set R)) R.
@@ -275,17 +273,18 @@ Proof.
 Qed.
 
 Lemma f_minus_plus : forall (f1 f2 : Rsub (Full_set R) -> R),
-  (f1 - f2 = f1 + (- f2)%f)%f.
+  (f1 - f2)%f = (f1 + (- f2))%f.
 Proof.
-  intros f1 f2. apply functional_extensionality. intros x. unfold f_minus, f_plus, f_opp. lra.
+  intros f1 f2. unfold f_minus, f_plus, f_opp. extensionality x. lra.
 Qed.
 
 Lemma limit_minus : forall f1 f2 a L1 L2,
-  ⟦ lim a ⟧ f1 = L1 -> ⟦ lim a ⟧ f2 = L2 -> ⟦ lim a ⟧ ((f1 - f2)%f) = L1 - L2.
+  ⟦ lim a ⟧ f1 = L1 -> ⟦ lim a ⟧ f2 = L2 -> ⟦ lim a ⟧ ((f1 - f2)%f)_ = L1 - L2.
 Proof.
    intros f1 f2 a L1 L2 H1 [_ H2]. rewrite f_minus_plus. unfold Rminus. apply limit_plus; auto.
-   split; try apply Full_set_encloses. intros ε H3. specialize (H2 ε H3) as [δ [H4 H5]].
-   exists δ. split; auto. intros x H6. apply H5 in H6. unfold f_opp. solve_abs.
+   - replace (Full_set ℝ ⋂ Full_set ℝ) with (Full_set ℝ) by autoset. apply Full_set_encloses.
+   - split. apply Full_set_encloses. intros ε H3. specialize (H2 ε H3) as [δ [H4 H5]].
+     exists δ. split; auto. intros x H6. apply H5 in H6. unfold f_opp. solve_abs.
 Qed.
 
 Lemma limit_mult : forall f1 f2 a L1 L2,
