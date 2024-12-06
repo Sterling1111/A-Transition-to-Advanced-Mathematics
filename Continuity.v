@@ -1,16 +1,16 @@
-Require Import Imports Limit Sums Chapter36 Reals_util Sets Notations Functions.
+Require Import Imports Limit Sums Reals_util Sets Notations Functions.
 Import SetNotations.
 
-Definition continuous_at_a (D : Ensemble R) (f : Rsub D -> R) (a : Rsub D) : Prop :=
+Definition continuous_at (D : Ensemble R) (f : Rsub D -> R) (a : Rsub D) : Prop :=
   ⟦ lim a ⟧ f D = f a.
 
 Definition continuous_on (D : Ensemble R) (f : Rsub D -> R) : Prop :=
-  ∀ a : Rsub D, continuous_at_a D f a.
+  ∀ a : Rsub D, continuous_at D f a.
 
 Example example_37_2 : forall c d,
   continuous_on R (fun x => c * x + d).
 Proof.
-  intros c d a. apply lemma_36_2.
+  intros c d a. unfold continuous_at. unfold Type_to_Ensemble in *. solve_lim.
 Qed.
 
 Section section_37_3.
@@ -28,7 +28,7 @@ Section section_37_3.
 
   Let a := mkRsub R 1 ltac:(apply Full_intro).
 
-  Example example_37_3 : ~ continuous_at_a R f a.
+  Example example_37_3 : ~ continuous_at R f a.
   Proof.
     intros [H1 H2]. unfold Type_to_Ensemble in *. simpl in H2. specialize (H2 (1/2) ltac:(lra)) as [δ [H3 H4]].
     set (x := mkRsub (Full_set R) (1 + δ/2) ltac:(apply Full_intro)).
@@ -50,13 +50,31 @@ Section section_37_4.
 
   Let a := mkRsub (fun x => 0 <= x) 0 H1.
 
-  Example example_37_4 : ~ continuous_at_a D f a.
+  Example example_37_4 : ~ continuous_at D f a.
   Proof.
     intros [[b [c [H1 H2]]] _]. simpl in H1. specialize (H2 (b / 2) ltac:(unfold In; lra)).
     unfold In, D in H2. lra.
   Qed.
 
 End section_37_4.
+
+Lemma lemma_37_11_a : forall D f g a,
+  continuous_at D f a -> continuous_at D g a -> continuous_at D (f + g)%f a.
+Proof.
+  intros D f g a H1 H2. unfold continuous_at in *. pose proof H1 as [H3 _]. apply limit_plus; auto.
+Qed.
+
+Lemma lemma_37_11_b : forall D f g a,
+  continuous_at D f a -> continuous_at D g a -> continuous_at D (f ∙ g)%f a.
+Proof.
+  intros D f g a H1 H2. unfold continuous_at in *. pose proof H1 as [H3 _]. apply limit_mult; auto.
+Qed.
+
+Lemma lemma_37_11_c : forall D f g a,
+  g a ≠ 0 -> continuous_at D f a -> continuous_at D g a -> continuous_at D (f / g)%f a.
+Proof.
+  intros D f g a H1 H2 H3. unfold continuous_at in *. pose proof H2 as [H4 _]. apply limit_div; auto.
+Qed.
 
 Definition polynomial' (l : list R) : (Rsub (Full_set R)) -> R :=
   fun x => sum_f 0 (length l - 1) (fun i => nth i l 0 * x^(length l - 1 - i)).
@@ -72,7 +90,7 @@ Qed.
 
 Lemma poly_nil : forall x, polynomial [] x = 0.
 Proof.
-  intro; compute; lra.
+  intro; compute. rewrite Rmult_1_r. reflexivity.
 Qed.
 
 Lemma poly_cons : forall h t x, polynomial (h :: t) x = h * x^(length t) + polynomial t x.
@@ -86,14 +104,14 @@ Proof.
 Qed.
 
 Theorem theorem_37_14 : forall l a,
-  continuous_at_a R (polynomial l) a.
+  continuous_at R (polynomial l) a.
 Proof.
   intros l a. unfold Type_to_Ensemble in *. induction l as [| h t IH].
   - replace (fun x : (Rsub (Full_set R)) => polynomial [] x) with (fun x : Rsub (Full_set R) => 0).
-    2 : { extensionality x. rewrite poly_nil. reflexivity. } unfold continuous_at_a. solve_lim.
+    2 : { extensionality x. rewrite poly_nil. reflexivity. } unfold continuous_at. solve_lim.
   - replace (fun x : Rsub (Full_set R) => polynomial (h :: t) x) with (fun x : Rsub (Full_set R) => h * x^(length t) + polynomial t x).
     2 : { extensionality x. rewrite poly_cons. reflexivity. } 
-    unfold continuous_at_a. solve_lim.
+    unfold continuous_at. solve_lim.
 Qed.
 
 Theorem theorem_37_14' : forall l,
