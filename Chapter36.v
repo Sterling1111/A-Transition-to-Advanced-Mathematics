@@ -3,7 +3,7 @@ Require Export Chapter35.
 Import SetNotations.
 
 Lemma lemma_36_1 : ⟦ lim 4 ⟧ (fun x => 2 * x + 3) = 11.
-Proof. solve_lim. Qed.
+Proof. apply limit_iff_limit'. solve_lim. Qed.
 
 Lemma lemma_36_2 : forall a c d, ⟦ lim a ⟧ (fun x => c * x + d) = c * a + d.
 Proof. intros; solve_lim. Qed.

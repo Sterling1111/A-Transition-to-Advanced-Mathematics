@@ -15,8 +15,11 @@ Definition limit (D : Ensemble R) (f : Rsub D -> R) (a L : R) : Prop :=
   encloses D a /\
     (∀ ε, ε > 0 ⇒ ∃ δ, δ > 0 /\ ∀ x : Rsub D, 0 < |x - a| < δ ⇒ |f x - L| < ε).
 
+Definition limit' (f : ℝ -> ℝ) (a L : ℝ) : Prop :=
+  ∀ ε, ε > 0 ⇒ ∃ δ, δ > 0 /\ ∀ x, 0 < |x - a| < δ ⇒ |f x - L| < ε.
+
 Notation "⟦ 'lim' a ⟧ f '=' L" := 
-  (limit (Full_set ℝ) f a L) 
+  (limit' f a L) 
     (at level 70, f at level 0, no associativity, format "⟦  'lim'  a  ⟧  f  '='  L").
 
 Notation "⟦ 'lim' a ⟧ f D '=' L" := 
@@ -26,6 +29,15 @@ Notation "⟦ 'lim' a ⟧ f D '=' L" :=
 Lemma Full_set_encloses : forall a, encloses (Full_set ℝ) a.
 Proof.
   intros a. exists (a - 1), (a + 1). split. lra. intros x _. apply Full_intro.
+Qed.
+
+Lemma limit_iff_limit' : forall f a L,
+  ⟦ lim a ⟧ f = L ⟺ ⟦ lim a ⟧ f (Full_set ℝ) = L.
+Proof.
+  intros f a L. split; intros H1.
+  - split. apply Full_set_encloses. intros ε H2. specialize (H1 ε H2) as [δ [H3 H4]]. exists δ. split; auto.
+  - destruct H1 as [H1 H2]. intros ε H3. specialize (H2 ε H3) as [δ [H4 H5]]. exists δ. split; auto.
+    intros x. specialize (H5 (mkRsub (Full_set ℝ) x ltac:( apply Full_intro))). simpl in H5. apply H5.
 Qed.
 
 Lemma lemma_1_20 : forall x x0 y y0 ε,
@@ -122,6 +134,7 @@ Definition f_pow (D : Ensemble R) f n (x:Rsub D) : R := f x ^ n.
 Definition f_comp (D1 D2 : Ensemble R) (f1 : (Rsub D2) -> R) (f2 : (Rsub D1) -> (Rsub D2))  (x:Rsub D1) : R := f1 (f2 x).
 Definition f_inv (D : Ensemble R) f (x:Rsub D) : R := / f x.
 Definition f_mirr (D : Ensemble R) f (x:Rsub D) : R := f (- x).
+Definition f_sqrt (D : Ensemble R) (f : Rsub D -> R) (x:Rsub D) : R := sqrt (f x).
 
 Declare Scope f_scope.
 Delimit Scope f_scope with f.
@@ -137,6 +150,7 @@ Arguments f_comp {D1 D2} f1%_f f2%_f x%_R.
 Arguments f_inv {D} f%_f x%_R.
 Arguments f_mirr {D} f%_f x%_R.
 Arguments f_pow {D} f%_f n%_nat x%_R.
+Arguments f_sqrt {D} f%_f x%_R.
 
 Infix "+" := f_plus : f_scope.
 Notation "- x" := (f_opp x) : f_scope.
@@ -146,11 +160,12 @@ Infix "/" := f_div : f_scope.
 Infix "^" := f_pow (at level 30) : f_scope.
 Infix "*" := f_mult_c : f_scope.
 Notation "/ x" := (f_inv x) : f_scope.
+Notation "√ f" := (f_sqrt f) (at level 20) : f_scope.
 Notation "f1 'o' f2" := (f_comp f1 f2)
   (at level 20, right associativity) : f_scope.
 
 Lemma limit_of_function_unique : forall D f a L1 L2,
-  ⟦ lim a ⟧ f D = L1 -> ⟦ lim a ⟧ f D = L2 -> L1 = L2.
+  ⟦ lim a ⟧ f D = L1 -> ⟦ lim a ⟧ f D = L2 -> L1 = L2. 
 Proof.
   intros D f a L1 L2 [[b [c [H1 H2]]] H3] [_ H4]. pose proof (classic (L1 = L2)) as [H5 | H5]; auto.
   specialize (H3 (|L1 - L2| / 2) ltac:(solve_abs)) as [δ1 [H6 H7]].
@@ -251,6 +266,36 @@ Proof.
   - simpl. apply limit_mult; auto.
 Qed.
 
+Lemma sqrt_helper : forall x a,
+  x >= 0 -> a >= 0 -> |√x - √a| = |x - a| / (√x + √a).  
+Proof.
+  intros x a H1 H2. pose proof Rtotal_order x a as [H3 | [H3 | H3]].
+  - pose proof sqrt_lt_1_alt x a ltac:(lra) as H4. replace (|(√x - √a)|) with (√a - √x) by solve_abs.
+    replace (|x - a|) with (a - x) by solve_abs. pose proof sqrt_lt_R0 a ltac:(lra) as H5. 
+    pose proof sqrt_positivity x ltac:(lra) as H6. apply Rmult_eq_reg_r with (r := √x + √a); try nra.
+    field_simplify; try nra. repeat rewrite pow2_sqrt; lra.
+  - subst. solve_abs.
+  - pose proof sqrt_lt_1_alt a x ltac:(lra) as H4. replace (|(√x - √a)|) with (√x - √a) by solve_abs.
+    replace (|x - a|) with (x - a) by solve_abs. pose proof sqrt_lt_R0 x ltac:(lra) as H5. 
+    pose proof sqrt_positivity a ltac:(lra) as H6. apply Rmult_eq_reg_r with (r := √x + √a); try nra.
+    field_simplify; try nra. repeat rewrite pow2_sqrt; lra.
+Qed.
+
+Lemma limit_sqrt_x : forall a,
+  ⟦ lim a ⟧ sqrt = √a.
+Proof.
+  intros a ε H2. assert (a <= 0 \/ a > 0) as [H3 | H3] by lra.
+  - exists (√ε). split. apply sqrt_lt_R0; auto. intros x H4.
+   exists (Rmin (a / 2) ((√(a/2) + √a) * ε)). split.
+  - 
+Qed.
+
+Lemma limit_sqrt : forall D f a L,
+  encloses D a -> ⟦ lim a ⟧ f D = L -> L >= 0 -> ⟦ lim a ⟧ ((√f)%f) D = √L.
+Proof.
+  
+Admitted.
+
 Lemma lim_equality_substitution : forall D f a L1 L2,
   encloses D a -> L1 = L2 -> ⟦ lim a ⟧ f D = L1 -> ⟦ lim a ⟧ f D = L2.
 Proof.
@@ -262,28 +307,32 @@ Qed.
 Ltac solve_lim :=
   try solve_R;
   match goal with
-  | [ |- ⟦ lim ?a ⟧ ?f = ?rhs ] =>
-    let b :=
-      match type of a with
-      | R => constr:(mkRsub (Full_set R) a ltac:(apply Full_intro))
-      | _ => constr:(a)
-      end in
-    let L2' := eval cbv beta in (f b) in
-    let L2 := eval simpl in L2' in
-    let H := fresh "H" in 
-    assert (⟦ lim a ⟧ f = L2) as H by 
-    (repeat (first [ 
-                       apply limit_div
-                     | apply limit_pow
-                     | apply limit_mult
-                     | apply limit_inv
-                     | apply limit_plus
-                     | apply limit_minus
-                     | apply limit_id
-                     | apply limit_const
-                     | solve_R
-                 ]); try apply Full_set_encloses);
-    apply (lim_equality_substitution (Full_set R) f a L2 rhs); solve_R; apply Full_set_encloses
+  | [ |- ⟦ lim ?a ⟧ ?f = ?rhs ] => apply limit_iff_limit'; solve_lim
+  | [ |- ⟦ lim ?a ⟧ ?f (Full_set R) = ?rhs ] =>
+      let b := 
+        match type of a with
+        | R => constr:(mkRsub (Full_set R) a ltac:(apply Full_intro))
+        | _ => constr:(a)
+        end in
+      let L2' := eval cbv beta in (f b) in
+      let L2 := eval simpl in L2' in
+      let H := fresh "H" in
+      assert (⟦ lim a ⟧ f (Full_set R) = L2) as H by
+        (repeat (first [
+           apply limit_div
+         | apply limit_pow
+         | apply limit_mult
+         | apply limit_inv
+         | apply limit_plus
+         | apply limit_minus
+         | apply limit_sqrt
+         | apply limit_id
+         | apply limit_const
+         | solve_R
+         ]);
+         try apply Full_set_encloses);
+      apply (lim_equality_substitution (Full_set R) f a L2 rhs);
+      solve_R; apply Full_set_encloses
   end.
 
 Lemma f_subtype_independent (P : Ensemble R) (f : Rsub P ⇒ R) (x : R) (H1 H2 : In _ P x) :

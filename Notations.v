@@ -25,3 +25,5 @@ Notation "∃ x : T , P" := (exists x : T, P)
 
 Notation "| x |" := (Rabs x) 
   (at level 200, x at level 0, format "| x |", no associativity) : R_scope.
+
+Notation "√ x" := (sqrt x) (format "√ x", at level 20).

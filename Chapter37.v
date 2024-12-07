@@ -1,27 +1,29 @@
-Require Import Imports Limit Continuity Sets.
+Require Import Imports Limit Continuity Sets Reals_util Notations Functions.
 Require Export Chapter36.
 Import SetNotations.
 
-Notation In := Coq.Sets.Ensembles.In.
-
 Section section_37_1.
-  Let Rnonneg : Ensemble R := fun x => x >= 0.
+  Lemma H1 : 9 ∈ Full_set ℝ.
+  Proof. apply Full_intro. Qed.
 
-  Lemma H1 : 9 ∈ Rnonneg.
+  Lemma lemma_37_1_helper : forall x, √x - 3 = (x-9) / (√x+3).
   Proof.
-    unfold Rnonneg. unfold In. lra.
-  Qed.
+    intros x. 
+  Admitted.
 
-  Definition sqrt : Rsub (Rnonneg) -> R := fun x => sqrt x.
-  Notation "√ x" := (sqrt x) (format "√ x", at level 20).
 
-  Lemma lemma_37_1 : continuous_at _ sqrt (mkRsub Rnonneg 9 H1).
+
+  Lemma lemma_37_1 : continuous_at ℝ sqrt (mkRsub ℝ 9 H1).
   Proof.
-    unfold continuous_at, sqrt; simpl. split.
-    - exists 8, 10. split; try lra. intros x H2. unfold Rnonneg, In in *; lra.
-    - intros ε H1. exists (ε^2). split.
-      + unfold Rnonneg, In. lra.
-      + intros x H3. unfold Rnonneg, In in H3. apply sqrt_lt_1 in H3. lra.
+    unfold continuous_at. simpl. split; try apply Full_set_encloses.
+    intros ε H1. exists (ε^2). split; try (simpl; nra).
+    intros [x prop] [H2 H3]; simpl in *. replace 9 with (3 * 3) by lra. rewrite sqrt_square; try lra.
+         rewrite lemma_37_1_helper. Search (|_ / _|).
+         assert (x <> 3 * 3) as H4 by solve_abs. assert (√x <> 3).
+         { intros H5. apply H4. apply sqrt_inj; try lra. inversion prop; lra. rewrite sqrt_square; auto; lra. }
+         apply Rlt_pow_base with (n := 2%nat); try lra; try lia. solve_abs.
+         simpl. 
+         apply sqrt_lt_1_alt. lra.
   Qed.
     
 End section_37_1.
