@@ -13,8 +13,8 @@ Proof.
   intros c d a. unfold continuous_at. unfold Type_to_Ensemble in *. solve_lim.
 Qed.
 
-Section section_37_3.
-  Let f (x : R) : R :=
+Module module_37_3.
+  Definition f (x : R) : R :=
     match Rle_dec 0 x, Rle_dec x 1 with
     | left _, left _ => 1
     | _, _ => 0
@@ -26,7 +26,7 @@ Section section_37_3.
     intros x H1 [H2 H3]. unfold f. destruct (Rle_dec 0 x), (Rle_dec x 1); simpl in *; lra.
   Qed.
 
-  Let a := mkRsub R 1 ltac:(apply Full_intro).
+  Definition a := mkRsub R 1 ltac:(apply Full_intro).
 
   Example example_37_3 : ~ continuous_at R f a.
   Proof.
@@ -37,7 +37,7 @@ Section section_37_3.
     replace (f 1) with 1 in H4. 2 : { unfold f. destruct (Rle_dec 0 1), (Rle_dec 1 1); simpl in *; lra. }
     solve_abs.
   Qed.
-End section_37_3.
+End module_37_3.
 
 Section section_37_4.
   Let f : Rsub (fun x => 0 <= x) -> R := fun x => x.

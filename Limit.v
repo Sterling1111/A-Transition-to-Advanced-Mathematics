@@ -266,7 +266,7 @@ Proof.
   - simpl. apply limit_mult; auto.
 Qed.
 
-Lemma sqrt_helper : forall x a,
+Lemma sqrt_limit_helper_1 : forall x a,
   x >= 0 -> a >= 0 -> |√x - √a| = |x - a| / (√x + √a).  
 Proof.
   intros x a H1 H2. pose proof Rtotal_order x a as [H3 | [H3 | H3]].
@@ -281,13 +281,36 @@ Proof.
     field_simplify; try nra. repeat rewrite pow2_sqrt; lra.
 Qed.
 
-Lemma limit_sqrt_x : forall a,
-  ⟦ lim a ⟧ sqrt = √a.
+Lemma sqrt_limit_helper_2 : forall x a,
+  a >= 0 -> |x - a| < a / 2 -> √x + √a > √(a/2) + √a.
 Proof.
-  intros a ε H2. assert (a <= 0 \/ a > 0) as [H3 | H3] by lra.
-  - exists (√ε). split. apply sqrt_lt_R0; auto. intros x H4.
-   exists (Rmin (a / 2) ((√(a/2) + √a) * ε)). split.
-  - 
+  intros x a H1 H2. pose proof Rtotal_order x a as [H3 | [H3 | H3]].
+  - replace (|x - a|) with (a - x) in H2 by solve_abs. assert (a / 2 < x) as H4 by lra.
+    pose proof sqrt_lt_1_alt (a/2) x ltac:(lra) as H5. lra.
+  - subst. pose proof sqrt_lt_1_alt (a/2) a ltac:(solve_R) as H5. lra.
+  - pose proof sqrt_lt_1_alt (a/2) x ltac:(lra) as H4. lra.
+Qed.
+
+Lemma limit_sqrt_x : forall a,
+  ⟦ lim a ⟧ (fun x => √x) (Full_set R) = √a.
+Proof.
+  intros a. split; try apply Full_set_encloses. intros ε H1. assert (a <= 0 \/ a > 0) as [H2 | H2] by lra.
+  - exists (ε^2). split. nra. intros x H3. assert (x < a \/ x > a) as [H4 | H4] by solve_abs.
+    -- repeat rewrite sqrt_neg_0; solve_abs.
+    -- rewrite (sqrt_neg_0 a); try lra. replace (|x - a|) with (x - a) in H3 by solve_abs.
+       assert (x < ε ^ 2) as H5 by nra. pose proof sqrt_pos x as H6. replace (|(√x - 0)|) with (√x) by solve_abs.
+       apply Rlt_pow_base with (n := 2%nat); try lra; try lia. assert (x <= 0 \/ x > 0) as [H7 | H7] by lra.
+       apply sqrt_neg_0 in H7. rewrite H7. lra. rewrite pow2_sqrt; lra.
+  - set (δ := Rmin (a / 2) ((√(a/2) + √a) * ε)). exists δ. split.
+    -- unfold δ. pose proof sqrt_lt_R0 a ltac:(lra) as H3.
+       pose proof sqrt_lt_R0 (a / 2) ltac:(apply Rdiv_pos_pos; lra) as H4. solve_min.
+    -- intros x H3. assert (|(x - a)| < a / 2) as H4 by (unfold δ in *; solve_R).
+       assert (|(x - a)| < (√(a / 2) + √a) * ε) as H5 by (unfold δ in *; solve_R).
+       assert (x < 0 \/ x >= 0) as [H6 | H6] by lra.
+       * rewrite sqrt_neg_0; try lra. solve_abs.
+       * pose proof sqrt_limit_helper_2 x a ltac:(lra) ltac:(lra) as H7.
+         rewrite sqrt_limit_helper_1; try lra. apply Rmult_lt_reg_r with (r := √x + √a); try nra.
+         field_simplify; nra.
 Qed.
 
 Lemma limit_sqrt : forall D f a L,
@@ -325,7 +348,7 @@ Ltac solve_lim :=
          | apply limit_inv
          | apply limit_plus
          | apply limit_minus
-         | apply limit_sqrt
+         | apply limit_sqrt_x
          | apply limit_id
          | apply limit_const
          | solve_R

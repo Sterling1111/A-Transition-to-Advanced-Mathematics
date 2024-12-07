@@ -116,3 +116,33 @@ Proof.
     apply H1.
   - apply Rdiv_pos_pos. lra. apply H2.
 Qed.  
+
+Lemma pow_incrst_1 : forall r1 r2 n,
+  (n > 0)%nat -> r1 >= 0 -> r2 > 0 -> r1 < r2 -> r1^n < r2^n.
+Proof.
+  intros r1 r2 n H1 H2 H3 H4. generalize dependent r1. generalize dependent r2. induction n as [| k IH].
+  - lia.
+  - intros r2 H2 r1 H3 H4. simpl. destruct k; try nra. assert (H6 : r1^(S k) < r2 ^(S k)). { apply IH; try lia; try nra. }
+    apply Rmult_ge_0_gt_0_lt_compat; try nra. simpl. assert (0 <= r1 ^ k). { apply pow_le; nra. } nra. 
+Qed.
+
+Lemma Rlt_pow_base : forall a b n,
+  0 <= a -> 0 < b -> (n > 0)%nat -> a^n < b^n -> a < b.
+Proof.
+  intros a b n H1 H2 H3 H4. induction n as [| k IH].
+  - lia.
+  - simpl in H4. destruct k.
+    -- simpl in H4. lra.
+    -- apply IH. lia. simpl. simpl in H4. pose proof Rtotal_order a b as [H5 | [H6 | H7]].
+      --- assert (k = 0 \/ k > 0)%nat as [H8 | H8] by lia; subst; try lra.
+          assert (H6 : a^k < b^k). { apply pow_incrst_1; try lia; try lra. } assert (H7 : 0 <= a^k). { apply pow_le. lra. } nra.
+      --- subst; lra.
+      --- assert (k = 0 \/ k > 0)%nat as [H8 | H8] by lia. { rewrite H8 in H4. nra. }
+          assert (H9 : b^k < a^k). { apply pow_incrst_1; try lia; try lra. } assert (H10 : b^k > 0). { apply pow_lt. lra. }
+          assert (H11 : a * a^k > b * b^k). { nra. } assert (H12 : a * (a * a^k) > b * (b * b^k)). { apply Rmult_gt_0_lt_compat. nra. nra. nra. nra. } nra.
+Qed.
+
+Lemma sqrt_2_gt_1 : (1 < sqrt 2)%R.
+Proof.
+    apply Rlt_pow_base with (n := 2%nat); try lra; try lia. apply sqrt_lt_R0; lra. rewrite pow2_sqrt; lra.
+Qed.
