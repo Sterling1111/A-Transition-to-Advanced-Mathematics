@@ -85,29 +85,44 @@ Section section_20_1.
   Admitted.
 End section_20_1.
 
+Definition Antisymmetric {A} (R : Relation A) : Prop :=
+  forall x y, R x y -> R y x -> x = y.
+
 Section section_20_3.
   Let R : Relation ℝ := fun x y => x * y < 0.
 
-  Lemma lemma_20_3_c_1 : Reflexive R.
+  Lemma lemma_20_3_c_1 : ~ Reflexive R.
   Proof.
-    unfold Reflexive. intros x. unfold R. 
+    intros H1. unfold Reflexive in H1. specialize (H1 1). unfold R in H1. lra.
   Qed.
-  
+
+  Lemma lemma_20_3_c_2 : Symmetric R.
+  Proof.
+    intros x y H1. unfold R in *. lra.
+  Qed.
+
+  Lemma lemma_20_3_c_3 : ~ Transitive R.
+  Proof.
+    intros H1. unfold Transitive in H1. specialize (H1 (-1) 1 (-1)). unfold R in H1. lra.
+  Qed.
+
+  Lemma lemma_20_c_c_4 : ~ Antisymmetric R.
+  Proof.
+    intros H1. specialize (H1 1 (-1)). unfold R in H1. lra.
+  Qed.
+
 End section_20_3.
 
-Section yuckk.
-  Let E : Ensemble R := fun x => x <> 0.
-  Let A := subType E.
-  Let Rel : Relation A := fun x y : A => val E x * val E y > 0.
+Section section_20_4.
+  Let R : Relation ℝ := fun x y => exists z : Z, IZR z = x - y.
 
-  Lemma eating_cats : Equivalence Rel.
+  Lemma lemma_20_4_c_1 : Reflexive R.
   Proof.
-    unfold Rel; constructor; [intros x | intros x y H1 | intros x y z H1 H2].
-    - destruct x. simpl. assert (val0 <> 0) as H1 by autoset. nra.
-    - nra.
-    - nra.
+    intros x. exists 0%Z. lra.
   Qed.
-End yuckk.
+
+  
+End section_20_4.
 
 Definition disjoint_pieces {A} (P : Ensemble (Ensemble A)) : Prop :=
   forall E1 E2, E1 ∈ P -> E2 ∈ P -> E1 ⋂ E2 = ∅.
