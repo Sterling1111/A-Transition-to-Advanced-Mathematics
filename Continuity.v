@@ -21,9 +21,11 @@ Module module_37_3.
     end.
 
   Lemma f_spec : forall x,
-    (0 <= x <= 1)%R -> f x = 1 /\ (x < 0 \/ x > 1)%R -> f x = 0.
+    ((0 <= x <= 1)%R -> f x = 1) /\ ((x < 0 \/ x > 1)%R -> f x = 0).
   Proof.
-    intros x H1 [H2 H3]. unfold f. destruct (Rle_dec 0 x), (Rle_dec x 1); simpl in *; lra.
+    intros x. split. 
+    - intros [H1 H2]. unfold f. destruct (Rle_dec 0 x), (Rle_dec x 1); simpl in *; lra.
+    - intros [H1 | H1]; unfold f; destruct (Rle_dec 0 x), (Rle_dec x 1); simpl in *; lra.
   Qed.
 
   Definition a := mkRsub R 1 ltac:(apply Full_intro).

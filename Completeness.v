@@ -1,45 +1,44 @@
-Require Import Imports.
+Require Import Imports Sets Notations Functions.
+Import SetNotations.
 
 Open Scope R_scope.
 
-Definition is_lower_bound (E:R -> Prop) (m:R) := forall x:R, E x -> x >= m.
+Definition is_lower_bound (E:Ensemble ℝ) lb := forall x, x ∈ E -> x >= lb.
+Definition is_upper_bound (E:Ensemble ℝ) ub := forall x, x ∈ E -> x <= ub.
 
-Definition has_lower_bound (E:R -> Prop) := exists m : R, is_lower_bound E m.
+Definition has_lower_bound (E:Ensemble ℝ) := exists lb, is_lower_bound E lb.
+Definition has_upper_bound (E:Ensemble ℝ) := exists ub, is_upper_bound E ub.
 
-Definition is_glb (E:R -> Prop) (m:R) :=
-  is_lower_bound E m /\ (forall b:R, is_lower_bound E b -> m >= b).
+Definition is_glb (E:Ensemble ℝ) glb :=
+  is_lower_bound E glb /\ (forall lb, is_lower_bound E lb -> glb >= lb).
+
+Definition is_lub (E:Ensemble ℝ) lub :=
+  is_upper_bound E lub /\ (forall ub, is_upper_bound E ub -> lub <= ub).
+
+Lemma completeness_upper_bound : forall E:Ensemble ℝ,
+  has_upper_bound E -> E ≠ ∅ -> { sup | is_lub E sup }.
+Proof.
+  intros E H1 H2. apply not_Empty_In in H2. assert (H3 : bound E).
+  { destruct H1 as [ub H1]. exists ub. intros x H3. apply H1. apply H3. }
+  apply completeness; auto.
+Qed.
 
 Lemma completeness_lower_bound :
-    forall E:R -> Prop,
-      has_lower_bound E -> (exists x : R, E x) -> { m:R | is_glb E m }.
+    forall E:Ensemble ℝ, has_lower_bound E -> E ≠ ∅ -> { inf | is_glb E inf }.
 Proof.
-  intros E Hbounded Hexists.
-  pose (E' := fun x => E (-x)).
-  assert (Hbounded' : bound E').
+  intros E H1 H2. set (E' := fun x => -x ∈ E). assert (H3 : forall x, x ∈ E <-> -x ∈ E').
   {
-    unfold bound, is_upper_bound, E'.
-    destruct Hbounded as [m Hm].
-    exists (-m).
-    intros x Ex.
-    specialize (Hm (-x) Ex).
-    lra.
+    intros x. split; intros H3.
+    - unfold In, E' in *. rewrite Ropp_involutive. apply H3.
+    - unfold In, E' in *. rewrite Ropp_involutive in H3. apply H3.
   }
-  assert (Hexists' : exists x:R, E' x).
-  {
-    destruct Hexists as [x Ex].
-    exists (-x). unfold E'. rewrite Ropp_involutive. exact Ex.
-  }
-  destruct (completeness E' Hbounded' Hexists') as [m' Hm'].
-  exists (-m'). unfold is_glb, is_lower_bound.
-  split.
-  - intros x Ex. destruct Hm' as [Hup _]. unfold E', is_upper_bound in Hup.
-    specialize (Hup (-x)). apply Ropp_ge_cancel. rewrite Ropp_involutive. 
-    rewrite Ropp_involutive in Hup. apply Rle_ge. apply Hup. apply Ex.
-  - intros b Hlow. destruct Hm' as [_ Hleast]. unfold is_upper_bound in Hleast.
-    assert (H : forall r1 r2 : R, r1 <= - r2 -> - r1 >= r2).
-    { intros r1 r2. lra. } apply H.
-    apply Hleast. 
-    assert (H2 : forall r1 r2 : R, -r1 >= r2 -> r1 <= - r2).
-    { intros r1 r2. lra. } intros x H3. apply H2. apply Hlow.
-    unfold E' in H3. apply H3.
+  assert (H4 : has_upper_bound E').
+  { destruct H1 as [lb H1]. exists (-lb). intros x H4. specialize (H1 (-x) H4). lra. }
+  assert (H5 : E' ≠ ∅).
+  { apply not_Empty_In in H2 as [x H2]. apply not_Empty_In. exists (-x). apply H3 in H2; auto. }
+  destruct (completeness_upper_bound E' H4 H5) as [lub H6]. exists (-lub). split.
+  - intros x H7. destruct H6 as [H6 _]. specialize (H6 (-x)). apply H3 in H7. specialize (H6 H7). lra.
+  - intros lb H7. destruct H6 as [_ H6]. specialize (H6 (-lb)). replace (-lub >= lb) with (lub <= -lb).
+    2 : { apply EquivThenEqual. lra. } apply H6. intros x H8. specialize (H7 (-x)). specialize (H3 (-x)).
+    rewrite Ropp_involutive in H3. apply H3 in H8. specialize (H7 H8). lra.
 Qed.

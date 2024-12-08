@@ -1,4 +1,5 @@
-Require Import Imports Reals_util Completeness Chapter13 Sums Notations.
+Require Import Imports Reals_util Completeness Chapter13 Sums Notations Sets.
+Import SetNotations.
 
 Open Scope R_scope.
 
@@ -358,7 +359,7 @@ Proof.
   { unfold has_lower_bound. exists LB. apply H3. }
 
   assert (H5 : {L : R | is_glb (fun x => exists n : nat, a n = x) L}).
-  { apply completeness_lower_bound. apply H4. exists (a 0%nat). exists 0%nat. reflexivity. }
+  { apply completeness_lower_bound. apply H4. apply not_Empty_In. exists (a 0%nat). exists 0%nat. reflexivity. }
 
   destruct H5 as [L H5]. unfold is_glb in H5. destruct H5 as [H5 H6]. unfold is_lower_bound in H5.
 

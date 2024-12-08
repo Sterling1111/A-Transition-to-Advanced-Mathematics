@@ -1,4 +1,4 @@
-Require Import Imports Limit Continuity Sets Reals_util Notations Functions.
+Require Import Imports Limit Continuity Sets Reals_util Notations Functions Completeness.
 Require Export Chapter36.
 Import SetNotations.
 
@@ -15,17 +15,21 @@ Proof.
 Qed.
 
 Section section_37_3.
-  Let f := Continuity.module_37_3.f.
+  Import Continuity.module_37_3.
+
   Let A : Ensemble ℝ := ℝ − ⦃0, 1⦄.
 
-  Lemma lemma_37_3_a : forall a,
-    continuous_at A f a.
+  Lemma lemma_37_3_a : forall a : (Rsub (Full_set ℝ)),
+    a ∈ A -> continuous_at (Full_set R) f a.
   Proof.
-    intros [a propa]; unfold continuous_at; simpl.
-    assert (a <> 0 /\ a <> 1) as [H1 H2].
-    { apply In_Setminus_def in propa as [_ H1]. split; intros H2; apply H1; autoset. }
-    split; admit.
-  Admitted.  
+    intros [a H1] H2; unfold continuous_at; simpl in *; split; try apply Full_set_encloses.
+    intros ε H3. assert (a <> 0 /\ a <> 1) as [H4 H5].
+    { apply In_Setminus_def in H2 as [_ H2]. split; intros H4; apply H2; autoset. }
+    exists (Rmin (|a|/2) (|a-1|/2)). split. solve_R. intros [x H6] H7; simpl in *.
+    assert ((a < 0 \/ 1 < a) \/ (0 < a < 1)) as [H8 | H8] by lra.
+    - assert (f a = 0 /\ f x = 0) as [H9 H10] by (split; apply f_spec; solve_R). solve_R.
+    - assert (f a = 1 /\ f x = 1) as [H9 H10] by (split; apply f_spec; solve_R). solve_R.
+  Qed.
 End section_37_3.
 
 Lemma lemma_37_4 : forall D f1 f2 a L1 L2,
