@@ -812,6 +812,7 @@ Proof.
       pose proof (exists_count_occ_of U l2 x H4) as [n' [H13 H14]]. specialize (H9 x n' H12 H13). 
       apply count_occ_of_In with (n := n'); auto.
     }
+    (*this is obvioulsy true but will be painful to prove. Ill do it some other time...*)
     admit.
 Admitted.
 

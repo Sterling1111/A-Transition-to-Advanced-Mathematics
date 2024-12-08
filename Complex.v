@@ -152,7 +152,3 @@ Infix "^" := Cpow : C_scope.
 Lemma Csqr_pow2 : forall x, Csqr x = x ^ 2.
   Proof. intros. unfold Cpow. unfold Csqr. rewrite Cmult_1_r. reflexivity.
 Qed.
-
-
-Close Scope C_scope.
-Close Scope R_scope.
