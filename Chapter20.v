@@ -110,7 +110,6 @@ Section section_20_3.
   Proof.
     intros H1. specialize (H1 1 (-1)). unfold R in H1. lra.
   Qed.
-
 End section_20_3.
 
 Section section_20_4.
@@ -121,8 +120,25 @@ Section section_20_4.
     intros x. exists 0%Z. lra.
   Qed.
 
-  
+  Lemma lemma_20_4_c_2 : Symmetric R.
+  Proof.
+    intros x y [z H1]. exists (-z)%Z. rewrite opp_IZR. lra.
+  Qed.
+
+  Lemma lemma_20_4_c_3 : Transitive R.
+  Proof.
+    intros x y z [m H1] [n H2]. exists (m + n)%Z. rewrite plus_IZR. lra.
+  Qed.
+
+  Lemma lemma_20_4_c_4 : ~Antisymmetric R.
+  Proof.
+    intros H1. specialize (H1 1 2 ltac:(exists (-1)%Z; lra) ltac:(exists 1%Z; lra)). lra.
+  Qed.
 End section_20_4.
+
+Section section_20_5.
+  
+End section_20_5.
 
 Definition disjoint_pieces {A} (P : Ensemble (Ensemble A)) : Prop :=
   forall E1 E2, E1 ∈ P -> E2 ∈ P -> E1 ⋂ E2 = ∅.

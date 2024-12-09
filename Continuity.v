@@ -127,3 +127,37 @@ Proof.
   replace (fun x : Rsub R => 5 * x ^ 5 + 4 * x ^ 4 + 3 * x ^ 3 + 2 * x ^ 2 + x + 1) with (polynomial' [5; 4; 3; 2; 1; 1]).
   2 : { extensionality x. compute; lra. } rewrite poly_equiv. apply theorem_37_14'.
 Qed.
+
+Definition differentiable_at f a : Prop :=
+  exists L, ⟦ lim 0 ⟧ (fun h => (f (a + h) - f a) / h) = L.
+
+Definition derivative f f' : Prop :=
+  forall a, ⟦ lim 0 ⟧ (fun h => (f (a + h) - f a) / h) = f' a.
+
+Lemma deriv_test : derivative (fun x => x^2) (fun x => 2*x).
+Proof.
+  intros a. apply limit_to_0_equiv with (f1 := fun h => 2 * a + h).
+  - intros h H1. simpl. field; auto.
+  - solve_lim.
+Qed.
+
+
+
+Section deriv.
+
+  Lemma power_rule : forall n, derivative (fun x => x^n) (fun x => INR n * x^(n-1)). 
+  Proof.
+    intros n a. induction n as [| k IH].
+    - replace (fun h : R => ((a + h) ^ 0 - a ^ 0) / h) with (fun h : R => 0).
+      2 : { extensionality h. simpl. replace (1 - 1) with 0 by lra. rewrite Rdiv_0_l; lra. }
+      simpl. rewrite Rmult_0_l. solve_lim.
+    - assert (k = 0 \/ k > 0)%nat as [H1 | H1] by lia.
+      -- subst. simpl. admit.
+      -- replace (S k - 1)%nat with (S (k - 1)) by lia. rewrite <- tech_pow_Rmult with (n := (k - 1)%nat).
+         replace (INR (S k) * (a * a ^ (k - 1))) with (a * (INR k * a ^ (k - 1)) + a * a ^ (k - 1)) by solve_R.
+         rewrite limit_iff_limit'. apply limit_plus.
+         replace (fun h : R => ((a + h) ^ S k - a ^ S k) / h) with (fun h : R => (a + h) ^ k + a * (a + h) ^ (k - 1) - a ^ k / h).
+         2 : { extensionality h. simpl. field; lra. } rewrite <- IH. solve_lim.
+  Qed.
+  
+End deriv.

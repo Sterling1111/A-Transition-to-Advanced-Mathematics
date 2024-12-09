@@ -319,6 +319,13 @@ Proof.
   
 Admitted.
 
+Lemma limit_to_0_equiv : forall f1 f2 L,
+  (forall x, x <> 0 -> f1 x = f2 x) -> ⟦ lim 0 ⟧ f1 = L -> ⟦ lim 0 ⟧ f2 = L.
+Proof.
+  intros f1 f2 L H1 H2 ε H3. specialize (H2 ε H3) as [δ [H4 H5]]. exists δ. split; auto.
+  intros x H6. specialize (H5 x H6). rewrite <- H1; solve_R.
+Qed.
+
 Lemma lim_equality_substitution : forall D f a L1 L2,
   encloses D a -> L1 = L2 -> ⟦ lim a ⟧ f D = L1 -> ⟦ lim a ⟧ f D = L2.
 Proof.
