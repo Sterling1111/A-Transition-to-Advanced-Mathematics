@@ -1,6 +1,8 @@
-Require Import Imports Binomial.
+Require Import Imports Binomial Reals_util.
 
 Import ListNotations Binomial.Choose_Notations.
+
+Open Scope nat_scope.
 
 Definition injective {A B : Type} (f : A -> B) : Prop :=
   forall x y : A, f x = f y -> x = y.
@@ -442,11 +444,25 @@ Proof.
   intros U A B. rewrite Setminus_def. rewrite De_Morgan_Intersection. rewrite Complement_Complement. reflexivity.
 Qed.
 
-  
+Ltac destruct_finite_sets H :=
+  match type of H with
+  | ?x ∈ ⦃⦄ => inversion H
+  | ?x ∈ ⦃_⦄ => apply In_singleton_def in H
+  | ?x ∈ _  => 
+      apply In_Union_def in H as [H | H];
+      [ apply In_singleton_def in H
+      | destruct_finite_sets H]
+  end.
+
+Ltac destruct_all_finitesets :=
+  repeat match goal with
+  | [ H : ?x ∈ _ |- _ ] => try (destruct_finite_sets H; inversion H; solve_R)
+  end.
+
 Ltac break_union_intersection_2 :=
   repeat match goal with
   | [ H: ?x ∈ _ ⋃ _ |- _ ] => apply In_Union_def in H
-  | [ H: ?x ∈ _ ⋂ _ |- _ ] => apply In_Intersection_def in H
+  | [ H: ?x ∈ _ ⋂ _ |- _ ] => apply In_Intersection_def in H 
   | [ H: _ /\ _ |- _ ] => destruct H
   | [ H: _ \/ _ |- _ ] => destruct H
   | [ H: ?x ∈ (?A ⋃ ?B)′ |- _ ] => rewrite De_Morgan_Union in H
@@ -457,10 +473,11 @@ Ltac break_union_intersection_2 :=
   | [ H: ?x ∉ _ ⋂ _ |- _ ] => rewrite not_in_Intersection in H
   | [ H: ?x ∉ _ |- _ ] => rewrite not_in_Complement in H
   | [ H: ?x ∉ _ − _ |- _ ] => rewrite not_in_Setminus in H
+  | [ H: _ = _ |- _ ] => injection H; intros; subst; clear H
   end.
 
 Ltac solve_in_Intersection_Union_helper_2 :=
-  unfold list_to_ensemble in *; intros; break_union_intersection_2; simpl; auto; (try contradiction);
+  subst; unfold list_to_ensemble in *; intros; break_union_intersection_2; simpl; auto; (try contradiction);
   match goal with
   | [ |- ?x ∉ _ ⋃ _ ] => apply not_in_Union; split; solve_in_Intersection_Union_helper_2
   | [ |- ?x ∉ _ ⋂ _ ] => apply not_in_Intersection; (try tauto); solve [ left; solve_in_Intersection_Union_helper_2 | right; solve_in_Intersection_Union_helper_2 ]
@@ -474,7 +491,7 @@ Ltac solve_in_Intersection_Union_helper_2 :=
   | [ |- ?x ∈ (_ − _)′ ] => rewrite Setminus_Complement; solve_in_Intersection_Union_helper_2
   | [ |- ?x ∈ (_)′′ ] => rewrite Complement_Complement; solve_in_Intersection_Union_helper_2
   | [ |- ?x ∈ _ ⋂ _ ] => apply In_Intersection_def; split; solve_in_Intersection_Union_helper_2
-  | [ |- ?x ∈ _ ⋃ _ ] => apply In_Union_def; (try tauto); solve [ left; solve_in_Intersection_Union_helper_2 | right; solve_in_Intersection_Union_helper_2 ]
+  | [ |- ?x ∈ _ ] => apply In_Union_def; (try tauto); solve [ left; solve_in_Intersection_Union_helper_2 | right; solve_in_Intersection_Union_helper_2 ]
   | [ |- ?G ] => fail "Goal not solvable"
   end.
 
@@ -483,7 +500,6 @@ Ltac in_list x l :=
   | context[x] => constr:(true)
   | _ => constr:(false)
   end.
-
 
 Ltac find_sets_in_expr E acc :=
   match E with
@@ -533,7 +549,12 @@ Ltac pose_in_or_not_for_sets x :=
   process_sets sets.
 
 Ltac solve_set_equality_auto :=
-  intros; apply set_equal_def; let x := fresh "x" in intros x; pose_in_or_not_for_sets x; split; solve_in_Intersection_Union_helper_2.
+  intros; apply set_equal_def; let x := fresh "x" in intros x; pose_in_or_not_for_sets x; 
+  split; intros; destruct_all_finitesets; solve_in_Intersection_Union_helper_2.
+
+Ltac solve_set_equality_auto' :=
+  intros; apply set_equal_def; let x := fresh "x" in intros x; split; intros; 
+  destruct_all_finitesets; solve_in_Intersection_Union_helper_2.
 
 Lemma De_Morgan_Intersection_2 : forall (U : Type) (A B : Ensemble U),
   A = A.
@@ -578,7 +599,7 @@ Ltac solve_not_in_ensemble :=
 
 Ltac autoset :=
   subst;
-  try (solve_set_equality_auto); try (solve_in_Union); try (solve_not_in_ensemble); try (solve_in_Intersection_Union_helper_2).
+  try (solve_set_equality_auto'); try (solve_set_equality_auto); try (solve_in_Union); try (solve_not_in_ensemble); try (solve_in_Intersection_Union_helper_2).
 
 Fixpoint Union_f_n {A : Type} (f : nat -> Ensemble A) (n : nat) : Ensemble A :=
   match n with
@@ -709,7 +730,7 @@ Proof.
            apply In_Union_def in H3 as [H3 | H3]; auto. apply In_singleton_def in H3. rewrite H3. apply H2.
         }
         rewrite H3 in H1. rewrite H3. specialize (IH A). rewrite <- H1 in IH at 2. specialize (IH H1). auto.
-      + replace (⦃h⦄ ⋃ list_to_ensemble t) with (Add _ (list_to_ensemble t) h). 2 : { unfold Add; autoset. } 
+      + replace (⦃h⦄ ⋃ list_to_ensemble t) with (Add _ (list_to_ensemble t) h). 2 : { unfold Add; autoset. }
         apply Union_is_finite; auto.
   - intros H1. induction H1 as [| A H1 IH].
     -- exists []. rewrite list_to_ensemble_nil. reflexivity.

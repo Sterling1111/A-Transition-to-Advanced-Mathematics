@@ -128,6 +128,18 @@ Proof.
   2 : { extensionality x. compute; lra. } rewrite poly_equiv. apply theorem_37_14'.
 Qed.
 
+Lemma exists_function : forall D (f : Rsub D -> R) L,
+  { g : R -> R |
+    (forall x : Rsub D, f x = g x) /\
+    (forall x : R, x ∉ D -> g x = L) }.
+Proof.
+Admitted.
+
+Definition derivable_at (D : Ensemble R) (f : Rsub D -> R) (a : Rsub D) : Prop :=
+  exists L, 
+    let g := proj1_sig (exists_function D f L) in
+      ⟦ lim 0 ⟧ (fun h => (g (a + h) - g a) / h) = L.
+
 Definition differentiable_at f a : Prop :=
   exists L, ⟦ lim 0 ⟧ (fun h => (f (a + h) - f a) / h) = L.
 
@@ -140,24 +152,3 @@ Proof.
   - intros h H1. simpl. field; auto.
   - solve_lim.
 Qed.
-
-
-
-Section deriv.
-
-  Lemma power_rule : forall n, derivative (fun x => x^n) (fun x => INR n * x^(n-1)). 
-  Proof.
-    intros n a. induction n as [| k IH].
-    - replace (fun h : R => ((a + h) ^ 0 - a ^ 0) / h) with (fun h : R => 0).
-      2 : { extensionality h. simpl. replace (1 - 1) with 0 by lra. rewrite Rdiv_0_l; lra. }
-      simpl. rewrite Rmult_0_l. solve_lim.
-    - assert (k = 0 \/ k > 0)%nat as [H1 | H1] by lia.
-      -- subst. simpl. admit.
-      -- replace (S k - 1)%nat with (S (k - 1)) by lia. rewrite <- tech_pow_Rmult with (n := (k - 1)%nat).
-         replace (INR (S k) * (a * a ^ (k - 1))) with (a * (INR k * a ^ (k - 1)) + a * a ^ (k - 1)) by solve_R.
-         rewrite limit_iff_limit'. apply limit_plus.
-         replace (fun h : R => ((a + h) ^ S k - a ^ S k) / h) with (fun h : R => (a + h) ^ k + a * (a + h) ^ (k - 1) - a ^ k / h).
-         2 : { extensionality h. simpl. field; lra. } rewrite <- IH. solve_lim.
-  Qed.
-  
-End deriv.

@@ -19,6 +19,20 @@ Section section_37_3.
 
   Let A : Ensemble ℝ := ℝ − ⦃0, 1⦄.
 
+  Lemma lemma_37_3_a' : continuous_on A f.
+  Proof.
+    intros [a H1]. unfold continuous_at. simpl. assert (a <> 0 /\ a <> 1) as [H2 H3].
+    { apply In_Setminus_def in H1 as [_ H1]. split; intros H2; apply H1; autoset. } unfold limit. split.
+    - assert (a < 0 \/ 1 < a \/ 0 < a < 1) as [H4 | [H4 | H4]] by lra;
+      [ exists (a-1), (a/2) | exists ((a+1)/2), (a+1) | exists(a/2), ((a+1)/2) ]; split; try lra; intros x H5;
+      unfold A; unfold Ensembles.In in H5; rewrite In_Setminus_def; split; 
+      first [apply Full_intro | intros H6; destruct_finite_set H6; lra].
+    - intros ε H4. exists (Rmin (|a|/2) (|a-1|/2)). split. solve_R. intros [x H5] H6; simpl in *.
+      assert ((a < 0 \/ 1 < a) \/ (0 < a < 1)) as [H7 | H7] by lra.
+      -- assert (f a = 0 /\ f x = 0) as [H8 H9] by (split; apply f_spec; solve_R). solve_R.
+      -- assert (f a = 1 /\ f x = 1) as [H8 H9] by (split; apply f_spec; solve_R). solve_R.
+  Qed.
+
   Lemma lemma_37_3_a : forall a : (Rsub (Full_set ℝ)),
     a ∈ A -> continuous_at (Full_set R) f a.
   Proof.

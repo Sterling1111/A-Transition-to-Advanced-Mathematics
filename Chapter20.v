@@ -46,10 +46,9 @@ Section section_20_1.
   Open Scope R_scope.
 
   Let A : Ensemble ℝ := ⦃ 1, 2, 3, 4, 5, 6 ⦄.
-  Let T := subType A.
   Let R : Relation ℝ := ⦃ (1,1),(1,2),(1,3),(1,4),(2,3),(2,5),(2,6),(3,5),(4,5),(4,6) ⦄.
   
-  Let S (n : T) : Ensemble ℝ := (fun x => (val A n, x) ∈ R).
+  Let S (n : subType A) : Ensemble ℝ := (fun x => (val A n, x) ∈ R).
 
   Lemma lemma_20_1_a : R 1 1.
   Proof.
@@ -61,32 +60,23 @@ Section section_20_1.
     assert (H1 : (2,1) ∉ R). { unfold R; rewrite ens_rel_ens_id. autoset. } auto.
   Qed.
 
-  Let one : T := mkSubType _ A 1 ltac:(unfold A; autoset).
+  Let one := mkSubType _ A 1 ltac:(unfold A; autoset).
+  Let two := mkSubType _ A 2 ltac:(unfold A; autoset).
+  Let three := mkSubType _ A 3 ltac:(unfold A; autoset).
+  Let four := mkSubType _ A 4 ltac:(unfold A; autoset).
+  Let five := mkSubType _ A 5 ltac:(unfold A; autoset).
+  Let six := mkSubType _ A 6 ltac:(unfold A; autoset).
 
-  Lemma S1_elements : S one = ⦃ 1, 2, 3, 4 ⦄.
-  Proof.
-    unfold S, R; replace (val A one) with 1 by reflexivity; clear one. apply set_equal_def; intros x; split; intros H1.
-    - rewrite ens_rel_ens_id in H1. 
-      replace (fun x : ℝ => (1, x) ∈ ⦃(1, 1),(1, 2),(1, 3),(1, 4),(2, 3),(2, 5),(2, 6),(3, 5),(4, 5),(4, 6)⦄) with 
-      (⦃1, 2, 3, 4⦄) in H1; auto. clear x H1. apply functional_extensionality. intros x.
-      apply EquivThenEqual. split; intros H1.
-      -- assert (x = 1 \/ x = 2 \/ x = 3 \/ x = 4) as [H2 | [H2 | [H2 | H2]]]; subst; autoset.
-         { apply In_Union_def in H1 as [H1 | H1]. left. apply In_singleton_def in H1. auto. right.
-           apply In_Union_def in H1 as [H1 | H1]. left. apply In_singleton_def in H1. auto. right.
-           apply In_Union_def in H1 as [H1 | H1]. left. apply In_singleton_def in H1. auto. right.
-           apply In_Union_def in H1 as [H1 | H1]. apply In_singleton_def in H1. auto. autoset. }
-      -- assert (x = 1 \/ x = 2 \/ x = 3 \/ x = 4) as [H2 | [H2 | [H2 | H2]]]; subst; autoset. admit.
-      left. autoset. right; left. autoset. right; right; left. autoset. right; right; right. autoset.
-    -  assert (x = 1 \/ x = 2 \/ x = 3 \/ x = 4) as [H2 | [H2 | [H2 | H2]]]; subst; autoset. admit.
-       -- rewrite ens_rel_ens_id. left. autoset.
-       -- rewrite ens_rel_ens_id. right; left. autoset.
-       -- rewrite ens_rel_ens_id. right; right; left. autoset.
-       -- rewrite ens_rel_ens_id. right; right; right. autoset.
-  Admitted.
+  Lemma S_elements : S one = ⦃ 1, 2, 3, 4 ⦄ /\ S two = ⦃ 3, 5, 6 ⦄ /\ S three = ⦃ 5 ⦄ /\ S four = ⦃ 5, 6 ⦄ /\ S five = ∅ /\ S six = ∅.
+  Proof. repeat split; clear; unfold S, R; rewrite ens_rel_ens_id; autoset.  Qed.
+
 End section_20_1.
 
 Definition Antisymmetric {A} (R : Relation A) : Prop :=
   forall x y, R x y -> R y x -> x = y.
+
+Notation "❴ ( x , y ) : U * V | P ❵" := (fun p : U * V => let '(x, y) := p in P)
+  (at level 200, x, y at level 99, U, V at level 30, P at level 200, format "❴ ( x , y ) : U * V | P ❵") : set_scope.
 
 Section section_20_3.
   Let R : Relation ℝ := fun x y => x * y < 0.
@@ -137,6 +127,9 @@ Section section_20_4.
 End section_20_4.
 
 Section section_20_5.
+  Let R : Relation ℤ := fun a b => Z.Even (a - b).
+
+  
   
 End section_20_5.
 
