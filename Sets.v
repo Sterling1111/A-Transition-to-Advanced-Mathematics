@@ -1,4 +1,4 @@
-Require Import Imports Binomial Reals_util.
+Require Import Imports Binomial Reals_util Utf8.
 
 Import ListNotations Binomial.Choose_Notations.
 
@@ -26,8 +26,6 @@ Notation "x ∈ A" := (In _ A x) (at level 40) : set_scope.
 Definition set_prod {U V : Type} (A : Ensemble U) (B : Ensemble V) : Ensemble (U * V) :=
   fun p => exists a b, (a ∈ A)%set /\ (b ∈ B)%set /\ p = (a, b).
 
-(* Define notations within the custom scope with improved precedence *)
-Notation "A ≠ B" := (A <> B) (at level 40) : set_scope.
 Notation "x ∉ A" := (~ In _ A x) (at level 40) : set_scope.
 Notation "A ⊆ B" := (Included _ A B) (at level 40) : set_scope.
 Notation "A ⊈ B" := (~ Included _ A B) (at level 40) : set_scope.

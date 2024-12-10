@@ -10,7 +10,7 @@ Section section_35_1.
   Lemma lemma_35_1 : forall n,
     partial_sum a n = (INR n * (INR n + 1)) / 2.
   Proof.
-    intros n. unfold partial_sum, a. rewrite proposition_13_5. solve_INR.
+    intros n. unfold partial_sum, a. rewrite proposition_13_5. reflexivity.
   Qed.
 End section_35_1.
 
@@ -46,8 +46,9 @@ Section section_35_3.
     apply nth_term_in_series_sequence_35_5.
   Qed.
 
-  Lemma lemma_35_3_b : ⟦ lim_s ⟧ (partial_sum a) = 2.
+  Lemma lemma_35_3_b : ∑ 0 ∞ a = 2.
   Proof.
+    unfold series_sum. 
     set (b := (fun n => 1 / INR n)). set (c := (fun n : nat => 2)).
     assert (⟦ lim_s ⟧ a = 0) as H1.
     {
@@ -61,6 +62,13 @@ Section section_35_3.
     replace (partial_sum a) with (fun n => 2 - 1 / 2 ^ n). 2 : { apply functional_extensionality. intro n. rewrite lemma_35_3_a; auto. }
     replace 2 with (2 - 0) at 1 by lra. apply limit_of_sequence_sub; auto.
   Qed.
+
+  Lemma lemma_35_3_b' : ∑ 0 ∞ a = 2.
+  Proof.
+    unfold series_sum. intros ε H1. pose proof theorem_34_12 ε H1 as [N H2]. exists N. intros n H3.
+    specialize (H2 n H3). rewrite lemma_35_3_a. replace (2 - 1 / 2 ^ n - 2) with (- 1 / 2 ^ n) by lra.
+    admit.
+  Admitted.
 End section_35_3.
 
 Section section_35_4.

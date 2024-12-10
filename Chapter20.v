@@ -1,63 +1,24 @@
-Require Import Imports Sets Notations.
-
+Require Import Imports Sets Relations Notations.
 Import SetNotations.
-
 Require Export Chapter19.
 
-Lemma Relation_is_Ensemble : forall A, Relation A = Ensemble (A * A).
-Proof.
-  intros A.
-  apply univalence.
-  exists (fun (r : Relation A) (p : A * A) => r (fst p) (snd p)),
-      (fun (e : Ensemble (A * A)) (x y : A) => e (x,y)).
-  split; intros H1.
-  - apply functional_extensionality; intros p.
-    constructor; intros H2; destruct p; simpl in *; auto.
-  - apply functional_extensionality; intros p. replace (fst p, snd p) with p; tauto.
-Qed.
-
-Coercion rel_to_ens {A} (R : Relation A) : Ensemble (A * A) := 
-  fun p => R (fst p) (snd p).
-
-Coercion ens_to_rel {A} (E : Ensemble (A * A)) : Relation A := 
-  fun x y => E (x,y).
-
-Lemma ens_rel_ens_id : forall A (E : Ensemble (A * A)),
-  rel_to_ens (ens_to_rel E) = E.
-Proof.
-  intros A E. apply set_equal_def. intros p; destruct p; split; auto.
-Qed.
-
-Lemma rel_ens_rel_id : forall A (R : Relation A),
-  ens_to_rel (rel_to_ens R) = R.
-Proof.
-  intros A E. unfold ens_to_rel, rel_to_ens. apply functional_extensionality; intros x.
-  apply functional_extensionality; intros y. reflexivity.
-Qed.
-  
 Open Scope R_scope.
-
-Lemma x_y_In_implies_rel : forall A (R : Relation A) x y, (x, y) ∈ R <-> R x y.
-Proof.
-  intros; split; auto.
-Qed.
+Set Printing Coercions.
 
 Section section_20_1.
-  Open Scope R_scope.
-
   Let A : Ensemble ℝ := ⦃ 1, 2, 3, 4, 5, 6 ⦄.
-  Let R : Relation ℝ := ⦃ (1,1),(1,2),(1,3),(1,4),(2,3),(2,5),(2,6),(3,5),(4,5),(4,6) ⦄.
+  Let R : Relation ℝ ℝ := ⦃ (1,1),(1,2),(1,3),(1,4),(2,3),(2,5),(2,6),(3,5),(4,5),(4,6) ⦄.
   
   Let S (n : subType A) : Ensemble ℝ := (fun x => (val A n, x) ∈ R).
 
   Lemma lemma_20_1_a : R 1 1.
   Proof.
-    apply x_y_In_implies_rel. unfold R; rewrite ens_rel_ens_id. autoset.
+    unfold R. rewrite <- x_y_In_implies_rel. autoset.
   Qed.
 
   Lemma lemma_20_1_b : ~ R 2 1.
   Proof.
-    assert (H1 : (2,1) ∉ R). { unfold R; rewrite ens_rel_ens_id. autoset. } auto.
+    unfold R. rewrite <- x_y_In_implies_rel. rewrite ens_rel_ens_id. autoset.
   Qed.
 
   Let one := mkSubType _ A 1 ltac:(unfold A; autoset).
@@ -70,21 +31,15 @@ Section section_20_1.
   Lemma S_elements : S one = ⦃ 1, 2, 3, 4 ⦄ /\ S two = ⦃ 3, 5, 6 ⦄ /\ S three = ⦃ 5 ⦄ /\ S four = ⦃ 5, 6 ⦄ /\ S five = ∅ /\ S six = ∅.
   Proof. repeat split; clear; unfold S, R; rewrite ens_rel_ens_id; autoset.  Qed.
 
-End section_20_1.
-
-Definition Antisymmetric {A} (R : Relation A) : Prop :=
-  forall x y, R x y -> R y x -> x = y.
-
-Notation "❴ ( x , y ) : U * V | P ❵" := (fun p : U * V => let '(x, y) := p in P)
-  (at level 200, x, y at level 99, U, V at level 30, P at level 200, format "❴ ( x , y ) : U * V | P ❵") : set_scope.
+End section_20_1. 
 
 Section section_20_3.
-  Let R : Relation ℝ := fun x y => x * y < 0.
+  Let R : Relation ℝ ℝ := fun x y => x * y < 0.
 
   Lemma lemma_20_3_c_1 : ~ Reflexive R.
   Proof.
     intros H1. unfold Reflexive in H1. specialize (H1 1). unfold R in H1. lra.
-  Qed.
+  Qed. 
 
   Lemma lemma_20_3_c_2 : Symmetric R.
   Proof.
@@ -103,7 +58,7 @@ Section section_20_3.
 End section_20_3.
 
 Section section_20_4.
-  Let R : Relation ℝ := fun x y => exists z : Z, IZR z = x - y.
+  Let R : Relation ℝ ℝ := fun x y => exists z : Z, IZR z = x - y.
 
   Lemma lemma_20_4_c_1 : Reflexive R.
   Proof.
@@ -127,7 +82,7 @@ Section section_20_4.
 End section_20_4.
 
 Section section_20_5.
-  Let R : Relation ℤ := fun a b => Z.Even (a - b).
+  Let R : Relation ℤ ℤ := fun a b => Z.Even (a - b).
 
   
   

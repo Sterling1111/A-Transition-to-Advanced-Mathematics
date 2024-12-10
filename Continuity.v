@@ -10,7 +10,7 @@ Definition continuous_on (D : Ensemble R) (f : Rsub D -> R) : Prop :=
 Example example_37_2 : forall c d,
   continuous_on R (fun x => c * x + d).
 Proof.
-  intros c d a. unfold continuous_at. unfold Type_to_Ensemble in *. solve_lim.
+  intros c d a. unfold continuous_at, Type_to_Ensemble. solve_lim.
 Qed.
 
 Module module_37_3.

@@ -26,7 +26,7 @@ Section section_37_3.
     - assert (a < 0 \/ 1 < a \/ 0 < a < 1) as [H4 | [H4 | H4]] by lra;
       [ exists (a-1), (a/2) | exists ((a+1)/2), (a+1) | exists(a/2), ((a+1)/2) ]; split; try lra; intros x H5;
       unfold A; unfold Ensembles.In in H5; rewrite In_Setminus_def; split; 
-      first [apply Full_intro | intros H6; destruct_finite_set H6; lra].
+      first [apply Full_intro | intros H6; destruct_all_finitesets ].
     - intros ε H4. exists (Rmin (|a|/2) (|a-1|/2)). split. solve_R. intros [x H5] H6; simpl in *.
       assert ((a < 0 \/ 1 < a) \/ (0 < a < 1)) as [H7 | H7] by lra.
       -- assert (f a = 0 /\ f x = 0) as [H8 H9] by (split; apply f_spec; solve_R). solve_R.

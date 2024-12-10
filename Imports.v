@@ -42,8 +42,9 @@ From Coq Require Export
   Orders
   Sorting
   Permutation
-  Classes.Morphisms
-  Relations.Relations.
+  Utf8
+  Classes.Morphisms.
+  
 
 (* Common notations *)
 Export ListNotations.
