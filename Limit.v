@@ -1,17 +1,17 @@
-Require Import Imports Sequence Sets Chapter12 Reals_util Sequence Notations.
+Require Import Imports Sequence Sets Chapter12 Reals_util Sequence Notations Utf8 Functions.
 Import SetNotations.
 
 Open Scope R_scope.
 
-Definition encloses (D : Ensemble R) (a : R) : Prop :=
+Definition encloses (D : Ensemble ℝ) (a : R) : Prop :=
   exists b c, b < a < c /\ (fun x => b <= x <= c) ⊆ D.
 
-Record Rsub (D : Ensemble R) := mkRsub {
+Record Rsub (D : Ensemble ℝ) := mkRsub {
   val :> R;
   prop : val ∈ D
 }.
 
-Definition limit (D : Ensemble R) (f : Rsub D -> R) (a L : R) : Prop :=
+Definition limit (D : Ensemble ℝ) (f : Rsub D -> ℝ) (a L : ℝ) : Prop :=
   encloses D a /\
     (∀ ε, ε > 0 ⇒ ∃ δ, δ > 0 /\ ∀ x : Rsub D, 0 < |x - a| < δ ⇒ |f x - L| < ε).
 

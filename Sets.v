@@ -787,6 +787,13 @@ Proof.
   - contradiction.
 Qed.
 
+Lemma Infinite_exists_In : forall (U : Type) (A : Ensemble U),
+  ~Finite_set A -> exists x : U, x ∈ A.
+Proof.
+  intros U A H1. pose proof Empty_or_exists_In U A as [H2 | H2]; auto.
+  exfalso. apply H1. exists []. autoset.
+Qed.
+
 Lemma Power_set_Empty_1 : forall (U : Type),
   ℙ(∅ : Ensemble U) = Singleton (Ensemble U) (Empty_set _).
 Proof.

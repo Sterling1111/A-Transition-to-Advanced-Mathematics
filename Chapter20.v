@@ -1,5 +1,5 @@
-Require Import Imports Sets Relations Notations.
-Import SetNotations.
+Require Import Imports Sets Relations Notations Functions.
+Import SetNotations RelationNotations.
 Require Export Chapter19.
 
 Open Scope R_scope.
@@ -33,60 +33,111 @@ Section section_20_1.
 
 End section_20_1. 
 
+Section section_20_2.
+  Let Ra := ❴ (x, y) ∈ ℝ ⨯ ℝ | x <= y ❵.
+  Let Rb := ❴ (x, y) ∈ ℝ ⨯ ℝ | x >= y ❵.
+  Let Rc := ❴ (x, y) ∈ ℝ ⨯ ℝ | x > y ❵.
+  Let Rd := ❴ (x, y) ∈ ℝ ⨯ ℝ | x = y ❵.
+  Let Re := ❴ (x, y) ∈ ℝ ⨯ ℝ | x ≠ y ❵.
+End section_20_2.
+
 Section section_20_3.
-  Let R : Relation ℝ ℝ := fun x y => x * y < 0.
+  Let R := ❴ (x, y) ∈ ℝ ⨯ ℝ | x * y < 0 ❵.
 
   Lemma lemma_20_3_c_1 : ~ Reflexive R.
   Proof.
-    intros H1. unfold Reflexive in H1. specialize (H1 1). unfold R in H1. lra.
+    unfold R, mk_relation, Reflexive. intros H1. specialize (H1 1). lra.
   Qed. 
 
   Lemma lemma_20_3_c_2 : Symmetric R.
   Proof.
-    intros x y H1. unfold R in *. lra.
+    unfold Symmetric, R, mk_relation. intros x y H1. lra.
   Qed.
 
   Lemma lemma_20_3_c_3 : ~ Transitive R.
   Proof.
-    intros H1. unfold Transitive in H1. specialize (H1 (-1) 1 (-1)). unfold R in H1. lra.
+    unfold Transitive, R, mk_relation. intros H1. specialize (H1 (-1) 1 (-1)). lra.
   Qed.
 
   Lemma lemma_20_c_c_4 : ~ Antisymmetric R.
   Proof.
-    intros H1. specialize (H1 1 (-1)). unfold R in H1. lra.
+    unfold Antisymmetric, R, mk_relation. intros H1. specialize (H1 1 (-1)). lra.
   Qed.
 End section_20_3.
 
 Section section_20_4.
-  Let R : Relation ℝ ℝ := fun x y => exists z : Z, IZR z = x - y.
+  Let R := ❴ (x, y) ∈ ℝ ⨯ ℝ | exists z, IZR z = x - y ❵.
 
   Lemma lemma_20_4_c_1 : Reflexive R.
   Proof.
-    intros x. exists 0%Z. lra.
+    unfold Reflexive, R, mk_relation. intros x. exists 0%Z. lra.
   Qed.
 
   Lemma lemma_20_4_c_2 : Symmetric R.
   Proof.
-    intros x y [z H1]. exists (-z)%Z. rewrite opp_IZR. lra.
+    unfold Symmetric, R, mk_relation. intros x y [z H1]. exists (-z)%Z. rewrite opp_IZR. lra.
   Qed.
 
   Lemma lemma_20_4_c_3 : Transitive R.
   Proof.
-    intros x y z [m H1] [n H2]. exists (m + n)%Z. rewrite plus_IZR. lra.
+    unfold Transitive, R, mk_relation. intros x y z [m H1] [n H2]. exists (m + n)%Z. rewrite plus_IZR. lra.
   Qed.
 
   Lemma lemma_20_4_c_4 : ~Antisymmetric R.
   Proof.
-    intros H1. specialize (H1 1 2 ltac:(exists (-1)%Z; lra) ltac:(exists 1%Z; lra)). lra.
+    unfold Antisymmetric, R, mk_relation. intros H1. specialize (H1 1 2 ltac:(exists (-1)%Z; lra) ltac:(exists 1%Z; lra)). lra.
   Qed.
 End section_20_4.
 
 Section section_20_5.
-  Let R : Relation ℤ ℤ := fun a b => Z.Even (a - b).
+  Open Scope Z_scope.
+  Let R := ❴ (a, b) ∈ ℤ ⨯ ℤ | Z.Even (a - b) ❵.
 
-  
-  
+  Lemma lemma_20_5_b_1 : Reflexive R.
+  Proof.
+    unfold Reflexive, R, mk_relation. intros x. exists 0%Z. rewrite Z.sub_diag. lia.
+  Qed.
+
+  Lemma lemma_20_5_b_2 : Symmetric R.
+  Proof.
+    unfold Symmetric, R, mk_relation. intros x y [z H1]. exists (-z)%Z. lia.
+  Qed.
+
+  Lemma lemma_20_5_b_3 : Transitive R.
+  Proof.
+    unfold Transitive, R, mk_relation. intros x y z [m H1] [n H2]. exists (m + n)%Z. lia.
+  Qed.
+
+  Lemma lemma_20_5_c : ~ Antisymmetric R.
+  Proof.
+    unfold Antisymmetric, R, mk_relation. intros H1. specialize (H1 4 2 ltac:(exists 1%Z; lia) ltac:(exists (-1)%Z; lia)). lia.
+  Qed.
+
+  Lemma lemma_20_5_d : forall b, 
+    R 1 b <-> Z.Odd b.
+  Proof.
+    unfold R, mk_relation. intros b. split; intros H1.
+    - apply even_minus_Z in H1 as [[[k H1] _] | H1]; [lia | tauto].
+    - apply even_minus_Z. right. split; auto. exists 0. lia.
+  Qed.
 End section_20_5.
+
+Section section_20_6.
+  Let A : Ensemble ℝ := ⦃ 1, 2, 3 ⦄.
+  Let T := subType A.
+
+  Let one := mkSubType _ A 1 ltac:(unfold A; autoset).
+  Let two := mkSubType _ A 2 ltac:(unfold A; autoset).
+  Let three := mkSubType _ A 3 ltac:(unfold A; autoset).
+
+  Notation "1" := one.
+  Notation "2" := two.
+  Notation "3" := three.
+
+  Let Ra : Relation T T := ⦃ (1, 1), (2, 2), (3, 3) ⦄.
+  
+End section_20_6.
+
 
 Definition disjoint_pieces {A} (P : Ensemble (Ensemble A)) : Prop :=
   forall E1 E2, E1 ∈ P -> E2 ∈ P -> E1 ⋂ E2 = ∅.
@@ -96,17 +147,3 @@ Definition covering {A} (P : Ensemble (Ensemble A)) : Prop :=
   forall x : A, exists E, E ∈ P /\ x ∈ E.
 Definition partition {A} (E : Ensemble (Ensemble A)) : Prop :=
   disjoint_pieces E /\ nonempty_pieces E /\ covering E.
-Definition Forall_Ensemble {A : Type} (E : Ensemble A) (P : A -> Prop) :=
-  forall x, x ∈ E -> P x.
-Definition Ensemble_map {A B} (f : A -> B) (E : Ensemble A) : Ensemble B :=
-  fun y => exists x, x ∈ E /\ y = f x.
-Section testsection.
-  Definition Ensemble_to_Type {A} (E : Ensemble A) : Type := {x : A | x ∈ E}.
-  Definition E := ⦃⦃1, 2, 3⦄, ⦃4, 5, 6⦄, ⦃7, 8, 9⦄⦄.
-  Definition E' := Ensemble_map (fun x => Ensemble_to_Type x) E.
-  Theorem pasting_together_theorem : forall {A B : Type} (P : Ensemble (Ensemble A)) (Q : Ensemble (Ensemble B)),
-    partition P -> partition Q -> exists R : (Ensemble (Type -> Type)), 2 + 2 = 4.
-  Proof.
-    intros. exists ⦃⦄. lra.
-  Qed.
-End testsection.

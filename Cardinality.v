@@ -55,24 +55,18 @@ Proof.
     rewrite <- H6 in H3 at 1. exists (f y). rewrite H3; auto. rewrite H6. auto.
 Qed.
 
-Definition countably_infinite {T : Type} (A : Ensemble T) : Prop := ‖ A ‖ = ‖ ℕ ‖.
+Definition countably_infinite {T : Type} (A : Ensemble T) : Prop := ‖ ℕ ‖ = ‖ A ‖.
 Definition countable {T : Type} (A : Ensemble T) : Prop := Finite_set A \/ countably_infinite A.
 
 Theorem theorem_29_14 : forall (T : Type) (A B : Ensemble T),
-  ~Finite_set B -> B ⊆ A -> countably_infinite A -> countably_infinite B.
+  Infinite_set B -> B ⊆ A -> countably_infinite A -> countably_infinite B.
 Proof.
-  intros T A B H1 H2 [[_ H3] | [_ [_ [f [H3 H4]]]]].
-  - exfalso. apply (not_Empty_In ℕ ℕ); auto. exists 0%nat. constructor.
-  - unfold countably_infinite. (* apply cardinal_eq_sym *) unfold cardinal_eq. right. repeat split.
-    -- admit.
-    -- admit.
-    -- assert (H5 : forall x : subType B, val B x ∈ A) by (destruct x; autoset).
-       set (b_to_a := fun x : subType B => mkSubType T A (val B x) ltac:(apply (H5 x))).
-       set (g := fun x : subType B => f (b_to_a x)). exists g. split.
-       + intros x y H6. unfold injective in H3. destruct x, y. unfold g in H6. apply H3 in H6.
-         unfold b_to_a in H6. simpl in H6. inversion H6. subst. replace property0 with property1.
-         2 : { apply proof_irrelevance. } reflexivity.
-       + admit.
+  intros T A B H1 H2. unfold countably_infinite. unfold Type_to_Ensemble. intros [[_ H3] | [_ [_ [f [H3 H4]]]]].
+  - assert (B <> ⦃⦄) as H5. { apply not_Empty_In. apply Infinite_exists_In; auto. } exfalso. apply H5. autoset.
+  - unfold countably_infinite. unfold cardinal_eq. right. repeat split.
+    -- apply not_Empty_In. exists 0%nat. apply Full_intro.
+    -- apply not_Empty_In. apply Infinite_exists_In; auto.
+    -- unfold injective in H3. unfold surjective in H4. 
 Admitted.
 
 Theorem theorem_29_5 : ‖ ℕ ‖ = ‖ ℚ ‖.
