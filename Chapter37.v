@@ -52,6 +52,15 @@ Proof.
   intros D f1 f2 a L1 L2 H1 H2 H3 H4 H5. apply limit_mult; auto.
 Qed.
 
+Lemma lemma_37_4' : forall D f1 f2 a L1 L2,
+  L1 = 0 -> L2 = 0 -> encloses D a -> ⟦ lim a ⟧ f1 D = L1 -> ⟦ lim a ⟧ f2 D = L2 -> ⟦ lim a ⟧ ((f1 ∙ f2)%f) D = L1 * L2.
+Proof.
+  intros D f1 f2 a L1 L2 H1 H2 H3 H4 H5. unfold f_mult. split; auto.
+  intros ε H6. destruct H4 as [_ H4]. destruct H5 as [_ H5]. specialize (H4 (sqrt ε)) as [δ1 [H7 H8]]. admit.
+  specialize (H5 (sqrt ε)) as [δ2 [H9 H10]]. admit. exists (Rmin δ1 δ2). split. solve_R.
+  intros x H11. subst. 
+Abort.
+
 Section section_37_5.
   Variables l1 l2 : list ℝ.
   Let g := polynomial' l1.

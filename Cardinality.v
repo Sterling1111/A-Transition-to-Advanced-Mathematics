@@ -69,6 +69,58 @@ Proof.
     -- unfold injective in H3. unfold surjective in H4. 
 Admitted.
 
+Definition Q' : Ensemble (ℤ * ℤ) := fun p => let (a, b) := p in b <> 0 /\ Z.gcd a b = 1.
+Definition Q'' : Ensemble ℝ := fun r => exists a b : ℤ, b <> 0 /\ Z.gcd a b = 1 /\ (r = (IZR a) / IZR b)%R.
+Definition Q''' : Ensemble ℚ := ℚ.
+
+Print find.
+Print Pos.of_nat.
+
+Open Scope Q_scope.
+
+Notation "q1 =? q2" := (Qeq_bool q1 q2) (at level 70) : Q_scope.
+
+Definition nat_to_Q (n d : nat) : Q := (Z.of_nat n) # (Pos.of_nat d).
+Definition Q_num_nat (q : Q) : nat := Z.to_nat (Qnum q).
+Definition Q_den_nat (q : Q) : nat := Pos.to_nat (Qden q).
+
+Fixpoint next_Q (n d : nat) (l : list Q) : (list Q * Q) :=
+  let q := nat_to_Q n d in
+  match d with
+  | 0%nat => (l, 0)
+  | 1%nat => (l ++ [q], q)
+  | S d' => match (find (fun q' => q' =? q) l) with
+            | None => (l ++ [q], q)
+            | Some _ => next_Q (n + 1) d' l
+            end
+  end.
+
+Fixpoint func1 (iter : nat) (n d : nat) (l : list Q) : list Q :=
+  match iter with
+  | 0%nat => l
+  | S iter' =>
+      let (l', q) := next_Q n d l in
+      let d' := Q_den_nat q in
+      let n' := Q_num_nat q in
+      match d' with
+      | 1%nat => func1 iter' 1 (n' + 1) l'
+      | _ => func1 iter' (n' + 1) (d' - 1) l'
+      end
+  end.
+
+Fixpoint last_element {A : Type} (l : list A) (default : A) : A :=
+  match l with
+  | [] => default
+  | [x] => x
+  | _ :: t => last_element t default
+  end.
+
+Definition N_Qpos_bijection (n : nat) : Q :=
+  let l := func1 (n + 1) 1 1 [1] in
+  last_element l 0.
+
+Compute (map N_Qpos_bijection (seq 0 10)).
+
 Theorem theorem_29_5 : ‖ ℕ ‖ = ‖ ℚ ‖.
 Proof.
 Admitted.

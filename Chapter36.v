@@ -40,6 +40,7 @@ Lemma lemma_36_5 : ⟦ lim 3 ⟧ (fun x => x^3 + x^2 + 2) = 38.
 Proof.
   intros ε H1. exists (Rmin 1 (ε/44)). split. solve_R. intros x [H2 H3].
   replace (x^3 + x^2 + 2 - 38) with ((x - 3) * (x^2 + 4 * x + 12)) by lra.
+  
   solve_R.
 Admitted.
 
