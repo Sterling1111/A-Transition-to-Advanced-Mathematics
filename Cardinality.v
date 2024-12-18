@@ -110,6 +110,11 @@ Qed.
 
 Open Scope nat_scope.
 
+Lemma exists_test : forall n,
+  exists t, t * (t + 1) / 2 <= n < (t + 1) * (t + 2) / 2.
+Proof.
+Admitted.
+
 Lemma theorem_30_3 : ‖ ℕ ‖ = ‖ ℕ × ℕ ‖.
 Proof.
   apply cardinal_eq_sym. unfold cardinal_eq. right. repeat split.
@@ -139,7 +144,23 @@ Proof.
          assert (d = 0 \/ d > 0) as [H4 | H4] by lia; try lia.
          assert (d * (d + 1) / 2 >= 1) as H5. { pose proof sum_n_divisible d as [j H5]. rewrite H5. rewrite Nat.div_mul; lia. }
          assert (a * d + d * (d + 1) / 2 >= a + 1) as H6 by nia. assert (n > a + m) as H7 by lia. unfold a in H7. lia.
-    -- intros n. admit.
+    -- intros n. pose proof exists_test n as [t [H1 H2]]. set (b := n - t * (t + 1) / 2). set (a := t - b). exists (a, b). unfold f.
+       unfold a, b. assert (n >= t \/ n < t) as [H3 | H3]; assert (t * (t + 1) / 2 = n \/ t * (t + 1) / 2 < n) as [H4 | H4]; try lia.
+       * rewrite H4. replace (n - n) with 0 by lia. rewrite Nat.sub_0_r. repeat rewrite Nat.add_0_r. lia.
+       * assert (t >= (n - t * (t + 1) / 2) \/ t < (n - t * (t + 1) / 2)) as [H5 | H5] by lia.
+         ** replace ((t - (n - t * (t + 1) / 2) + (n - t * (t + 1) / 2))) with t by nia. nia.
+         ** apply add_lt_mono_r_proj_l2r with (p := t * (t + 1) / 2) in H5.
+            replace (n - t * (t + 1) / 2 + t * (t + 1) / 2) with n in H5 by lia.
+            replace ((t + 1) * (t + 2)) with (t^2 + 3*t + 2) in H2 by (simpl; lia).
+            replace t with (t * 2 / 2) in H5 at 1. 2 : { rewrite Nat.div_mul; lia. }
+            replace (t * 2 / 2 + t * (t + 1) / 2) with ((2 * t + t * (t + 1)) / 2) in H5.
+            2 : { pose proof sum_n_divisible t as [j H6]. rewrite H6. repeat rewrite Nat.div_mul; try lia. replace (2 * t + j * 2) with ((t + j) * 2) by lia. rewrite Nat.div_mul; lia. }
+            replace ((2 * t + t * (t + 1)) / 2) with ((t^2 + 3 * t) / 2) in H5.
+            2 : { replace (2 * t + t * (t + 1)) with (t^2 + 3 * t) by (simpl; lia). lia. }
+            pose proof (classic (Nat.divide (t ^ 2 + 3 * t))).
+
+       * rewrite H4. replace (n - n) with 0 by lia. rewrite Nat.sub_0_r. repeat rewrite Nat.add_0_r. lia.
+       * replace ((t - (n - t * (t + 1) / 2) + (n - t * (t + 1) / 2))) with t by nia. nia.
 Admitted.
 
 Lemma card_Nat_pos_eq_Qpos : ‖ Qpos ‖ = ‖ Qpos' ‖.
