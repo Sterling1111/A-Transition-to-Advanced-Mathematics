@@ -522,3 +522,12 @@ Proof.
   - specialize (IH ltac:(lia)). rewrite sum_f_i_Sn_f; try lia. rewrite IH.
     rewrite sum_f_i_Sn_f; try lia. lra.
 Qed.
+
+Lemma sum_n_divisible : forall n : nat,
+  Nat.divide 2 (n * (n + 1)).
+Proof.
+  induction n as [| k IH].
+  - exists 0%nat. simpl. reflexivity.
+  - replace (S k * (S k + 1))%nat with ((k^2 + k) + (2*k + 2))%nat by (simpl; lia).
+    destruct IH as [m H1]. exists (m + (k + 1))%nat. simpl. lia.
+Qed.

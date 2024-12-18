@@ -529,8 +529,8 @@ Qed.
 
 Fixpoint Z_fact (n : nat) : Z :=
   match n with
-  | 0%nat => 1
-  | S n' => Z.of_nat n * Z_fact n'
+  | 0%nat => 1%Z
+  | S n' => Z.of_nat (S n') * Z_fact n'
   end.
 
 Open Scope Z_scope.

@@ -35,7 +35,7 @@ Qed.
 Lemma lemma_14_4 : forall (l : list Prop),
   ~ (fold_right and True l) <-> fold_right or False (map (fun P => ~ P) l).
 Proof.
-  intros l; induction l as [| h t IH]; (simpl; tauto).
+  induction l; simpl; tauto.
 Qed.
 
 Open Scope R_scope.
