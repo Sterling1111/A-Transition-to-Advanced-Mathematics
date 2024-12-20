@@ -124,18 +124,14 @@ End section_20_5.
 
 Section section_20_6.
   Let A : Ensemble ℝ := ⦃ 1, 2, 3 ⦄.
-  Let T := subType A.
+  Let Ra : Relation ℝ ℝ := ⦃ (1, 1), (2, 2), (3, 3) ⦄.
 
-  Let one := mkSubType _ A 1 ltac:(unfold A; autoset).
-  Let two := mkSubType _ A 2 ltac:(unfold A; autoset).
-  Let three := mkSubType _ A 3 ltac:(unfold A; autoset).
+  Lemma lemma_20_6_a : Reflexive_On Ra A.
+  Proof.
+    unfold Reflexive_On, Ra, A. intros x H1. rewrite <- x_y_In_implies_rel. rewrite ens_rel_ens_id.
+    destruct_all_finitesets; autoset.
+  Qed.
 
-  Notation "1" := one.
-  Notation "2" := two.
-  Notation "3" := three.
-
-  Let Ra : Relation T T := ⦃ (1, 1), (2, 2), (3, 3) ⦄.
-  
 End section_20_6.
 
 

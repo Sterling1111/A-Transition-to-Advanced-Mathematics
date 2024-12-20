@@ -136,6 +136,9 @@ Proof.
 Admitted.
 
 Definition derivable_at (D : Ensemble R) (f : Rsub D -> R) (a : Rsub D) : Prop :=
+  forall a : Rsub D, ⟦ lim 0 ⟧ (fun h => (f (a + h) - f a) / h) = f' a.
+
+Definition derivable_at (D : Ensemble R) (f : Rsub D -> R) (a : Rsub D) : Prop :=
   exists L, 
     let g := proj1_sig (exists_function D f L) in
       ⟦ lim 0 ⟧ (fun h => (g (a + h) - g a) / h) = L.

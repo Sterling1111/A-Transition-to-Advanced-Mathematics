@@ -1,4 +1,4 @@
-Require Import Imports Sets Functions Chapter6 Notations Sums.
+Require Import Imports Sets Functions Chapter6 Notations Sums WI_SI_WO.
 Import SetNotations.
 
 Notation subType := SetNotations.subType.
@@ -55,6 +55,12 @@ Proof.
     rewrite <- H6 in H3 at 1. exists (f y). rewrite H3; auto. rewrite H6. auto.
 Qed.
 
+Lemma cardinal_eq_trans : forall (T1 T2 T3 : Type) (A : Ensemble T1) (B : Ensemble T2) (C : Ensemble T3),
+  ‖ A ‖ = ‖ B ‖ -> ‖ B ‖ = ‖ C ‖ -> ‖ A ‖ = ‖ C ‖.
+Proof.
+  intros T1 T2 T3 A B C [H1 | H1].
+Admitted.
+
 Definition countably_infinite {T : Type} (A : Ensemble T) : Prop := ‖ ℕ ‖ = ‖ A ‖.
 Definition countable {T : Type} (A : Ensemble T) : Prop := Finite_set A \/ countably_infinite A.
 
@@ -110,10 +116,22 @@ Qed.
 
 Open Scope nat_scope.
 
-Lemma exists_test : forall n,
+Lemma triangular_number_bounds : forall n,
   exists t, t * (t + 1) / 2 <= n < (t + 1) * (t + 2) / 2.
 Proof.
-Admitted.
+  intros n.
+  assert (n = 0 \/ n = 1 \/ n = 2 \/ n > 2) as [H1 | [H1 | [H1 | H1]]] by lia;
+    [exists 0 | exists 1 | exists 1 |]; try (simpl; lia).
+  set (E t := t * (t + 1) / 2 > n). assert (exists t, E t) as H2.
+  { exists n. unfold E. pose proof sum_n_divisible n as [j H3]. rewrite H3. rewrite Nat.div_mul; nia. }
+  pose proof WI_SI_WO as [_ [_ WO]]. apply WO in H2 as [t [H2 H3]].
+  exists (t - 1). assert (t = 0 \/ t > 0) as [H4 | H4] by lia.
+  - rewrite H4 in H2. unfold E in H2. simpl in H2. lia.
+  - split.
+    -- unfold E in H2. pose proof classic ((t - 1) * (t - 1 + 1) / 2 <= n) as [H5 | H5]; auto.
+       apply not_le in H5. specialize (H3 (t - 1) H5); lia.
+    -- replace (t - 1 + 1) with t by lia. replace (t - 1 + 2) with (t + 1) by lia. unfold E in H2. auto.
+Qed.
 
 Lemma theorem_30_3 : ‖ ℕ ‖ = ‖ ℕ × ℕ ‖.
 Proof.
@@ -144,24 +162,38 @@ Proof.
          assert (d = 0 \/ d > 0) as [H4 | H4] by lia; try lia.
          assert (d * (d + 1) / 2 >= 1) as H5. { pose proof sum_n_divisible d as [j H5]. rewrite H5. rewrite Nat.div_mul; lia. }
          assert (a * d + d * (d + 1) / 2 >= a + 1) as H6 by nia. assert (n > a + m) as H7 by lia. unfold a in H7. lia.
-    -- intros n. pose proof exists_test n as [t [H1 H2]]. set (b := n - t * (t + 1) / 2). set (a := t - b). exists (a, b). unfold f.
+    -- intros n. pose proof triangular_number_bounds n as [t [H1 H2]]. set (b := n - t * (t + 1) / 2). set (a := t - b). exists (a, b). unfold f.
        unfold a, b. assert (n >= t \/ n < t) as [H3 | H3]; assert (t * (t + 1) / 2 = n \/ t * (t + 1) / 2 < n) as [H4 | H4]; try lia.
        * rewrite H4. replace (n - n) with 0 by lia. rewrite Nat.sub_0_r. repeat rewrite Nat.add_0_r. lia.
        * assert (t >= (n - t * (t + 1) / 2) \/ t < (n - t * (t + 1) / 2)) as [H5 | H5] by lia.
-         ** replace ((t - (n - t * (t + 1) / 2) + (n - t * (t + 1) / 2))) with t by nia. nia.
-         ** apply add_lt_mono_r_proj_l2r with (p := t * (t + 1) / 2) in H5.
-            replace (n - t * (t + 1) / 2 + t * (t + 1) / 2) with n in H5 by lia.
-            replace ((t + 1) * (t + 2)) with (t^2 + 3*t + 2) in H2 by (simpl; lia).
-            replace t with (t * 2 / 2) in H5 at 1. 2 : { rewrite Nat.div_mul; lia. }
-            replace (t * 2 / 2 + t * (t + 1) / 2) with ((2 * t + t * (t + 1)) / 2) in H5.
-            2 : { pose proof sum_n_divisible t as [j H6]. rewrite H6. repeat rewrite Nat.div_mul; try lia. replace (2 * t + j * 2) with ((t + j) * 2) by lia. rewrite Nat.div_mul; lia. }
-            replace ((2 * t + t * (t + 1)) / 2) with ((t^2 + 3 * t) / 2) in H5.
-            2 : { replace (2 * t + t * (t + 1)) with (t^2 + 3 * t) by (simpl; lia). lia. }
-            pose proof (classic (Nat.divide (t ^ 2 + 3 * t))).
+         ** replace ((t - (n - t * (t + 1) / 2) + (n - t * (t + 1) / 2))) with t by nia. lia.
+         ** replace (t + 2) with (t + 1 + 1) in H2 by lia. pose proof sum_n_divisible (t+1) as [j H6].
+            pose proof (sum_n_divisible t) as [k H7]. rewrite H6 in H2. rewrite H7 in H5. rewrite Nat.div_mul in H2; try lia.
+            rewrite Nat.div_mul in H5; lia.
+       * rewrite H4. replace (n - n) with 0 by lia. rewrite Nat.sub_0_r. repeat rewrite Nat.add_0_r. auto.
+       * replace ((t - (n - t * (t + 1) / 2) + (n - t * (t + 1) / 2))) with t by nia. lia.
+Qed.
 
-       * rewrite H4. replace (n - n) with 0 by lia. rewrite Nat.sub_0_r. repeat rewrite Nat.add_0_r. lia.
-       * replace ((t - (n - t * (t + 1) / 2) + (n - t * (t + 1) / 2))) with t by nia. nia.
-Admitted.
+Theorem theorem_30_3' : forall {T : Type} (A B : Ensemble T),
+  countably_infinite A -> countably_infinite B -> countably_infinite (A × B).
+Proof.
+  intros T A B H1 H2. unfold countably_infinite in *.
+
+  
+   unfold Type_to_Ensemble in *. unfold cardinal_eq in *.
+  right. assert (H3 : Full_set ℕ ≠ ⦃⦄). { apply not_Empty_In. exists 0%nat. apply Full_intro. }
+  repeat split; auto.
+  - destruct H1 as [[H1 _] | [H1 [H4 H5]]]; destruct H2 as [[H2 _] | [H2 [H6 H7]]]; auto.
+    apply not_Empty_In. apply not_Empty_In in H4 as [a H4]. apply not_Empty_In in H6 as [b H6].
+    exists (a, b). exists a, b. auto.
+  - destruct H1 as [[H1 _] | [H1 [H4 H5]]]; destruct H2 as [[H2 _] | [H2 [H6 H7]]]; try tauto.
+    destruct H5 as [f H5]. destruct H7 as [g H7]. pose proof theorem_30_3 as [H8 | [_ [_ [h H9]]]]; try tauto.
+    unfold Type_to_Ensemble in h. assert (H10 : forall a b : T, a ∈ A -> b ∈ B -> (a, b) ∈ A × B).
+    { intros a b H10 H11. unfold Ensembles.In, set_prod. exists a, b. auto. }
+    set (f' := fun n : subType ℕ => let (a, Ha) := f n in let (b, Hb) := g n in mkSubType _ (A × B) (a, b) ltac:(apply H10; [ apply Ha | apply Hb] )).
+    exists f'. split.
+    -- intros [n1 H11] [n2 H12] H13. unfold f' in H13. destruct H5 as [H5 _]. unfold injective in H5.
+Abort.
 
 Lemma card_Nat_pos_eq_Qpos : ‖ Qpos ‖ = ‖ Qpos' ‖.
 Proof.
