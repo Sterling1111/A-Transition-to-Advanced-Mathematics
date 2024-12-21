@@ -1,16 +1,18 @@
-Require Import Imports Limit Sums Reals_util Sets Notations Functions.
-Import SetNotations.
+Require Import Imports Limit Sums Reals_util Sets Notations Functions Completeness.
+Import SetNotations IntervalNotations.
 
-Definition continuous_at (D : Ensemble R) (f : Rsub D -> R) (a : Rsub D) : Prop :=
-  ⟦ lim a ⟧ f D = f a.
+Open Scope interval_scope.
 
-Definition continuous_on (D : Ensemble R) (f : Rsub D -> R) : Prop :=
-  ∀ a : Rsub D, continuous_at D f a.
+Definition continuous_at (f : ℝ -> ℝ) (a : ℝ) : Prop :=
+  ⟦ lim a ⟧ f = f a.
+
+Definition continuous_on (D : Ensemble ℝ) (f : ℝ -> ℝ) : Prop :=
+  ∀ a : ℝ, a ∈ D -> continuous_at f a.
 
 Example example_37_2 : forall c d,
-  continuous_on R (fun x => c * x + d).
+  continuous_on ℝ (fun x => c * x + d).
 Proof.
-  intros c d a. unfold continuous_at, Type_to_Ensemble. solve_lim.
+  intros c d a H1. unfold continuous_at. solve_lim.
 Qed.
 
 Module module_37_3.
@@ -28,67 +30,34 @@ Module module_37_3.
     - intros [H1 | H1]; unfold f; destruct (Rle_dec 0 x), (Rle_dec x 1); simpl in *; lra.
   Qed.
 
-  Definition a := mkRsub R 1 ltac:(apply Full_intro).
-
-  Example example_37_3 : ~ continuous_at R f a.
+  Example example_37_3 : ~ continuous_at f 1.
   Proof.
-    intros [H1 H2]. unfold Type_to_Ensemble in *. simpl in H2. specialize (H2 (1/2) ltac:(lra)) as [δ [H3 H4]].
-    set (x := mkRsub (Full_set R) (1 + δ/2) ltac:(apply Full_intro)).
-    specialize (H4 x ltac:(simpl; solve_abs)). replace (f x) with 0 in H4.
-    2 : { unfold f. destruct (Rle_dec 0 x), (Rle_dec x 1); simpl in *; lra. }
-    replace (f 1) with 1 in H4. 2 : { unfold f. destruct (Rle_dec 0 1), (Rle_dec 1 1); simpl in *; lra. }
-    solve_abs.
+    intros H1. specialize (H1 (1/2) ltac:(lra) ) as [δ [H2 H3]]. set (x := 1 + δ/2).
+    specialize (H3 x ltac:(unfold x; solve_abs)). replace (f x) with 0 in H3 by (unfold f, x; solve_R).
+    replace (f 1) with 1 in H3 by (unfold f; solve_R). solve_R.
   Qed.
 End module_37_3.
 
-Section section_37_4.
-  Let f : Rsub (fun x => 0 <= x) -> R := fun x => x.
-  Let D : Ensemble R := fun x => 0 <= x.
-  
-  Lemma H1 : 0 ∈ D.
-  Proof.
-    unfold D. unfold In. lra.
-  Qed.
-
-  Let a := mkRsub (fun x => 0 <= x) 0 H1.
-
-  Example example_37_4 : ~ continuous_at D f a.
-  Proof.
-    intros [[b [c [H1 H2]]] _]. simpl in H1. specialize (H2 (b / 2) ltac:(unfold In; lra)).
-    unfold In, D in H2. lra.
-  Qed.
-
-End section_37_4.
-
-Lemma lemma_37_11_a : forall D f g a,
-  continuous_at D f a -> continuous_at D g a -> continuous_at D (f + g)%f a.
+Lemma lemma_37_11_a : forall f g a,
+  continuous_at f a -> continuous_at g a -> continuous_at (f + g) a.
 Proof.
-  intros D f g a H1 H2. unfold continuous_at in *. pose proof H1 as [H3 _]. apply limit_plus; auto.
+  intros f g a H1 H2. unfold continuous_at in *. apply limit_plus; auto.
 Qed.
 
-Lemma lemma_37_11_b : forall D f g a,
-  continuous_at D f a -> continuous_at D g a -> continuous_at D (f ∙ g)%f a.
+Lemma lemma_37_11_b : forall f g a,
+  continuous_at f a -> continuous_at g a -> continuous_at (f ∙ g) a.
 Proof.
-  intros D f g a H1 H2. unfold continuous_at in *. pose proof H1 as [H3 _]. apply limit_mult; auto.
+  intros f g a H1 H2. unfold continuous_at in *. apply limit_mult; auto.
 Qed.
 
-Lemma lemma_37_11_c : forall D f g a,
-  g a ≠ 0 -> continuous_at D f a -> continuous_at D g a -> continuous_at D (f / g)%f a.
+Lemma lemma_37_11_c : forall f g a,
+  g a ≠ 0 -> continuous_at f a -> continuous_at g a -> continuous_at (f / g) a.
 Proof.
-  intros D f g a H1 H2 H3. unfold continuous_at in *. pose proof H2 as [H4 _]. apply limit_div; auto.
+  intros f g a H1 H2 H3. unfold continuous_at in *. apply limit_div; auto.
 Qed.
-
-Definition polynomial' (l : list R) : (Rsub (Full_set R)) -> R :=
-  fun x => sum_f 0 (length l - 1) (fun i => nth i l 0 * x^(length l - 1 - i)).
 
 Definition polynomial (l : list R) : R -> R :=
   fun x => sum_f 0 (length l - 1) (fun i => nth i l 0 * x^(length l - 1 - i)).
-
-Lemma poly_equiv : forall l, polynomial' l = polynomial l.
-Proof.
-  intros l. apply functional_extensionality. intros x. unfold polynomial, polynomial'.
-  apply sum_f_equiv; try lia. intros k H1. reflexivity.
-Qed.
 
 Lemma poly_nil : forall x, polynomial [] x = 0.
 Proof.
@@ -106,52 +75,97 @@ Proof.
 Qed.
 
 Theorem theorem_37_14 : forall l a,
-  continuous_at R (polynomial l) a.
+  continuous_at (polynomial l) a.
 Proof.
-  intros l a. unfold Type_to_Ensemble in *. induction l as [| h t IH].
-  - replace (fun x : (Rsub (Full_set R)) => polynomial [] x) with (fun x : Rsub (Full_set R) => 0).
-    2 : { extensionality x. rewrite poly_nil. reflexivity. } unfold continuous_at. solve_lim.
-  - replace (fun x : Rsub (Full_set R) => polynomial (h :: t) x) with (fun x : Rsub (Full_set R) => h * x^(length t) + polynomial t x).
-    2 : { extensionality x. rewrite poly_cons. reflexivity. } 
-    unfold continuous_at. solve_lim.
+  intros l a. induction l as [| h t IH].
+  - unfold continuous_at. rewrite poly_nil. replace (polynomial []) with (fun _ : ℝ => 0).
+    2 : { extensionality x. rewrite poly_nil. reflexivity. } solve_lim.
+  - replace (polynomial (h :: t)) with (fun x : ℝ => h * x^(length t) + polynomial t x).
+    2 : { extensionality x. rewrite poly_cons. reflexivity. } unfold continuous_at. solve_lim. 
 Qed.
 
-Theorem theorem_37_14' : forall l,
-  continuous_on R (polynomial l).
+Lemma poly_c_example : continuous_on ℝ (fun x => 5*x^5 + 4*x^4 + 3*x^3 + 2*x^2 + x + 1).
 Proof.
-  intros l a. apply theorem_37_14.
+  replace (fun x : ℝ => 5 * x ^ 5 + 4 * x ^ 4 + 3 * x ^ 3 + 2 * x ^ 2 + x + 1) with (polynomial [5; 4; 3; 2; 1; 1]).
+  2 : { extensionality x. compute; lra. } unfold continuous_on. intros a H1. apply theorem_37_14.
 Qed.
 
-Lemma poly_c_example : continuous_on R (fun x => 5*x^5 + 4*x^4 + 3*x^3 + 2*x^2 + x + 1).
+Theorem theorem_6_1_a : forall f g a,
+  continuous_at f a -> continuous_at g a -> continuous_at (f + g) a.
 Proof.
-  replace (fun x : Rsub R => 5 * x ^ 5 + 4 * x ^ 4 + 3 * x ^ 3 + 2 * x ^ 2 + x + 1) with (polynomial' [5; 4; 3; 2; 1; 1]).
-  2 : { extensionality x. compute; lra. } rewrite poly_equiv. apply theorem_37_14'.
+  intros f g a H1 H2. unfold continuous_at in *; solve_lim.
 Qed.
 
-Lemma exists_function : forall D (f : Rsub D -> R) L,
-  { g : R -> R |
-    (forall x : Rsub D, f x = g x) /\
-    (forall x : R, x ∉ D -> g x = L) }.
+Theorem theorem_6_1_b : forall f g a,
+  continuous_at f a -> continuous_at g a -> continuous_at (f ∙ g) a.
 Proof.
+  intros f g a H1 H2. unfold continuous_at in *; solve_lim.
+Qed.
+
+Theorem theorem_6_1_c : forall f a,
+  f a ≠ 0 -> continuous_at f a -> continuous_at (fun x => 1 / f x) a.
+Proof.
+  intros f a H1 H2. unfold continuous_at in *; solve_lim.
+Qed.
+
+Theorem theorem_6_1_d : forall f g a,
+  g a ≠ 0 -> continuous_at f a -> continuous_at g a -> continuous_at (f / g) a.
+Proof.
+  intros f g a H1 H2 H3. unfold continuous_at in *; solve_lim.
+Qed.
+
+Theorem theorem_6_2 : forall f g a,
+  continuous_at g a -> continuous_at f (g a) -> continuous_at (f ∘ g) a.
+Proof.
+  intros f g a H1 H2 ε H3. unfold continuous_at in *. specialize (H2 ε H3) as [δ1 [H4 H5]].
+  specialize (H1 δ1 H4) as [δ2 [H6 H7]]. exists δ2. split; auto. intros x H8.
+  specialize (H7 x H8). specialize (H5 (g x)). pose proof classic (g x = g a) as [H9 | H9].
+  - rewrite H9. solve_R.
+  - specialize (H5 ltac:(solve_R)). auto.
+Qed.
+
+Theorem theorem_6_3_a : ∀ f a,
+  continuous_at f a -> f a > 0 -> ∃ δ, δ > 0 /\ ∀ x, |x - a| < δ -> f x > 0.
+Proof.
+  intros f a H1 H2. specialize (H1 (f a) H2) as [δ [H3 H4]]. exists δ. split; auto.
+  intros x H5. pose proof classic (x = a) as [H6 | H6].
+  - subst. auto.
+  - specialize (H4 x ltac:(solve_R)). solve_R.
+Qed.
+
+Theorem theorem_6_3_b : ∀ f a,
+  continuous_at f a -> f a < 0 -> ∃ δ, δ > 0 /\ ∀ x, |x - a| < δ -> f x < 0.
+Proof.
+  intros f a H1 H2. specialize (H1 (-f a) ltac:(lra)) as [δ [H3 H4]]. exists δ. split; auto.
+  intros x H5. pose proof classic (x = a) as [H6 | H6].
+  - subst. auto.
+  - specialize (H4 x ltac:(solve_R)). solve_R.
+Qed.
+
+Theorem theorem_7_1 : forall f a b,
+  a < b -> continuous_on [a, b] f -> f a < 0 < f b -> ∃ x, x ∈ [a, b] /\ f x = 0.
+Proof.
+  intros f a b H1 H2 H3.
+  set (A := (fun x1 => x1 ∈ [a, b] /\ ∀ x2, x2 ∈ [a, x1] -> f x2 < 0)).
+  assert (H4 : A ≠ ∅).
+  { apply not_Empty_In. exists a. split. unfold In. lra. intros x H4. unfold In in H4. replace x with a by lra. lra. }
+  assert (H5 : is_upper_bound A b). { intros x H5. unfold A, In in H5. destruct H5 as [H5 H6]. specialize (H6 b). lra. }
+  assert (H6 : has_upper_bound A). { exists b. auto. }
+  destruct (completeness_upper_bound A H6 H4) as [α H7]. assert (H8 : a < α < b).
+  { destruct H7 as [H7 H8]. unfold is_lub in H7. destruct H7 as [H7 H8]. unfold In in H7. lra. }
+  { destruct H7 as [H7 _]. unfold is_lub in H7. destruct H7 as [H7 H8]. unfold In in H7. lra. }
+  assert (H7 : a < α < b).
+  { destruct H6 as [H6 H7]. unfold is_lub in H6. destruct H6 as [H6 H7]. unfold In in H6. lra. }
+  { destruct H6 as [H6 _]. unfold is_lub in H6. destruct H6 as [H6 H7]. unfold In in H6. lra. }
+  pose proof Rtotal_order (f α) 0 as [H7 | [H7 | H7]].
+  - assert (H8 : continuous_at f α). { unfold continuous_on in H2. specialize (H2 α). apply H2. unfold In. destruct H6 as [H6 H6']. specialize (H6' b). ltac:(solve_R)). lra. }
+    pose proof theorem_6_3_a f α H8 H7 as [δ [H9 H10]]. exists α. split; auto. unfold In. split; auto.
+    intros x H11. unfold In in H11. specialize (H10 x ltac:(solve_R)). lra.
+  pose proof theorem_6_3_b f α. H6 H7 as [δ [H8 H9]]. exists α. split; auto. unfold In. split; auto.
+    intros x H10. unfold In in H10. specialize (H9 x ltac:(solve_R)). lra.
 Admitted.
 
-Definition derivable_at (D : Ensemble R) (f : Rsub D -> R) (a : Rsub D) : Prop :=
-  forall a : Rsub D, ⟦ lim 0 ⟧ (fun h => (f (a + h) - f a) / h) = f' a.
-
-Definition derivable_at (D : Ensemble R) (f : Rsub D -> R) (a : Rsub D) : Prop :=
-  exists L, 
-    let g := proj1_sig (exists_function D f L) in
-      ⟦ lim 0 ⟧ (fun h => (g (a + h) - g a) / h) = L.
-
-Definition differentiable_at f a : Prop :=
-  exists L, ⟦ lim 0 ⟧ (fun h => (f (a + h) - f a) / h) = L.
-
-Definition derivative f f' : Prop :=
-  forall a, ⟦ lim 0 ⟧ (fun h => (f (a + h) - f a) / h) = f' a.
-
-Lemma deriv_test : derivative (fun x => x^2) (fun x => 2*x).
+Theorem theorem_7_4 : forall f a b c,
+  continuous_on [a, b] f -> f a < c < f b -> ∃ x, x ∈ [a, b] /\ f x = c.
 Proof.
-  intros a. apply limit_to_0_equiv with (f1 := fun h => 2 * a + h).
-  - intros h H1. simpl. field; auto.
-  - solve_lim.
-Qed.
+Admitted.

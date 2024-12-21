@@ -20,8 +20,8 @@ Proof.
     apply Rmult_lt_compat_r with (r := Rabs c) in H4; field_simplify in H4; solve_R.
 Qed.
 
-Lemma lemma_36_2' : forall a c d, ⟦ lim a ⟧ (fun x => c * x + d) ℝ = c * a + d.
-Proof. intros. unfold Type_to_Ensemble. solve_lim. Qed.
+Lemma lemma_36_2' : forall a c d, ⟦ lim a ⟧ (fun x => c * x + d) = c * a + d.
+Proof. intros. solve_lim. Qed.
 
 Lemma lemma_36_3 :  ⟦ lim 5 ⟧ (fun x => x^2 + 3 * x + 3) = 43.
 Proof.

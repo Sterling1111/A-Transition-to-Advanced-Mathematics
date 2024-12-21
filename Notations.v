@@ -34,15 +34,15 @@ Declare Scope interval_scope.
 Delimit Scope interval_scope with interval.
 
 Module IntervalNotations.
-  Notation "〚 a , b 〛" := (fun x => a <= x <= b) (only parsing) : interval_scope.
-  Notation "〚 a , b ⦆" := (fun x => a <= x < b) (only parsing) : interval_scope.
-  Notation "⦅ a , b 〛" := (fun x => a < x <= b) (only parsing) : interval_scope.
+  Notation "[ a , b ]" := (fun x => a <= x <= b) (only parsing) : interval_scope.
+  Notation "[ a , b ⦆" := (fun x => a <= x < b) (only parsing) : interval_scope.
+  Notation "⦅ a , b ]" := (fun x => a < x <= b) (only parsing) : interval_scope.
   Notation "⦅ a , b ⦆" := (fun x => a < x < b) (only parsing) : interval_scope.
 
-  Notation "⦅ -∞ , b ⦆" := (fun x => x < b) (only parsing) : interval_scope.
-  Notation "⦅ -∞ , b 〛" := (fun x => x <= b) (only parsing) : interval_scope.
-  Notation "⦅ a , +∞ ⦆" := (fun x => a < x) (only parsing) : interval_scope.
-  Notation "〚 a , +∞ ⦆" := (fun x => a <= x) (only parsing) : interval_scope.
+  Notation "⦅-∞ , b ⦆" := (fun x => x < b) (only parsing) : interval_scope.
+  Notation "⦅ -∞ , b ]" := (fun x => x <= b) (only parsing) : interval_scope.
+  Notation "⦅ a , +∞]" := (fun x => a < x) (only parsing) : interval_scope.
+  Notation "[ a , +∞⦆" := (fun x => a <= x) (only parsing) : interval_scope.
 
-  Notation "⦅ -∞ , +∞ ⦆" := (Full_set _) (only parsing) : interval_scope.
+  Notation "⦅-∞ , +∞⦆" := (Full_set _) (only parsing) : interval_scope.
 End IntervalNotations.
