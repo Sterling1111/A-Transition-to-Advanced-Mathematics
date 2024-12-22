@@ -142,27 +142,83 @@ Proof.
   - specialize (H4 x ltac:(solve_R)). solve_R.
 Qed.
 
+Lemma lemma_6_16_a_1 : ∀ f a,
+  ⟦ lim a⁺ ⟧ f = f a -> f a > 0 -> ∃ δ, δ > 0 /\ (∀ x, 0 <= x - a < δ -> f x > 0).
+Proof.
+  intros f a H1 H2. specialize (H1 (f a) H2) as [δ [H3 H4]]. exists δ. split; auto.
+  intros x H5. assert (x = a \/ x > a) as [H6 | H6] by lra.
+  - subst. auto.
+  - specialize (H4 x ltac:(solve_R)). solve_R.
+Qed.
+
+Lemma lemma_6_16_a_2 : ∀ f a,
+  ⟦ lim a⁺ ⟧ f = f a -> f a < 0 -> ∃ δ, δ > 0 /\ (∀ x, 0 <= x - a < δ -> f x < 0).
+Proof.
+  intros f a H1 H2. specialize (H1 (-f a) ltac:(lra)) as [δ [H3 H4]]. exists δ. split; auto.
+  intros x H5. assert (x = a \/ x > a) as [H6 | H6] by lra.
+  - subst. auto.
+  - specialize (H4 x ltac:(solve_R)). solve_R.
+Qed.
+
+Lemma lemma_6_16_b_1 : ∀ f a,
+  ⟦ lim a⁻ ⟧ f = f a -> f a > 0 -> ∃ δ, δ > 0 /\ (∀ x, 0 <= a - x < δ -> f x > 0).
+Proof.
+  intros f a H1 H2. specialize (H1 (f a) H2) as [δ [H3 H4]]. exists δ. split; auto.
+  intros x H5. assert (x = a \/ x < a) as [H6 | H6] by lra.
+  - subst. auto.
+  - specialize (H4 x ltac:(solve_R)). solve_R.
+Qed.
+
+Lemma lemma_6_16_b_2 : ∀ f a,
+  ⟦ lim a⁻ ⟧ f = f a -> f a < 0 -> ∃ δ, δ > 0 /\ (∀ x, 0 <= a - x < δ -> f x < 0).
+Proof.
+  intros f a H1 H2. specialize (H1 (-f a) ltac:(lra)) as [δ [H3 H4]]. exists δ. split; auto.
+  intros x H5. assert (x = a \/ x < a) as [H6 | H6] by lra.
+  - subst. auto.
+  - specialize (H4 x ltac:(solve_R)). solve_R.
+Qed.
+
 Theorem theorem_7_1 : forall f a b,
   a < b -> continuous_on [a, b] f -> f a < 0 < f b -> ∃ x, x ∈ [a, b] /\ f x = 0.
 Proof.
   intros f a b H1 H2 H3.
   set (A := (fun x1 => x1 ∈ [a, b] /\ ∀ x2, x2 ∈ [a, x1] -> f x2 < 0)).
-  assert (H4 : A ≠ ∅).
-  { apply not_Empty_In. exists a. split. unfold In. lra. intros x H4. unfold In in H4. replace x with a by lra. lra. }
-  assert (H5 : is_upper_bound A b). { intros x H5. unfold A, In in H5. destruct H5 as [H5 H6]. specialize (H6 b). lra. }
-  assert (H6 : has_upper_bound A). { exists b. auto. }
-  destruct (completeness_upper_bound A H6 H4) as [α H7]. assert (H8 : a < α < b).
-  { destruct H7 as [H7 H8]. unfold is_lub in H7. destruct H7 as [H7 H8]. unfold In in H7. lra. }
-  { destruct H7 as [H7 _]. unfold is_lub in H7. destruct H7 as [H7 H8]. unfold In in H7. lra. }
-  assert (H7 : a < α < b).
-  { destruct H6 as [H6 H7]. unfold is_lub in H6. destruct H6 as [H6 H7]. unfold In in H6. lra. }
-  { destruct H6 as [H6 _]. unfold is_lub in H6. destruct H6 as [H6 H7]. unfold In in H6. lra. }
-  pose proof Rtotal_order (f α) 0 as [H7 | [H7 | H7]].
-  - assert (H8 : continuous_at f α). { unfold continuous_on in H2. specialize (H2 α). apply H2. unfold In. destruct H6 as [H6 H6']. specialize (H6' b). ltac:(solve_R)). lra. }
-    pose proof theorem_6_3_a f α H8 H7 as [δ [H9 H10]]. exists α. split; auto. unfold In. split; auto.
-    intros x H11. unfold In in H11. specialize (H10 x ltac:(solve_R)). lra.
-  pose proof theorem_6_3_b f α. H6 H7 as [δ [H8 H9]]. exists α. split; auto. unfold In. split; auto.
-    intros x H10. unfold In in H10. specialize (H9 x ltac:(solve_R)). lra.
+  assert (H4 : a ∈ A). { unfold A. split. unfold In. lra. intros x H4. unfold In in H4. replace x with a by lra. lra. }
+  assert (H5 : A ≠ ∅). { apply not_Empty_In. exists a. auto. }
+  assert (H6 : is_upper_bound A b). { intros x H6. unfold A, In in H6. lra. }
+  assert (H7 : has_upper_bound A). { exists b. auto. }
+  destruct (completeness_upper_bound A H7 H5) as [α H8].
+  assert (H9 : α < b).
+  {
+    specialize (H2 b ltac:(unfold In; lra)). unfold continuous_at in H2. apply left_right_iff in H2 as [H2 _].
+    pose proof lemma_6_16_b_1 f b H2 ltac:(lra) as [δ [H10 H11]]. set (x := Rmax a (b - δ/2)).
+    assert (H12 : is_upper_bound A x).
+    { 
+      intros x1 H12. unfold A, In in H12. destruct H12 as [H12 H13].
+      assert (x1 <= x \/ x1 > x) as [H14 | H14] by lra; auto. specialize (H13 x ltac:(split; [ unfold x |]; solve_R)).
+      specialize (H11 x ltac:(unfold x; solve_R)). lra. 
+    }
+    assert (H13 : x < b). { unfold x. solve_R. } destruct H8 as [H8 H14]. specialize (H8 a H4). specialize (H14 x H12). lra.
+  }
+  assert (H10 : a < α).
+  {
+    specialize (H2 a ltac:(unfold In; lra)). unfold continuous_at in H2. apply left_right_iff in H2 as [_ H2].
+    pose proof lemma_6_16_a_2 f a H2 ltac:(lra) as [δ2 [H10 H11]]. set (x := Rmin b (a + δ2/2)).
+    assert (H12 : x ∈ A).
+    {
+      unfold A. split. unfold x, In. solve_R. intros x2 H12. specialize (H11 x2). apply H11. unfold x, In in H12. solve_R.
+    }
+    assert (H13 : x > a). { unfold x. solve_R. } destruct H8 as [H8 H14]. specialize (H8 x H12). lra. 
+  }
+  pose proof Rtotal_order (f α) 0 as [H11 | [H11 | H11]]; [ exfalso | | exfalso].
+  - assert (H12 : continuous_at f α). { unfold continuous_on in H2. specialize (H2 α). apply H2. unfold In. lra. }
+    pose proof theorem_6_3_b f α H12 H11 as [δ [H13 H14]]. set (x := Rmin b (α + δ/2)).
+    assert (exists x0, x0 ∈ A /\ α - δ < x0 < α) as [x0 [H15 H16]] by admit.
+    specialize (H14 x ltac:(unfold x; solve_R)). destruct H15 as [H15 H17]. lra.
+    assert (H17 : x ∈ A).
+    {
+      unfold A. split. unfold x, In. solve_R. intros x2 H17. assert (f x1 < 0 \/ f x1 >= 0) as [H16 | H16] by lra; auto.
+    }
 Admitted.
 
 Theorem theorem_7_4 : forall f a b c,
