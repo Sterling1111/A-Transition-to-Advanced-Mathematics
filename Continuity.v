@@ -212,9 +212,12 @@ Proof.
   }
   pose proof Rtotal_order (f α) 0 as [H11 | [H11 | H11]]; [ exfalso | | exfalso].
   - assert (H12 : continuous_at f α). { unfold continuous_on in H2. specialize (H2 α). apply H2. unfold In. lra. }
-    pose proof theorem_6_3_b f α H12 H11 as [δ [H13 H14]]. set (x := Rmin b (α + δ/2)).
-    assert (exists x0, x0 ∈ A /\ α - δ < x0 < α) as [x0 [H15 H16]] by admit.
-    specialize (H14 x ltac:(unfold x; solve_R)). destruct H15 as [H15 H17]. lra.
+    pose proof theorem_6_3_b f α H12 H11 as [δ [H13 H14]].
+    assert (exists x0, x0 ∈ A /\ α - δ < x0 < α) as [x0 [H15 H16]] by admit. assert (forall x, x ∈ [a, x0] -> f x < 0) as H17.
+    {
+      intros x H17. unfold A in H15. destruct H15 as [H15 H18]. specialize (H18 x H17). lra.
+    }
+    unfold In, A in H15.
     assert (H17 : x ∈ A).
     {
       unfold A. split. unfold x, In. solve_R. intros x2 H17. assert (f x1 < 0 \/ f x1 >= 0) as [H16 | H16] by lra; auto.
