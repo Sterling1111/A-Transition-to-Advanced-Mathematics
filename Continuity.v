@@ -183,6 +183,10 @@ Theorem theorem_7_1 : forall f a b,
 Proof.
   intros f a b H1 H2 H3.
   set (A := (fun x1 => x1 ∈ [a, b] /\ ∀ x2, x2 ∈ [a, x1] -> f x2 < 0)).
+  assert (H4' : forall x, x ∈ A -> forall x2, a <= x2 <= x -> f x2 < 0).
+  {
+    intros x H4 x2 H5. unfold A in H4. destruct H4 as [H4 H6]. specialize (H6 x2 H5). auto.
+  }
   assert (H4 : a ∈ A). { unfold A. split. unfold In. lra. intros x H4. unfold In in H4. replace x with a by lra. lra. }
   assert (H5 : A ≠ ∅). { apply not_Empty_In. exists a. auto. }
   assert (H6 : is_upper_bound A b). { intros x H6. unfold A, In in H6. lra. }
@@ -217,9 +221,10 @@ Proof.
     {
        pose proof classic (exists x0, x0 ∈ A /\ α - δ < x0 < α) as [H15 | H15]; auto.
        assert (forall x0, ~x0 ∈ A \/ x0 <= α - δ \/ x0 >= α) as H16.
-       {
-         intros x0.
-       }
+       { intros x0. apply not_ex_all_not with (n := x0) in H15. apply not_and_or in H15 as [H15 | H15]; auto; lra. }
+       clear H15. rename H16 into H15. assert (forall x0, x0 ∈ A -> x0 <= α - δ \/ x0 >= α) as H16.
+       { intros x0 H16. specialize (H15 x0). solve_R. } 
+
     }
     assert (forall x, x ∈ [a, x0] -> f x < 0) as H17.
     { intros x H17. unfold A in H15. destruct H15 as [H15 H18]. specialize (H18 x H17). lra. }
