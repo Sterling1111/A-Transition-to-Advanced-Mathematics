@@ -212,16 +212,27 @@ Proof.
   }
   pose proof Rtotal_order (f α) 0 as [H11 | [H11 | H11]]; [ exfalso | | exfalso].
   - assert (H12 : continuous_at f α). { unfold continuous_on in H2. specialize (H2 α). apply H2. unfold In. lra. }
-    pose proof theorem_6_3_b f α H12 H11 as [δ [H13 H14]].
-    assert (exists x0, x0 ∈ A /\ α - δ < x0 < α) as [x0 [H15 H16]] by admit. assert (forall x, x ∈ [a, x0] -> f x < 0) as H17.
+    pose proof theorem_6_3_b f α H12 H11 as [δ [H13 H14]]. 
+    assert (exists x0, x0 ∈ A /\ α - δ < x0 < α) as [x0 [H15 H16]].
     {
-      intros x H17. unfold A in H15. destruct H15 as [H15 H18]. specialize (H18 x H17). lra.
+       pose proof classic (exists x0, x0 ∈ A /\ α - δ < x0 < α) as [H15 | H15]; auto.
+       assert (forall x0, ~x0 ∈ A \/ x0 <= α - δ \/ x0 >= α) as H16.
+       {
+         intros x0.
+       }
     }
-    unfold In, A in H15.
-    assert (H17 : x ∈ A).
+    assert (forall x, x ∈ [a, x0] -> f x < 0) as H17.
+    { intros x H17. unfold A in H15. destruct H15 as [H15 H18]. specialize (H18 x H17). lra. }
+    set (x := Rmin b (α + δ / 2)). assert (H18 : x ∈ A).
     {
-      unfold A. split. unfold x, In. solve_R. intros x2 H17. assert (f x1 < 0 \/ f x1 >= 0) as [H16 | H16] by lra; auto.
+      unfold A, In, x; split. solve_R. intros x2 H18.
+      assert (a <= x2 <= x0 \/ x0 < x2 <= Rmin b (α + δ / 2)) as [H19 | H19] by lra.
+      - apply H17. auto.
+      - apply H14. solve_R.
     }
+    assert (x > α) as H19. { unfold x. solve_R. } destruct H8 as [H8 _]. specialize (H8 x H18). lra.
+  - exists α. unfold In. split; lra.
+  - 
 Admitted.
 
 Theorem theorem_7_4 : forall f a b c,
