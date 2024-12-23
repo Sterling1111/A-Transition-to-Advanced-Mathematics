@@ -183,9 +183,10 @@ Theorem theorem_7_1 : forall f a b,
 Proof.
   intros f a b H1 H2 H3.
   set (A := (fun x1 => x1 ∈ [a, b] /\ ∀ x2, x2 ∈ [a, x1] -> f x2 < 0)).
-  assert (H4' : forall x, x ∈ A -> forall x2, a <= x2 <= x -> f x2 < 0).
+  assert (H4' : forall x, x ∈ A -> forall x2, a <= x2 <= x -> x2 ∈ A).
   {
-    intros x H4 x2 H5. unfold A in H4. destruct H4 as [H4 H6]. specialize (H6 x2 H5). auto.
+    intros x H4 x2 H5. destruct H4 as [H4 H6]. unfold A, In. split. unfold In in H4. lra. 
+    intros x3 H7. apply H6. split; try lra.
   }
   assert (H4 : a ∈ A). { unfold A. split. unfold In. lra. intros x H4. unfold In in H4. replace x with a by lra. lra. }
   assert (H5 : A ≠ ∅). { apply not_Empty_In. exists a. auto. }
@@ -219,12 +220,27 @@ Proof.
     pose proof theorem_6_3_b f α H12 H11 as [δ [H13 H14]]. 
     assert (exists x0, x0 ∈ A /\ α - δ < x0 < α) as [x0 [H15 H16]].
     {
-       pose proof classic (exists x0, x0 ∈ A /\ α - δ < x0 < α) as [H15 | H15]; auto.
-       assert (forall x0, ~x0 ∈ A \/ x0 <= α - δ \/ x0 >= α) as H16.
-       { intros x0. apply not_ex_all_not with (n := x0) in H15. apply not_and_or in H15 as [H15 | H15]; auto; lra. }
-       clear H15. rename H16 into H15. assert (forall x0, x0 ∈ A -> x0 <= α - δ \/ x0 >= α) as H16.
-       { intros x0 H16. specialize (H15 x0). solve_R. } 
-
+      assert (α ∈ A \/ α ∉ A) as [H15 | H15] by apply classic.
+      - exists (Rmax a (α - δ/2)). split.
+        -- apply H4' with (x := α); solve_R.
+        -- solve_R.
+      - pose proof classic (∃ x0 : ℝ, x0 ∈ A ∧ α - δ < x0 < α) as [H16 | H16]; auto.
+        assert (H17 : forall x, α - δ < x < α -> x ∉ A).
+        { intros x H17 H18. destruct H18 as [H18 H19]. apply H16. exists x. split; auto. unfold A, In. split; solve_R. }
+        pose proof classic ((α - δ) ∈ A) as [H18 | H18].
+        -- (*α is not lub *) admit.
+        -- pose proof classic (exists x, a < x <= α - δ /\ x ∈ A) as [[x [H19 H20]] | H19].
+           * (*α is not lub *) admit.
+           * assert (H20 : forall x, a < x <= α - δ -> x ∉ A).
+             { intros x H20 H21. destruct H21 as [H21 H22]. apply H19. exists x. split. solve_R. unfold A, In. split; solve_R. }
+              assert (H21 : forall x, a < x <= α -> x ∉ A).
+             { 
+               intros x H21 H22. assert (x = α \/ α - δ < x < α \/ a < x <= α - δ) as [H23 | [H23 | H23]] by lra.
+               - apply H15. subst. auto.
+               - apply (H17 x); auto.
+               - apply (H20 x); auto. 
+             }
+             (*α is not lub*) admit.
     }
     assert (forall x, x ∈ [a, x0] -> f x < 0) as H17.
     { intros x H17. unfold A in H15. destruct H15 as [H15 H18]. specialize (H18 x H17). lra. }
