@@ -9,6 +9,9 @@ Definition continuous_at (f : ℝ -> ℝ) (a : ℝ) : Prop :=
 Definition continuous_on (D : Ensemble ℝ) (f : ℝ -> ℝ) : Prop :=
   ∀ a : ℝ, a ∈ D -> continuous_at f a.
 
+Definition continuous (f : ℝ -> ℝ) : Prop :=
+  continuous_on (Full_set ℝ) f.
+
 Example example_37_2 : forall c d,
   continuous_on ℝ (fun x => c * x + d).
 Proof.
@@ -227,20 +230,12 @@ Proof.
       - pose proof classic (∃ x0 : ℝ, x0 ∈ A ∧ α - δ < x0 < α) as [H16 | H16]; auto.
         assert (H17 : forall x, α - δ < x < α -> x ∉ A).
         { intros x H17 H18. destruct H18 as [H18 H19]. apply H16. exists x. split; auto. unfold A, In. split; solve_R. }
-        pose proof classic ((α - δ) ∈ A) as [H18 | H18].
-        -- (*α is not lub *) admit.
-        -- pose proof classic (exists x, a < x <= α - δ /\ x ∈ A) as [[x [H19 H20]] | H19].
-           * (*α is not lub *) admit.
-           * assert (H20 : forall x, a < x <= α - δ -> x ∉ A).
-             { intros x H20 H21. destruct H21 as [H21 H22]. apply H19. exists x. split. solve_R. unfold A, In. split; solve_R. }
-              assert (H21 : forall x, a < x <= α -> x ∉ A).
-             { 
-               intros x H21 H22. assert (x = α \/ α - δ < x < α \/ a < x <= α - δ) as [H23 | [H23 | H23]] by lra.
-               - apply H15. subst. auto.
-               - apply (H17 x); auto.
-               - apply (H20 x); auto. 
-             }
-             (*α is not lub*) admit.
+        assert (H18 : is_upper_bound A (α - δ)).
+        {
+          intros x H18. assert (x <= α - δ \/ x > α - δ) as [H19 | H19] by lra; auto. destruct H8 as [H8 _]. specialize (H8 x H18).
+          assert (x = α \/ x < α) as [H20 | H20] by lra. subst. tauto. specialize (H17 x ltac:(lra)). tauto.
+        }
+        destruct H8 as [_ H8]. specialize (H8 (α - δ) H18). lra.
     }
     assert (forall x, x ∈ [a, x0] -> f x < 0) as H17.
     { intros x H17. unfold A in H15. destruct H15 as [H15 H18]. specialize (H18 x H17). lra. }
@@ -253,7 +248,59 @@ Proof.
     }
     assert (x > α) as H19. { unfold x. solve_R. } destruct H8 as [H8 _]. specialize (H8 x H18). lra.
   - exists α. unfold In. split; lra.
-  - 
+  - assert (H12 : continuous_at f α). { unfold continuous_on in H2. specialize (H2 α). apply H2. unfold In. lra. }
+    pose proof theorem_6_3_a f α H12 H11 as [δ [H13 H14]]. 
+    assert (exists x0, x0 ∈ A /\ α - δ < x0 < α) as [x0 [H15 H16]].
+    {
+      assert (α ∉ A) as H15.
+      { intros H15. unfold A, In in H15. destruct H15 as [_ H15]. specialize (H15 α ltac:(lra)). lra. }
+      pose proof classic (∃ x0 : ℝ, x0 ∈ A ∧ α - δ < x0 < α) as [H16 | H16]; auto.
+      assert (H17 : forall x, α - δ < x < α -> x ∉ A).
+      { intros x H17 H18. destruct H18 as [H18 H19]. apply H16. exists x. split; auto. unfold A, In. split; solve_R. }
+      assert (H18 : is_upper_bound A (α - δ)).
+      {
+        intros x H18. assert (x <= α - δ \/ x > α - δ) as [H19 | H19] by lra; auto. destruct H8 as [H8 _]. specialize (H8 x H18).
+        assert (x = α \/ x < α) as [H20 | H20] by lra. subst. tauto. specialize (H17 x ltac:(lra)). tauto.
+      }
+      destruct H8 as [_ H8]. specialize (H8 (α - δ) H18). lra.
+    }
+    assert (forall x, x ∈ [a, x0] -> f x < 0) as H17.
+    { intros x H17. unfold A in H15. destruct H15 as [H15 H18]. specialize (H18 x H17). lra. }
+    assert (a <= x0) as H18. { unfold A in H15. destruct H15 as [H15 _]. unfold In in H15. lra. }
+    specialize (H14 x0 ltac:(solve_R)). specialize (H17 x0). unfold In in H17. lra.
+Qed.
+
+Theorem theorem_8_1 : forall f a,
+  continuous_at f a -> ∃ δ c, δ > 0 /\ ∀ x, |x - a| < δ -> f x < c.
+Proof.
+  intros f a H1. unfold continuous_at in H1. specialize (H1 1 ltac:(lra)) as [δ [H2 H3]].
+  exists δ, (f a + 1). split; auto. intros x H4. assert (x = a \/ x ≠ a) as [H5 | H5] by apply classic.
+  - subst. lra.
+  - specialize (H3 x ltac:(solve_R)). solve_R.
+Qed.
+
+Lemma lemma_8_1_a : forall f a,
+  ⟦ lim a⁺ ⟧ f = f a -> ∃ δ c, δ > 0 /\ ∀ x, a <= x < a + δ -> f x < c.
+Proof.
+  intros f a H1. specialize (H1 1 ltac:(lra)) as [δ [H2 H3]]. exists δ, (f a + 1). split; auto.
+  intros x H4. assert (x = a \/ x ≠ a) as [H5 | H5] by apply classic.
+  - subst. lra.
+  - specialize (H3 x ltac:(solve_R)). solve_R.
+Qed.
+
+Lemma lemma_8_1_b : forall f a,
+  ⟦ lim a⁻ ⟧ f = f a -> ∃ δ c, δ > 0 /\ ∀ x, a - δ < x <= a -> f x < c.
+Proof.
+  intros f a H1. specialize (H1 1 ltac:(lra)) as [δ [H2 H3]]. exists δ, (f a + 1). split; auto.
+  intros x H4. assert (x = a \/ x ≠ a) as [H5 | H5] by apply classic.
+  - subst. lra.
+  - specialize (H3 x ltac:(solve_R)). solve_R.
+Qed.
+
+Theorem theorem_7_2 : forall f a b,
+  a < b -> continuous_on [a, b] f -> ∃ c, ∀ x, x ∈ [a, b] -> f x < c.
+Proof.
+  intros f a b H1 H2. set (A := fun x => a <= x <= b /\ ∃ c, ∀ x, x ∈ [a, x] -> f x < c).
 Admitted.
 
 Theorem theorem_7_4 : forall f a b c,
