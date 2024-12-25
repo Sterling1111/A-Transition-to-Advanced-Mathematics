@@ -107,8 +107,32 @@ Proof.
   assert ((c * f)%function = h ∙ f) as H3 by reflexivity. rewrite H3.
   assert (⟦ der a ⟧ h = h') as H4. { apply theorem_10_1. apply Full_intro. } 
   assert (⟦ der a ⟧ (h ∙ f) = h' ∙ f + h ∙ f') as H5.
-  { apply theorem_10_4_a; auto. } replace (c * f')%function with (h' ∙ f + h ∙ f')%function. 2 : { extensionality x. unfold h, h'. lra. }
+  { apply theorem_10_4_a; auto. } 
+  replace (c * f')%function with (h' ∙ f + h ∙ f')%function. 2 : { extensionality x. unfold h, h'. lra. }
   auto.
+Qed.
+
+Theorem theorem_10_6 : forall a n,
+  ⟦ der a ⟧ (fun x => (x^n)) = (fun x => INR n * x ^ (n - 1)).
+Proof.
+  intros a. induction n as [| k IH].
+  - simpl. rewrite Rmult_0_l. apply theorem_10_1. apply Full_intro.
+  - replace (λ x : ℝ, (x ^ S k)%R) with (λ x : ℝ, (x * x ^ k)) by (extensionality x; reflexivity).
+    replace (λ x : ℝ, INR (S k) * x ^ (S k - 1))%R with (λ x : ℝ, 1 * x^k + x * (INR k * x^(k-1))).
+    2 : { 
+      extensionality x. replace (S k - 1)%nat with k by lia. solve_R. replace (x * INR k * x ^ (k - 1)) with (INR k * x^k).
+      2 : { 
+        replace (x * INR k * x ^ (k - 1)) with (INR k * (x * x ^ (k - 1))) by lra. rewrite tech_pow_Rmult.
+        destruct k; solve_R. rewrite Nat.sub_0_r. reflexivity. 
+      } solve_R. 
+    }
+    apply theorem_10_4_a; auto. apply theorem_10_2; apply Full_intro.
+Qed.
+
+Theorem power_rule : forall n,
+  ⟦ der ⟧ (fun x => x^n) = (fun x => INR n * x ^ (n - 1)).
+Proof.
+  intros n x H1. apply theorem_10_6.
 Qed.
 
 Theorem theorem_10_9 : forall f g f' g' a,
@@ -142,4 +166,10 @@ Theorem chain_rule : forall f g f' g',
   ⟦ der ⟧ g = g' -> ⟦ der ⟧ f = f' -> ⟦ der ⟧ (f ∘ g) = (f' ∘ g) ∙ g'.
 Proof.
   intros f g f' g' H1 H2 x H3. apply theorem_10_9; auto. specialize (H2 (g x) ltac:(apply Full_intro)). auto. 
+Qed.
+
+Example example_10_1 : ⟦ der ⟧ (fun x => x^2) = (fun x => 2 * x).
+Proof.
+  replace (fun x => 2 * x) with (fun x => INR 2 * x ^ (2 - 1)). 2 : { extensionality x. solve_R. }
+  apply power_rule.
 Qed.
