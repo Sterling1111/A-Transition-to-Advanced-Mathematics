@@ -100,30 +100,35 @@ Proof.
   intros f g f' g' H1 H2 x H3. apply theorem_10_4_a; auto.
 Qed.
 
-Open Scope function_scope.
-
 Theorem theorem_10_5 : forall f f' a c,
   ⟦ der a ⟧ f = f' -> ⟦ der a ⟧ (c * f) = c * f'.
 Proof.
   intros f f' a c H1. set (h := fun _ : ℝ => c). set (h' := fun _ : ℝ => 0).
-  assert (c * f = h ∙ f) as H3 by reflexivity. rewrite H3.
+  assert ((c * f)%function = h ∙ f) as H3 by reflexivity. rewrite H3.
   assert (⟦ der a ⟧ h = h') as H4. { apply theorem_10_1. apply Full_intro. } 
   assert (⟦ der a ⟧ (h ∙ f) = h' ∙ f + h ∙ f') as H5.
-  { apply theorem_10_4_a; auto. } replace (c * f') with (h' ∙ f + h ∙ f'). 2 : { extensionality x. unfold h, h'. lra. }
+  { apply theorem_10_4_a; auto. } replace (c * f')%function with (h' ∙ f + h ∙ f')%function. 2 : { extensionality x. unfold h, h'. lra. }
   auto.
 Qed.
 
-Close Scope function_scope.
-
-Theorem theorem_10_9_a : forall f g f' g' a,
+Theorem theorem_10_9 : forall f g f' g' a,
   ⟦ der a ⟧ g = g' -> ⟦ der (g a) ⟧ f = f' -> ⟦ der a ⟧ (f ∘ g) = (f' ∘ g) ∙ g'.
 Proof.
-  intros f g f' g' a H1 H2. 
+  intros f g f' g' a H1 H2.
   set ( φ := fun h : ℝ => match (Req_dec (g (a + h) - g a) 0) with 
                           | left _ => f' (g a)
                           | right _ => (f (g (a + h)) - f (g a)) / (g (a + h) - g a)
                           end).
-  assert (continuous_at φ 0) as H3 by admit.
+  assert (continuous_at φ 0) as H3.
+  {
+    intros ε H4. specialize (H2 ε H4) as [δ' [H5 H6]].  unfold φ. rewrite Rplus_0_r, Rminus_diag.
+    assert (H7 : continuous_at g a). { apply theorem_9_1. unfold differentiable_at. unfold derivative_at in H1. exists (g' a). auto. }
+    specialize (H7 δ' H5) as [δ [H8 H9]]. exists δ. split; auto. intros x H10.
+    destruct (Req_dec (g (a + x) - g a) 0) as [H11 | H11]; destruct (Req_dec 0 0) as [H12 | H12]; try lra; clear H12.
+     - solve_R. 
+     - specialize (H9 (a + x) ltac:(solve_R)). specialize (H6 (g (a + x) - g a) ltac:(solve_R)).
+       replace (g a + (g (a + x) - g a)) with (g (a + x)) in H6 by lra. auto.
+  }
   unfold continuous_at in H3. unfold derivative_at.
   apply limit_to_0_equiv with (f1 := fun h => φ h * ((g (a + h) - g a)/h)). 
   2 : { apply limit_mult; auto. unfold φ in H3 at 2. rewrite Rplus_0_r in H3. replace (g a - g a) with 0 in H3 by lra.
@@ -131,10 +136,10 @@ Proof.
   intros x H4. unfold φ. destruct (Req_dec (g (a + x) - g a) 0) as [H5 | H5].
   - rewrite H5. field_simplify; auto. replace (0 / x) with 0 by nra. replace (g (a + x)) with (g a) by lra. lra.
   - field. auto.
-Admitted.
+Qed.
 
 Theorem chain_rule : forall f g f' g',
   ⟦ der ⟧ g = g' -> ⟦ der ⟧ f = f' -> ⟦ der ⟧ (f ∘ g) = (f' ∘ g) ∙ g'.
 Proof.
-  intros f g f' g' H1 H2 x H3. apply theorem_10_9_a; auto. specialize (H2 (g x) ltac:(apply Full_intro)). auto. 
+  intros f g f' g' H1 H2 x H3. apply theorem_10_9; auto. specialize (H2 (g x) ltac:(apply Full_intro)). auto. 
 Qed.
