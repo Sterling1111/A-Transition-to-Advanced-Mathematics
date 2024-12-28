@@ -164,9 +164,7 @@ Section section_35_5.
     { apply sum_f_ge; [ apply f1_le_f2 | apply a_decreasing ]. }
     unfold f1, f2, a in H1. destruct n.
     - compute; lra.
-    - replace (INR (2 ^ S n - 1 - 2 ^ n + 1)) with (INR (2^n)) in H1.
-      2 : { solve_INR. rewrite Nat.add_0_r. pose proof Rpow_gt_0 n 2 ltac:(lra) as H2. replace 2 with (INR 2) in H2 by auto.
-            rewrite <- pow_INR in H2. replace 0 with (INR 0) in H2 by auto. apply INR_lt in H2. nia. }
+    - replace (INR (2 ^ S n - 1 - 2 ^ n + 1)) with (INR (2^n)) in H1. 2 : { solve_INR. pose proof pow2_gt_0 n. nia. }
       replace (INR (2 ^ S n - 1) + 1) with (2 * 2 ^ n) in H1.
       2 : { solve_INR. 2 : { pose proof pow2_gt_0 n as H2. nia. } field_simplify. replace (0 + 1 + 1) with 2 by lra. nra. }
       rewrite pow_INR in H1. replace (INR 2) with 2 in H1 by auto. field_simplify in H1. nra. apply pow_nonzero; lra.
