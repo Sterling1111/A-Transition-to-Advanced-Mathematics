@@ -148,7 +148,7 @@ Proof.
          replace ((a + d) * (a + d + 1) / 2 - a * (a + 1) / 2) with (a * d + d * (d + 1) / 2) in H3.
          2 :
          { pose proof sum_n_divisible a as [j H4]. pose proof sum_n_divisible (a + d) as [k H5]. pose proof sum_n_divisible d as [i H6].
-             rewrite H4, H5, H6. repeat rewrite Nat.div_mul; try lia. }
+             rewrite H4, H5, H6. repeat rewrite Nat.div_mul; lia. }
          assert (d = 0 \/ d > 0) as [H4 | H4] by lia; try lia.
          assert (d * (d + 1) / 2 >= 1) as H5. { pose proof sum_n_divisible d as [j H5]. rewrite H5. rewrite Nat.div_mul; lia. }
          assert (a * d + d * (d + 1) / 2 >= a + 1) as H6 by nia. assert (n > a + q) as H7 by lia. unfold a in H7. lia.
