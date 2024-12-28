@@ -179,19 +179,3 @@ Proof.
   replace (fun x => 2 * x) with (fun x => INR 2 * x ^ (2 - 1)). 2 : { extensionality x. solve_R. }
   apply power_rule.
 Qed.
-
-Ltac ring_simpl_fun :=
-  match goal with
-  | |- ⟦ der ⟧ ?f1 = ?f2 =>
-    replace f1 with f2 by (extensionality x; solve_R)
-  end.
-
-Example example_d3 : ⟦ der ⟧ (fun x => x^3) = (fun x => x * x * x).
-Proof.
-  ring_simpl_fun.
-Qed.
-
-Example example_d2 : ⟦ der ⟧ (fun x => 1 + 2 * x^2 * x^2) = (fun x => 4 * x^3).
-Proof.
-  ring_simpl_fun.
-Qed.
