@@ -124,7 +124,7 @@ Qed.
 Notation "f + g" := (fun x : ℝ => f x + g x) (at level 50, left associativity) : function_scope.
 Notation "f - g" := (fun x : ℝ => f x - g x) (at level 50, left associativity) : function_scope.
 Notation "f ∙ g" := (fun x : ℝ => f x * g x) (at level 40, left associativity) : function_scope.
-Notation "f / g" := (fun x : ℝ => f x / g x) (at level 40, left associativity) : function_scope.
+Notation "f ∕ g" := (fun x : ℝ => f x / g x) (at level 40, left associativity) : function_scope.
 Notation "f ∘ g" := (fun x : ℝ => f (g x)) (at level 40, left associativity) : function_scope.
 Notation "c * f" := (fun x : ℝ => c * f x) (at level 40, left associativity) : function_scope.
 Notation "f ^ n" := (fun x : ℝ => (f x) ^ n) (at level 30, right associativity) : function_scope.
@@ -201,9 +201,9 @@ Proof.
 Qed.
 
 Lemma limit_div : forall f1 f2 a L1 L2,
-  ⟦ lim a ⟧ f1 = L1 -> ⟦ lim a ⟧ f2 = L2 -> L2 <> 0 -> ⟦ lim a ⟧ (f1 / f2) = L1 / L2.
+  ⟦ lim a ⟧ f1 = L1 -> ⟦ lim a ⟧ f2 = L2 -> L2 <> 0 -> ⟦ lim a ⟧ (f1 ∕ f2) = L1 / L2.
 Proof.
-  intros f1 f2 a L1 L2 H1 H2 H3. replace (f1 / f2)%function with (f1 ∙ (fun x => 1 / f2 x)).
+  intros f1 f2 a L1 L2 H1 H2 H3. replace (f1 ∕ f2)%function with (f1 ∙ (fun x => 1 / f2 x)).
   2 : { extensionality x. lra. }
   unfold Rdiv. apply limit_mult; auto. apply limit_inv; auto.
 Qed.

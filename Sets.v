@@ -21,12 +21,12 @@ Delimit Scope set_scope with set.
 
 Module SetNotations.
 
-Notation "x ∈ A" := (In _ A x) (at level 40) : set_scope.
+Notation "x ∈ A" := (In _ A x) (at level 20) : set_scope.
 
 Definition set_prod {U V : Type} (A : Ensemble U) (B : Ensemble V) : Ensemble (U * V) :=
   fun p => exists a b, (a ∈ A)%set /\ (b ∈ B)%set /\ p = (a, b).
 
-Notation "x ∉ A" := (~ In _ A x) (at level 40) : set_scope.
+Notation "x ∉ A" := (~ In _ A x) (at level 20) : set_scope.
 Notation "A ⊆ B" := (Included _ A B) (at level 40) : set_scope.
 Notation "A ⊈ B" := (~ Included _ A B) (at level 40) : set_scope.
 Notation "A ⊊ B" := (Strict_Included _ A B) (at level 40) : set_scope.
@@ -34,9 +34,10 @@ Notation "A ⋃ B" := (Union _ A B) (at level 30) : set_scope.
 Notation "A ⋂ B" := (Intersection _ A B) (at level 30) : set_scope.
 Notation "A − B" := (Setminus _ A B) (at level 30) : set_scope.
 Notation "A × B" := (set_prod A B) (at level 30) : set_scope.
-Notation "A ′" := (Complement _ A) (at level 20, format "A ′") : set_scope.
+Notation "A ′" := (Complement _ A) (at level 50, format "A ′") : set_scope.
 Notation "∅" := (Empty_set _) : set_scope.
 Notation "‖ A ‖ = n" := (@cardinal _ A n) (at level 70, format "‖ A ‖  =  n") : set_scope.
+
 
 Definition FromList {U : Type} (l : list U) : Ensemble U :=
   fun x => List.In x l.
@@ -221,7 +222,7 @@ Proof.
 Qed.
 
 Lemma Complement_def : forall (U : Type) (A : Ensemble U) (x : U),
-  x ∈ A′ <-> x ∉ A.
+  x ∈ (A′) <-> x ∉ A.
 Proof.
   intros U A x; split; auto.
 Qed.
