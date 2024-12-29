@@ -484,4 +484,3 @@ Proof.
   - pose proof theorem_7_4 f 0 α α H1  ltac:(apply continuous_imp_continuous_on; auto) ltac:(unfold f; split; solve_R) as [x [H4 H5]].
     exists x. apply H5.
 Qed.
-

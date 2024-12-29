@@ -123,6 +123,7 @@ Qed.
 
 Notation "f + g" := (fun x : ℝ => f x + g x) (at level 50, left associativity) : function_scope.
 Notation "f – g" := (fun x : ℝ => f x - g x) (at level 50, left associativity) : function_scope.
+Notation "– f" := (fun x : ℝ => - f x) (at level 30) : function_scope.
 Notation "f ∙ g" := (fun x : ℝ => f x * g x) (at level 40, left associativity) : function_scope.
 Notation "f ∕ g" := (fun x : ℝ => f x / g x) (at level 40, left associativity) : function_scope.
 Notation "f ∘ g" := (fun x : ℝ => f (g x)) (at level 40, left associativity) : function_scope.

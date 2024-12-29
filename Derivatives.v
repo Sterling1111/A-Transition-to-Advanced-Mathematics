@@ -159,19 +159,23 @@ Proof.
   apply limit_mult. replace ((λ x : ℝ, -1 * (f (a + x) - f a) / x)) with ((fun x => -1) ∙ (fun x => (f (a + x) - f a) / x)).
   2 : { extensionality x. lra. } apply limit_mult; auto. apply limit_const. apply limit_inv; solve_R.
   apply limit_mult. apply limit_const. rewrite Rmult_1_r. pose proof theorem_6_2 f (Rplus a) 0 as H6. unfold continuous_at in H6.
-  rewrite Rplus_0_r in H6. apply H6. solve_lim. assert (continuous_at f a) as H7. { apply theorem_9_1. unfold differentiable_at. exists (f' a). auto. }
-  auto.
+  rewrite Rplus_0_r in H6. apply H6. solve_lim. auto.
 Qed.
 
 Theorem theorem_10_8 : forall f f' g g' a,
-  ⟦ der a ⟧ f = f' -> ⟦ der a ⟧ g = g' -> g a <> 0 -> ⟦ der a ⟧ (f ∕ g) = (fun x => (g x * f' x - f x * g' x) / (g x)^2).
+  ⟦ der a ⟧ f = f' -> ⟦ der a ⟧ g = g' -> g a <> 0 -> ⟦ der a ⟧ (f ∕ g) = (g ∙ f' – f ∙ g') ∕ (g ∙ g).
 Proof.
   intros f f' g g' a H1 H2 H3.
-  replace (fun x => (g x * f' x - f x * g' x) / (g x)^2) with (fun x => (f' x * /g x + (f x * ((-1 * g' x) * / (g x)^2)))).
-  2 : { extensionality x. assert (g x = 0 \/ g x <> 0) as [H4 | H4] by lra. rewrite H4. rewrite Rinv_0. nra. field; lra. }
-  replace (f ∕ g)%function with (f ∙ (fun x => / g x))%function.
-  2 : { extensionality x. unfold Rdiv. reflexivity. } 
+  replace (f ∕ g)%function with (f ∙ (fun x => / g x))%function. 2 : { extensionality x. unfold Rdiv. reflexivity. }
+  replace (λ x : ℝ, (g x * f' x - f x * g' x) / (g x * g x)) with (fun x => (f' x * /g x + (f x * ((-1 * g' x) * / (g x)^2)))).
+  2 : { extensionality x. assert (g x = 0 \/ g x <> 0) as [H4 | H4] by lra. rewrite H4. simpl. unfold Rdiv. repeat rewrite Rmult_0_l. rewrite Rinv_0. nra. field; lra. }
   apply theorem_10_4_a; auto. apply theorem_10_7; auto.
+Qed.
+
+Theorem quotient_rule : forall f g f' g',
+  ⟦ der ⟧ f = f' -> ⟦ der ⟧ g = g' -> (forall x, g x <> 0) -> ⟦ der ⟧ (f ∕ g) = (g ∙ f' – f ∙ g') ∕ (g ∙ g).
+Proof.
+  intros f g f' g' H1 H2 H3 x H4. apply theorem_10_8; auto.
 Qed.
 
 Theorem theorem_10_9 : forall f g f' g' a,
