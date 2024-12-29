@@ -54,7 +54,7 @@ Proof.
 Qed.
 
 Lemma lemma_37_11_c : forall f g a,
-  g a ≠ 0 -> continuous_at f a -> continuous_at g a -> continuous_at (f / g) a.
+  g a ≠ 0 -> continuous_at f a -> continuous_at g a -> continuous_at (f ∕ g) a.
 Proof.
   intros f g a H1 H2 H3. unfold continuous_at in *. apply limit_div; auto.
 Qed.
@@ -112,7 +112,7 @@ Proof.
 Qed.
 
 Theorem theorem_6_1_d : forall f g a,
-  g a ≠ 0 -> continuous_at f a -> continuous_at g a -> continuous_at (f / g) a.
+  g a ≠ 0 -> continuous_at f a -> continuous_at g a -> continuous_at (f ∕ g) a.
 Proof.
   intros f g a H1 H2 H3. unfold continuous_at in *; solve_lim.
 Qed.
@@ -143,6 +143,16 @@ Proof.
   intros x H5. pose proof classic (x = a) as [H6 | H6].
   - subst. auto.
   - specialize (H4 x ltac:(solve_R)). solve_R.
+Qed.
+
+Theorem theorem_6_3_c : ∀ f a,
+  continuous_at f a -> f a ≠ 0 -> ∃ δ, δ > 0 /\ ∀ x, |x - a| < δ -> f x ≠ 0.
+Proof.
+  intros f a H1 H2. assert (f a > 0 \/ f a < 0) as [H3 | H3] by lra.
+  - apply theorem_6_3_a in H3 as [δ [H4 H5]]; auto. exists δ. split; auto.
+    intros x H6. specialize (H5 x ltac:(solve_R)). lra.
+  - apply theorem_6_3_b in H3 as [δ [H4 H5]]; auto. exists δ. split; auto.
+    intros x H6. specialize (H5 x ltac:(solve_R)). lra.
 Qed.
 
 Lemma lemma_6_16_a_1 : ∀ f a,

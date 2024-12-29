@@ -151,6 +151,35 @@ Proof.
   intros n x H1. apply theorem_10_6.
 Qed.
 
+Lemma limit_to_0_equiv' : forall f1 f2 L,
+  (exists δ, δ > 0 /\ forall x, x <> 0 -> |x| < δ -> f1 x = f2 x) -> ⟦ lim 0 ⟧ f1 = L -> ⟦ lim 0 ⟧ f2 = L.
+Proof.
+  intros f1 f2 L [δ1 [H1 H2]] H3 ε H4. specialize (H3 ε H4) as [δ2 [H5 H6]].
+  exists (Rmin δ1 δ2). split. solve_R. intros x H7. specialize (H2 x ltac:(solve_R) ltac:(solve_R)). specialize (H6 x ltac:(solve_R)).
+  solve_R.
+Qed.
+
+Theorem theorem_10_7 : forall f f' a,
+  ⟦ der a ⟧ f = f' -> f a <> 0 -> ⟦ der a ⟧ (fun x => / f x) = (fun x => -1 * f' x) ∕ (fun x => f x ^ 2).
+Proof.
+  intros f f' a H1 H2. unfold derivative_at. assert (H3 : continuous_at f a). { apply theorem_9_1. unfold differentiable_at. exists (f' a). auto. }
+  pose proof theorem_6_3_c f a H3 H2 as [δ [H4 H5]].
+  apply limit_to_0_equiv' with (f1 := fun h => ((-1 * (f (a + h) - f a) / h)) * (1 / (f a * f (a + h)))).
+  { exists δ. split; auto. intros x H6 H7. specialize (H5 (a + x) ltac:(solve_R)). field_simplify; repeat split; auto. }
+  apply limit_mult. replace ((λ x : ℝ, -1 * (f (a + x) - f a) / x)) with ((fun x => -1) ∙ (fun x => (f (a + x) - f a) / x)).
+  2 : { extensionality x. lra. } apply limit_mult; auto. apply limit_const. apply limit_inv; solve_R.
+  apply limit_mult. apply limit_const. rewrite Rmult_1_r. pose proof theorem_6_2 f (Rplus a) 0 as H6. unfold continuous_at in H6.
+  rewrite Rplus_0_r in H6. apply H6. solve_lim. assert (continuous_at f a) as H7. { apply theorem_9_1. unfold differentiable_at. exists (f' a). auto. }
+  auto.
+Qed.
+
+Theorem theorem_10_8 : forall f f' g g' a,
+  ⟦ der a ⟧ f = f' -> ⟦ der a ⟧ g = g' -> g a <> 0 -> ⟦ der a ⟧ (f ∕ g) = (((g ∙ f') - (f ∙ g')) ∕ (g ∙ g)).
+
+Proof.
+  
+Qed.
+
 Theorem theorem_10_9 : forall f g f' g' a,
   ⟦ der a ⟧ g = g' -> ⟦ der (g a) ⟧ f = f' -> ⟦ der a ⟧ (f ∘ g) = (f' ∘ g) ∙ g'.
 Proof.
