@@ -457,3 +457,21 @@ Proof.
   intros x H6. specialize (H5 x H6). lra.
 Qed.
 
+Lemma continuous_imp_continuous_on : forall f a b,
+  continuous f -> continuous_on [a, b] f.
+Proof.
+  intros f a b H1. unfold continuous_on. intros x H2. unfold continuous_at. apply H1. apply Full_intro.
+Qed.
+
+Theorem theorem_7_8 : forall α,
+  α > 0 -> exists x, x * x = α.
+Proof.
+  intros α H1. set (f := fun x => x * x). assert (H2 : continuous f). { intros a H2. unfold continuous_at. solve_lim. }
+  assert (α < 1 \/ α = 1 \/ α > 1) as [H3 | [H3 | H3]] by lra.
+  - pose proof theorem_7_4 f 0 1 α ltac:(lra) ltac:(apply continuous_imp_continuous_on; auto) ltac:(unfold f; solve_R) as [x [H4 H5]].
+    exists x. apply H5.
+  - exists 1. lra.
+  - pose proof theorem_7_4 f 0 α α H1  ltac:(apply continuous_imp_continuous_on; auto) ltac:(unfold f; split; solve_R) as [x [H4 H5]].
+    exists x. apply H5.
+Qed.
+

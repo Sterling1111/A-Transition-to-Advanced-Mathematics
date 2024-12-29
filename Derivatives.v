@@ -135,6 +135,16 @@ Proof.
     apply theorem_10_4_a; auto. apply theorem_10_2; apply Full_intro.
 Qed.
 
+Theorem theorem_10_7 : forall f f' a,
+  ⟦ der a ⟧ f = f' -> f a ≠ 0 -> ⟦ der a ⟧ (fun x => / f x) = (fun x => -f' x) / (fun x => f x ^ 2).
+Proof.
+  intros f f' a H1 H2. unfold derivative_at. apply limit_to_0_equiv with (f1 := fun h => (/ f (a + h) - / f a) / h).
+  { intros x H3. field. repeat split; auto. assert (differentiable_at f a) as H4. { exists (f' a). auto. } apply theorem_9_1 in H4. unfold continuous_at in H4. auto. }
+  replace (fun h => (/ f (a + h) - / f a) / h) with (fun h => - (f (a + h) - f a) / (f (a + h) * f a) / h).
+  2 : { extensionality h. field. auto. }
+  apply limit_mult; auto. apply limit_opp; auto.
+
+
 Theorem power_rule : forall n,
   ⟦ der ⟧ (fun x => x^n) = (fun x => INR n * x ^ (n - 1)).
 Proof.
