@@ -122,12 +122,13 @@ Proof.
 Qed. 
 
 Notation "f + g" := (fun x : ℝ => f x + g x) (at level 50, left associativity) : function_scope.
-Notation "f - g" := (fun x : ℝ => f x - g x) (at level 50, left associativity) : function_scope.
+Notation "f – g" := (fun x : ℝ => f x - g x) (at level 50, left associativity) : function_scope.
 Notation "f ∙ g" := (fun x : ℝ => f x * g x) (at level 40, left associativity) : function_scope.
 Notation "f ∕ g" := (fun x : ℝ => f x / g x) (at level 40, left associativity) : function_scope.
 Notation "f ∘ g" := (fun x : ℝ => f (g x)) (at level 40, left associativity) : function_scope.
 Notation "c * f" := (fun x : ℝ => c * f x) (at level 40, left associativity) : function_scope.
 Notation "f ^ n" := (fun x : ℝ => (f x) ^ n) (at level 30, right associativity) : function_scope.
+Notation "∕ f" := (fun x : ℝ => 1 / f x) (at level 40, left associativity) : function_scope.
 
 Lemma limit_of_function_unique : forall f a L1 L2,
   ⟦ lim a ⟧ f = L1 -> ⟦ lim a ⟧ f = L2 -> L1 = L2. 
@@ -171,7 +172,7 @@ Proof.
 Qed.
 
 Lemma limit_minus : forall f1 f2 a L1 L2,
-  ⟦ lim a ⟧ f1 = L1 -> ⟦ lim a ⟧ f2 = L2 -> ⟦ lim a ⟧ (f1 - f2) = (L1 - L2).
+  ⟦ lim a ⟧ f1 = L1 -> ⟦ lim a ⟧ f2 = L2 -> ⟦ lim a ⟧ (f1 – f2) = (L1 - L2).
 Proof.
    intros f1 f2 a L1 L2 H1 H2. unfold Rminus. apply limit_plus; auto.
    intros ε H3. specialize (H2 ε H3) as [δ [H4 H5]].
@@ -191,7 +192,7 @@ Proof.
 Qed.
 
 Lemma limit_inv : forall f a L,
-  ⟦ lim a ⟧ f = L -> L <> 0 -> ⟦ lim a ⟧ (fun x => 1 / f x) = / L.
+  ⟦ lim a ⟧ f = L -> L <> 0 -> ⟦ lim a ⟧ (∕ f) = / L.
 Proof.
   intros f a L H1 H2 ε H3. assert (|L| / 2 > 0) as H4 by solve_abs. assert (ε * |L|^2 / 2 > 0) as H5.
   { apply Rmult_lt_0_compat. apply pow2_gt_0 in H2. solve_abs. apply Rinv_pos; lra. }

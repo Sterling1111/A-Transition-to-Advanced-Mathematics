@@ -107,71 +107,8 @@ Proof.
   assert ((c * f)%function = h ∙ f) as H3 by reflexivity. rewrite H3.
   assert (⟦ der a ⟧ h = h') as H4. { apply theorem_10_1. apply Full_intro. } 
   assert (⟦ der a ⟧ (h ∙ f) = h' ∙ f + h ∙ f') as H5.
-  { apply theorem_10_4_a; auto. } 
-  replace (c * f')%function with (h' ∙ f + h ∙ f')%function. 2 : { extensionality x. unfold h, h'. lra. }
+  { apply theorem_10_4_a; auto. } replace (c * f')%function with (h' ∙ f + h ∙ f')%function. 2 : { extensionality x. unfold h, h'. lra. }
   auto.
-Qed.
-
-Theorem theorem_10_5' : forall f f' c,
-  ⟦ der ⟧ f = f' -> ⟦ der ⟧ (fun x => c * f x) = (fun x => c * f' x).
-Proof.
-  intros f f' c H1 x H2. apply theorem_10_5; auto.
-Qed.
-
-Theorem theorem_10_6 : forall a n,
-  ⟦ der a ⟧ (fun x => (x^n)) = (fun x => INR n * x ^ (n - 1)).
-Proof.
-  intros a. induction n as [| k IH].
-  - simpl. rewrite Rmult_0_l. apply theorem_10_1. apply Full_intro.
-  - replace (λ x : ℝ, (x ^ S k)%R) with (λ x : ℝ, (x * x ^ k)) by (extensionality x; reflexivity).
-    replace (λ x : ℝ, INR (S k) * x ^ (S k - 1))%R with (λ x : ℝ, 1 * x^k + x * (INR k * x^(k-1))).
-    2 : { 
-      extensionality x. replace (S k - 1)%nat with k by lia. solve_R. replace (x * INR k * x ^ (k - 1)) with (INR k * x^k).
-      2 : { 
-        replace (x * INR k * x ^ (k - 1)) with (INR k * (x * x ^ (k - 1))) by lra. rewrite tech_pow_Rmult.
-        destruct k; solve_R. rewrite Nat.sub_0_r. reflexivity. 
-      } solve_R. 
-    }
-    apply theorem_10_4_a; auto. apply theorem_10_2; apply Full_intro.
-Qed.
-
-Theorem power_rule : forall n,
-  ⟦ der ⟧ (fun x => x^n) = (fun x => INR n * x ^ (n - 1)).
-Proof.
-  intros n x H1. apply theorem_10_6.
-Qed.
-
-Lemma limit_to_0_equiv' : forall f1 f2 L,
-  (exists δ, δ > 0 /\ forall x, x <> 0 -> |x| < δ -> f1 x = f2 x) -> ⟦ lim 0 ⟧ f1 = L -> ⟦ lim 0 ⟧ f2 = L.
-Proof.
-  intros f1 f2 L [δ1 [H1 H2]] H3 ε H4. specialize (H3 ε H4) as [δ2 [H5 H6]].
-  exists (Rmin δ1 δ2). split. solve_R. intros x H7. specialize (H2 x ltac:(solve_R) ltac:(solve_R)). specialize (H6 x ltac:(solve_R)).
-  solve_R.
-Qed.
-
-Theorem theorem_10_7 : forall f f' a,
-  ⟦ der a ⟧ f = f' -> f a <> 0 -> ⟦ der a ⟧ (fun x => / f x) = (fun x => -1 * f' x) ∕ (fun x => f x ^ 2).
-Proof.
-  intros f f' a H1 H2. unfold derivative_at. assert (H3 : continuous_at f a). { apply theorem_9_1. unfold differentiable_at. exists (f' a). auto. }
-  pose proof theorem_6_3_c f a H3 H2 as [δ [H4 H5]].
-  apply limit_to_0_equiv' with (f1 := fun h => ((-1 * (f (a + h) - f a) / h)) * (1 / (f a * f (a + h)))).
-  { exists δ. split; auto. intros x H6 H7. specialize (H5 (a + x) ltac:(solve_R)). field_simplify; repeat split; auto. }
-  apply limit_mult. replace ((λ x : ℝ, -1 * (f (a + x) - f a) / x)) with ((fun x => -1) ∙ (fun x => (f (a + x) - f a) / x)).
-  2 : { extensionality x. lra. } apply limit_mult; auto. apply limit_const. apply limit_inv; solve_R.
-  apply limit_mult. apply limit_const. rewrite Rmult_1_r. pose proof theorem_6_2 f (Rplus a) 0 as H6. unfold continuous_at in H6.
-  rewrite Rplus_0_r in H6. apply H6. solve_lim. assert (continuous_at f a) as H7. { apply theorem_9_1. unfold differentiable_at. exists (f' a). auto. }
-  auto.
-Qed.
-
-Theorem theorem_10_8 : forall f f' g g' a,
-  ⟦ der a ⟧ f = f' -> ⟦ der a ⟧ g = g' -> g a <> 0 -> ⟦ der a ⟧ (f ∕ g) = (fun x => (g x * f' x - f x * g' x) / (g x)^2).
-Proof.
-  intros f f' g g' a H1 H2 H3.
-  replace (fun x => (g x * f' x - f x * g' x) / (g x)^2) with (fun x => (f' x * /g x + (f x * ((-1 * g' x) * / (g x)^2)))).
-  2 : { extensionality x. assert (g x = 0 \/ g x <> 0) as [H4 | H4] by lra. rewrite H4. rewrite Rinv_0. nra. field; lra. }
-  replace (f ∕ g)%function with (f ∙ (fun x => / g x))%function.
-  2 : { extensionality x. unfold Rdiv. reflexivity. } 
-  apply theorem_10_4_a; auto. apply theorem_10_7; auto.
 Qed.
 
 Theorem theorem_10_9 : forall f g f' g' a,
@@ -205,10 +142,4 @@ Theorem chain_rule : forall f g f' g',
   ⟦ der ⟧ g = g' -> ⟦ der ⟧ f = f' -> ⟦ der ⟧ (f ∘ g) = (f' ∘ g) ∙ g'.
 Proof.
   intros f g f' g' H1 H2 x H3. apply theorem_10_9; auto. specialize (H2 (g x) ltac:(apply Full_intro)). auto. 
-Qed.
-
-Example example_d1 : ⟦ der ⟧ (fun x => x^2) = (fun x => 2 * x).
-Proof.
-  replace (fun x => 2 * x) with (fun x => INR 2 * x ^ (2 - 1)). 2 : { extensionality x. solve_R. }
-  apply power_rule.
 Qed.
