@@ -115,7 +115,7 @@ Proof.
   - simpl. exists 0. lia.
   - simpl. destruct t as [| h' t].
     -- simpl. rewrite Z.mul_1_r. apply (H1 0%nat). simpl. lia.
-    -- assert (H2 : (forall i : ℕ, (0 <= i < length (h' :: t))%nat ⇒ nth i (h' :: t) 0 ≡ 1 (mod 3))).
+    -- assert (H2 : (forall i : ℕ, (0 <= i < length (h' :: t))%nat -> nth i (h' :: t) 0 ≡ 1 (mod 3))).
        {
           intros i H2. pose proof H1 as H3. specialize (H1 i ltac:(simpl in *; lia)).
           assert (i = 0 \/ i > 0)%nat as [H4 | H4] by lia.

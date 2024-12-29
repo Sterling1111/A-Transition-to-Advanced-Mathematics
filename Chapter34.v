@@ -51,14 +51,14 @@ End section_34_1.
 Section section_34_2.
   Definition prop_34_2_a := ⟦ lim_s ⟧ (fun n => 3 - 4 / INR n) = 3.
 
-  Lemma prop_34_2_a_symbolic : prop_34_2_a = forall ε : ℝ, ε > 0 ⇒ (exists N : ℝ, forall n : ℕ, INR n > N ⇒ Rabs (3 - 4 / INR n - 3) < ε).
+  Lemma prop_34_2_a_symbolic : prop_34_2_a = forall ε : ℝ, ε > 0 -> (exists N : ℝ, forall n : ℕ, INR n > N -> Rabs (3 - 4 / INR n - 3) < ε).
   Proof.
     unfold prop_34_2_a, lim_s. reflexivity.
   Qed.
         
   Definition prop_34_2_b := ~ ⟦ lim_s ⟧ (fun n => 6) = 3.
   
-  Lemma prop_34_2_b_symbolic : prop_34_2_b = exists ε : ℝ, ε > 0 ⇒ forall N : ℝ, exists n : ℕ, INR n > N ⇒ Rabs (6 - 3) >= ε.
+  Lemma prop_34_2_b_symbolic : prop_34_2_b = exists ε : ℝ, ε > 0 -> forall N : ℝ, exists n : ℕ, INR n > N -> Rabs (6 - 3) >= ε.
   Proof.
     unfold prop_34_2_b, lim_s. apply EquivThenEqual. split.
     - intros _. exists 1. intros _. intros N. exists 0%nat. intros _. rewrite Rabs_pos_eq; lra.

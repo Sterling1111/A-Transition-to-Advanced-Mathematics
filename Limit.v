@@ -6,13 +6,13 @@ Open Scope R_scope.
 Record Rsub (P : Ensemble ℝ) : Type := mkRsub { val : ℝ; prop : In _ P val }.
 
 Definition limit (f : ℝ -> ℝ) (a L : ℝ) : Prop :=
-  ∀ ε, ε > 0 ⇒ ∃ δ, δ > 0 /\ ∀ x, 0 < |x - a| < δ ⇒ |f x - L| < ε.
+  ∀ ε, ε > 0 -> ∃ δ, δ > 0 /\ ∀ x, 0 < |x - a| < δ -> |f x - L| < ε.
 
 Definition left_limit (f : ℝ -> ℝ) (a L : ℝ) : Prop :=
-  ∀ ε, ε > 0 ⇒ ∃ δ, δ > 0 /\ ∀ x, 0 < a - x < δ ⇒ |f x - L| < ε.
+  ∀ ε, ε > 0 -> ∃ δ, δ > 0 /\ ∀ x, 0 < a - x < δ -> |f x - L| < ε.
 
 Definition right_limit (f : ℝ -> ℝ) (a L : ℝ) : Prop :=
-  ∀ ε, ε > 0 ⇒ ∃ δ, δ > 0 /\ ∀ x, 0 < x - a < δ ⇒ |f x - L| < ε.
+  ∀ ε, ε > 0 -> ∃ δ, δ > 0 /\ ∀ x, 0 < x - a < δ -> |f x - L| < ε.
 
 Notation "⟦ 'lim' a ⟧ f '=' L" := 
   (limit f a L) 
@@ -306,7 +306,7 @@ Ltac solve_lim :=
       solve_R; auto
   end.
 
-Lemma f_subtype_independent (P : Ensemble R) (f : Rsub P ⇒ R) (x : R) (H1 H2 : In _ P x) :
+Lemma f_subtype_independent (P : Ensemble R) (f : Rsub P -> R) (x : R) (H1 H2 : In _ P x) :
   f {| val := x; prop := H1 |} = f {| val := x; prop := H2 |}.
 Proof.
   assert ({| val := x; prop := H1 |} = {| val := x; prop := H2 |}) as H3 by (f_equal; apply proof_irrelevance).

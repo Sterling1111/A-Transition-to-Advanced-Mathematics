@@ -6,13 +6,13 @@ Import SetNotations.
 Open Scope Z_scope.
 
 Lemma lemma_12_1_a : forall (U : Type) (A B C : Ensemble U),
-  A ⊆ B ⋂ C ⇒ A ⊆ B.
+  A ⊆ B ⋂ C -> A ⊆ B.
 Proof.
   intros U A B C H1 x H2. rewrite Subset_def in H1. specialize (H1 x H2). apply In_Intersection_def in H1 as [H1 _]. auto.
 Qed.
 
 Lemma lemma_12_1_a_converse : 
-  (forall (U : Type) (A B C : Ensemble U), A ⊆ B ⇒ A ⊆ B ⋂ C) ⇒ False.
+  (forall (U : Type) (A B C : Ensemble U), A ⊆ B -> A ⊆ B ⋂ C) -> False.
 Proof.
   intros H1. specialize (H1 Z ⦃1⦄ ⦃1,3⦄ ⦃2⦄).
   assert (⦃1⦄ ⊆ ⦃1, 3⦄) as H2. { intros x H2. solve_in_Intersection_Union_helper_2. }
