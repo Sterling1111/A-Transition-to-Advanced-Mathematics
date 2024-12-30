@@ -27,7 +27,7 @@ Notation "⟦ 'lim' a ⁻ ⟧ f '=' L" :=
     (at level 70, f at level 0, no associativity, format "⟦  'lim'  a ⁻  ⟧  f  '='  L").
 
 Lemma left_right_iff : forall f a L,
-  ⟦ lim a ⟧ f = L ↔ ⟦ lim a⁻ ⟧ f = L ∧ ⟦ lim a⁺ ⟧ f = L.
+  ⟦ lim a ⟧ f = L <-> ⟦ lim a⁻ ⟧ f = L ∧ ⟦ lim a⁺ ⟧ f = L.
 Proof.
   intros f a L. split.
   - intros H1. split.
