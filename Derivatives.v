@@ -222,12 +222,6 @@ Proof.
   apply power_rule' with (m := 3). simpl; lra.
 Qed.
 
-Example example_d2 : ⟦ der ⟧ (fun x => (3 * x + 2)^3) = (fun x => 3 * (3 * x + 2)^2 * 3).
-Proof.
-  replace (fun x => 2 * x) with (fun x => INR 2 * x ^ (2 - 1)). 2 : { extensionality x. solve_R. }
-  apply power_rule.
-Qed.
-
 Definition maximum_point (f: ℝ -> ℝ) (A : Ensemble ℝ) (x : ℝ) :=
   x ∈ A /\ forall y, y ∈ A -> f y <= f x.
 
@@ -251,6 +245,7 @@ Proof.
   { exists (Rmin (b - x) (x - a)). split. unfold In in *; solve_R. intros h H9 H10. specialize (H4 h ltac:(unfold In; solve_R)) as [H4 | H4]. apply Rgt_ge. apply Rdiv_neg_neg; auto. solve_R. }
   assert (H9 : ⟦ lim 0 ⟧ (λ h : ℝ, (f (x + h) - f x) / h) = 0).
   {
+    (*dogs*)
     intros ε H9. exists (Rmin δ1 δ2). split. solve_R. intros h H10. assert (h > 0 \/ h < 0) as [H11 | H11] by solve_R.
     - specialize (H6 h ltac:(solve_R) H11). specialize (H8 (-h) ltac:(solve_R) ltac:(solve_R)).
 

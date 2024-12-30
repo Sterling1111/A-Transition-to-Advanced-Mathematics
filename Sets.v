@@ -21,12 +21,12 @@ Delimit Scope set_scope with set.
 
 Module SetNotations.
 
-Notation "x ∈ A" := (In _ A x) (at level 20) : set_scope.
+Notation "x ∈ A" := (In _ A x) (at level 40) : set_scope.
 
 Definition set_prod {U V : Type} (A : Ensemble U) (B : Ensemble V) : Ensemble (U * V) :=
   fun p => exists a b, (a ∈ A)%set /\ (b ∈ B)%set /\ p = (a, b).
 
-Notation "x ∉ A" := (~ In _ A x) (at level 20) : set_scope.
+Notation "x ∉ A" := (~ In _ A x) (at level 40) : set_scope.
 Notation "A ⊆ B" := (Included _ A B) (at level 40) : set_scope.
 Notation "A ⊈ B" := (~ Included _ A B) (at level 40) : set_scope.
 Notation "A ⊊ B" := (Strict_Included _ A B) (at level 40) : set_scope.
@@ -34,7 +34,7 @@ Notation "A ⋃ B" := (Union _ A B) (at level 30) : set_scope.
 Notation "A ⋂ B" := (Intersection _ A B) (at level 30) : set_scope.
 Notation "A − B" := (Setminus _ A B) (at level 30) : set_scope.
 Notation "A × B" := (set_prod A B) (at level 30) : set_scope.
-Notation "A ′" := (Complement _ A) (at level 50, format "A ′") : set_scope.
+Notation "A ′" := (Complement _ A) (at level 20, format "A ′") : set_scope.
 Notation "∅" := (Empty_set _) : set_scope.
 Notation "‖ A ‖ = n" := (@cardinal _ A n) (at level 70, format "‖ A ‖  =  n") : set_scope.
 
@@ -216,7 +216,7 @@ Proof.
 Qed.
 
 Lemma In_Intersection_def : forall (U : Type) (A B : Ensemble U) (x : U),
-  x ∈ (A ⋂ B) <-> (x ∈ A /\ x ∈ B).
+  x ∈ (A ⋂ B) <-> x ∈ A /\ x ∈ B.
 Proof.
   intros; split; [apply Intersection_inv | intros [H1 H2]; apply Intersection_intro; auto].
 Qed.
@@ -228,7 +228,7 @@ Proof.
 Qed.
 
 Lemma In_Setminus_def : forall (U : Type) (A B : Ensemble U) (x : U),
-  x ∈ A − B <-> x ∈ A /\ x ∉ B.
+  x ∈ (A − B) <-> x ∈ A /\ x ∉ B.
 Proof.
   intros U A B x; split.
   - intros H1. auto.
@@ -236,10 +236,10 @@ Proof.
 Qed.
 
 Lemma Setminus_def : forall (U : Type) (A B : Ensemble U),
-  A − B = A ⋂ B′.
+  (A − B) = A ⋂ B′.
 Proof.
   intros U A B. apply set_equal_def. intros x. split; intros H1.
-  - pose proof In_Intersection_def U A (B'). apply In_Intersection_def. apply In_Setminus_def in H1. auto.
+  - apply In_Intersection_def. apply In_Setminus_def in H1. auto.
   - apply In_Intersection_def in H1. apply In_Setminus_def. auto.
 Qed.
 
