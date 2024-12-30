@@ -141,6 +141,12 @@ Proof.
   intros n x H1. apply theorem_10_6.
 Qed.
 
+Theorem power_rule' : forall n m,
+   m = INR n -> ⟦ der ⟧ (fun x => x^n) = (fun x => m * x ^ (n - 1)).
+Proof.
+  intros n m H1. rewrite H1. apply power_rule.
+Qed.
+
 Lemma limit_to_0_equiv' : forall f1 f2 L,
   (exists δ, δ > 0 /\ forall x, x <> 0 -> |x| < δ -> f1 x = f2 x) -> ⟦ lim 0 ⟧ f1 = L -> ⟦ lim 0 ⟧ f2 = L.
 Proof.
@@ -211,7 +217,12 @@ Proof.
   intros f g f' g' H1 H2 x H3. apply theorem_10_9; auto. specialize (H2 (g x) ltac:(apply Full_intro)). auto. 
 Qed.
 
-Example example_d1 : ⟦ der ⟧ (fun x => x^2) = (fun x => 2 * x).
+Example example_d1 : ⟦ der ⟧ (fun x => x^3) = (fun x => 3 * x^2).
+Proof.
+  apply power_rule' with (m := 3). simpl; lra.
+Qed.
+
+Example example_d2 : ⟦ der ⟧ (fun x => (3 * x + 2)^3) = (fun x => 3 * (3 * x + 2)^2 * 3).
 Proof.
   replace (fun x => 2 * x) with (fun x => INR 2 * x ^ (2 - 1)). 2 : { extensionality x. solve_R. }
   apply power_rule.

@@ -228,7 +228,7 @@ Proof.
 Qed.
 
 Lemma In_Setminus_def : forall (U : Type) (A B : Ensemble U) (x : U),
-  x ∈ (A − B) <-> x ∈ A /\ x ∉ B.
+  x ∈ A − B <-> x ∈ A /\ x ∉ B.
 Proof.
   intros U A B x; split.
   - intros H1. auto.
@@ -236,7 +236,7 @@ Proof.
 Qed.
 
 Lemma Setminus_def : forall (U : Type) (A B : Ensemble U),
-  (A − B) = A ⋂ B′.
+  A − B = A ⋂ B′.
 Proof.
   intros U A B. apply set_equal_def. intros x. split; intros H1.
   - pose proof In_Intersection_def U A (B'). apply In_Intersection_def. apply In_Setminus_def in H1. auto.

@@ -50,7 +50,7 @@ Section section_37_5.
   Variables l1 l2 : list ℝ.
   Let g := polynomial l1.
   Let h := polynomial l2.
-  Let f := (g / h)%function.
+  Let f := (g ∕ h).
 
   Lemma lemma_37_5 : forall a,
     h a <> 0 -> continuous_at f a.
