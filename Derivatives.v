@@ -1,5 +1,5 @@
 Require Import Imports Sets Notations Functions Limit Continuity Reals_util.
-Import SetNotations.
+Import SetNotations IntervalNotations.
 
 Definition differentiable_at (f:R -> R) (a:R) :=
   exists L, ⟦ lim 0 ⟧ (fun h => (f (a + h) - f a) / h) = L.
@@ -216,3 +216,31 @@ Proof.
   replace (fun x => 2 * x) with (fun x => INR 2 * x ^ (2 - 1)). 2 : { extensionality x. solve_R. }
   apply power_rule.
 Qed.
+
+Definition maximum_point (f: ℝ -> ℝ) (A : Ensemble ℝ) (x : ℝ) :=
+  x ∈ A /\ forall y, y ∈ A -> f y <= f x.
+
+Definition minimum_point (f: ℝ -> ℝ) (A : Ensemble ℝ) (x : ℝ) :=
+  x ∈ A /\ forall y, y ∈ A -> f x <= f y.
+
+Definition maximum_value (f: ℝ -> ℝ) (A : Ensemble ℝ) (x : ℝ) :=
+  exists y, maximum_point f A y /\ x = f y.
+
+Definition minimum_value (f: ℝ -> ℝ) (A : Ensemble ℝ) (x : ℝ) :=
+  exists y, minimum_point f A y /\ x = f y.
+
+Theorem theorem_11_1_a : forall f a b x,
+  maximum_point f ⦅a, b⦆ x -> differentiable_at f x -> ⟦ der x ⟧ f = (λ _, 0).
+Proof.
+  intros f a b x [H1 H2] [L H3]. assert (exists δ, 0 < δ /\ forall h, |h| < δ -> f (x + h) - f x <= 0) as [δ1 [H4 H5]].
+  { exists (Rmin (b - x) (x - a)). split. unfold In in *. solve_R. intros h H4. specialize (H2 (x + h) ltac:(unfold In in *; solve_R)). lra. }
+  assert (exists δ, 0 < δ /\ forall h, |h| < δ -> h > 0 -> (f (x + h) - f x) / h <= 0) as [δ2 [H6 H7]].
+  { exists (Rmin (b - x) (x - a)). split. unfold In in *; solve_R. intros h H6 H7. specialize (H2 h ltac:(unfold In; solve_R)) as [H4 | H4]. apply Rlt_le. apply Rdiv_neg_pos; auto. solve_R. }
+  assert (exists δ, 0 < δ /\ forall h, |h| < δ -> h < 0 -> (f (x + h) - f x) / h >= 0) as [δ2 [H7 H8]].
+  { exists (Rmin (b - x) (x - a)). split. unfold In in *; solve_R. intros h H9 H10. specialize (H4 h ltac:(unfold In; solve_R)) as [H4 | H4]. apply Rgt_ge. apply Rdiv_neg_neg; auto. solve_R. }
+  assert (H9 : ⟦ lim 0 ⟧ (λ h : ℝ, (f (x + h) - f x) / h) = 0).
+  {
+    intros ε H9. exists (Rmin δ1 δ2). split. solve_R. intros h H10. assert (h > 0 \/ h < 0) as [H11 | H11] by solve_R.
+    - specialize (H6 h ltac:(solve_R) H11). specialize (H8 (-h) ltac:(solve_R) ltac:(solve_R)).
+
+Admitted.
