@@ -240,13 +240,12 @@ Proof.
   intros f a b x [H1 H2] [L H3]. assert (exists δ, 0 < δ /\ forall h, |h| < δ -> f (x + h) - f x <= 0) as [δ1 [H4 H5]].
   { exists (Rmin (b - x) (x - a)). split. unfold In in *. solve_R. intros h H4. specialize (H2 (x + h) ltac:(unfold In in *; solve_R)). lra. }
   assert (exists δ, 0 < δ /\ forall h, |h| < δ -> h > 0 -> (f (x + h) - f x) / h <= 0) as [δ2 [H6 H7]].
-  { exists (Rmin (b - x) (x - a)). split. unfold In in *; solve_R. intros h H6 H7. specialize (H2 h ltac:(unfold In; solve_R)) as [H4 | H4]. apply Rlt_le. apply Rdiv_neg_pos; auto. solve_R. }
-  assert (exists δ, 0 < δ /\ forall h, |h| < δ -> h < 0 -> (f (x + h) - f x) / h >= 0) as [δ2 [H7 H8]].
-  { exists (Rmin (b - x) (x - a)). split. unfold In in *; solve_R. intros h H9 H10. specialize (H4 h ltac:(unfold In; solve_R)) as [H4 | H4]. apply Rgt_ge. apply Rdiv_neg_neg; auto. solve_R. }
-  assert (H9 : ⟦ lim 0 ⟧ (λ h : ℝ, (f (x + h) - f x) / h) = 0).
-  {
-    (*dogs*)
-    intros ε H9. exists (Rmin δ1 δ2). split. solve_R. intros h H10. assert (h > 0 \/ h < 0) as [H11 | H11] by solve_R.
-    - specialize (H6 h ltac:(solve_R) H11). specialize (H8 (-h) ltac:(solve_R) ltac:(solve_R)).
-
-Admitted.
+  { exists δ1. split. unfold In in *; solve_R. intros h H6 H7. specialize (H5 h ltac:(solve_R)) as [H8 | H8]. apply Rlt_le. apply Rdiv_neg_pos; auto. solve_R. }
+  assert (exists δ, 0 < δ /\ forall h, |h| < δ -> h < 0 -> (f (x + h) - f x) / h >= 0) as [δ3 [H8 H9]].
+  { exists δ1. split. unfold In in *; solve_R. intros h H10 H11. specialize (H5 h ltac:(solve_R)) as [H12 | H12]. apply Rgt_ge. apply Rdiv_neg_neg; auto. solve_R. }
+  assert (L = 0 \/ L <> 0) as [H10 | H10] by lra.
+  - intros ε H11. specialize (H3 ε H11) as [δ4 [H12 H13]]. exists δ4. split; auto. intros h H14. specialize (H13 h ltac:(solve_R)). solve_R.
+  - exfalso. clear H1 H2 a b H4 H5 δ1. specialize (H3 (|L| / 2) ltac:(solve_R)) as [δ4 [H12 H13]]. set (h := Rmin (δ2/2) (Rmin (δ3/2) (δ4/2))).
+    assert (h > 0) as H14 by (unfold h; solve_R). assert (-h < 0) as H15 by lra. specialize (H13 h ltac:(unfold h; solve_R)) as H13'. specialize (H13 (-h) ltac:(unfold h; solve_R)).
+    specialize (H7 h ltac:(unfold h; solve_R) H14). specialize (H9 (-h) ltac:(unfold h; solve_R) H15). solve_R. 
+Qed.
