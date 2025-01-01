@@ -228,11 +228,37 @@ Definition maximum_point (f: ℝ -> ℝ) (A : Ensemble ℝ) (x : ℝ) :=
 Definition minimum_point (f: ℝ -> ℝ) (A : Ensemble ℝ) (x : ℝ) :=
   x ∈ A /\ forall y, y ∈ A -> f x <= f y.
 
-Definition maximum_value (f: ℝ -> ℝ) (A : Ensemble ℝ) (x : ℝ) :=
-  exists y, maximum_point f A y /\ x = f y.
+Definition maximum_value (f: ℝ -> ℝ) (A : Ensemble ℝ) (y : ℝ) :=
+  exists x, maximum_point f A x /\ y = f x.
 
-Definition minimum_value (f: ℝ -> ℝ) (A : Ensemble ℝ) (x : ℝ) :=
-  exists y, minimum_point f A y /\ x = f y.
+Definition minimum_value (f: ℝ -> ℝ) (A : Ensemble ℝ) (y : ℝ) :=
+  exists x, minimum_point f A x /\ y = f x.
+
+Lemma continuous_exists_min_max : forall f a b,
+  a < b -> continuous_on f [a, b] -> exists y1 y2, maximum_value f [a, b] y1 /\ minimum_value f [a, b] y2.
+Proof.
+  intros f a b H1 H2. pose proof theorem_7_3 f a b H1 H2 as [x1 [H3 H4]]. pose proof theorem_7_7 f a b H1 H2 as [x2 [H5 H6]].
+  exists (f x1), (f x2). split; unfold minimum_value, minimum_point, maximum_value, maximum_point.
+  - exists x1. repeat split; unfold In in *; try lra. intros h H7. specialize (H4 h H7). lra.
+  - exists x2. repeat split; unfold In in *; try lra. intros h H7. specialize (H6 h H7). lra.
+Qed.
+
+Lemma min_max_val_eq : forall f a b y1 y2,
+  maximum_value f [a, b] y1 -> minimum_value f [a, b] y2 -> y1 = y2 -> forall x, x ∈ [a, b] -> f x = y1.
+Proof.
+  intros f a b y1 y2 H1 H2 H3 x H4. destruct H1 as [x1 [H5 H6]]. destruct H2 as [x2 [H7 H8]].
+  destruct H5 as [H5 H9]. destruct H7 as [H7 H10].
+  assert (f x <= y1) as H11. { specialize (H10 x H4). specialize (H9 x H4). lra. }
+  assert (f x >= y1) as H12. { rewrite H3. specialize (H10 x H4). lra. }
+  lra.
+Qed.
+
+Lemma min_max_val_eq' : forall f a b y1 y2,
+  maximum_value f [a, b] y1 -> minimum_value f [a, b] y2 -> y1 = y2 -> forall x1 x2, x1 ∈ [a, b] -> x2 ∈ [a, b] -> f x1 = f x2.
+Proof.
+  intros f a b y1 y2 H1 H2 H3 x1 x2 H4 H5. specialize (min_max_val_eq f a b y1 y2 H1 H2 H3 x1 H4) as H6.
+  specialize (min_max_val_eq f a b y1 y2 H1 H2 H3 x2 H5) as H7. lra.
+Qed.
 
 Theorem theorem_11_1_a : forall f a b x,
   maximum_point f ⦅a, b⦆ x -> differentiable_at f x -> ⟦ der x ⟧ f = (λ _, 0).
@@ -249,3 +275,43 @@ Proof.
     assert (h > 0) as H14 by (unfold h; solve_R). assert (-h < 0) as H15 by lra. specialize (H13 h ltac:(unfold h; solve_R)) as H13'. specialize (H13 (-h) ltac:(unfold h; solve_R)).
     specialize (H7 h ltac:(unfold h; solve_R) H14). specialize (H9 (-h) ltac:(unfold h; solve_R) H15). solve_R. 
 Qed.
+
+Theorem theorem_11_1_b : forall f a b x,
+  minimum_point f ⦅a, b⦆ x -> differentiable_at f x -> ⟦ der x ⟧ f = (λ _, 0). 
+Proof.
+  intros f a b x [H1 H2] [L H3]. pose proof theorem_11_1_a (–f) a b x as H4. assert (⟦ der x ⟧ (– f) = (λ _ : ℝ, 0) -> ⟦ der x ⟧ f = (λ _ : ℝ, 0)) as H5.
+  {
+    intros H5. apply theorem_10_5 with (c := -1) in H5. replace (-1 * 0) with 0 in H5 by lra.
+    replace ((λ x : ℝ, -1 * - f x)) with (λ x : ℝ, f x) in H5. 2 : { extensionality x'. lra. } auto.
+  }
+  apply H5. apply H4; auto. unfold maximum_point. split; auto. intros y H6. specialize (H2 y H6). lra.
+  unfold differentiable_at. exists (-1 * L). replace ((λ h : ℝ, (- f (x + h) - - f x) / h)) with ((λ h : ℝ, -1 * ((f (x + h) - f x) / h))).
+  2 : { extensionality x'. lra. } apply limit_mult; solve_lim.
+Qed.
+
+Definition critical_point (f: ℝ -> ℝ) (A : Ensemble ℝ) (x : ℝ) :=
+  x ∈ A /\ ⟦ der x ⟧ f = (λ _, 0).
+
+Definition critical_value (f: ℝ -> ℝ) (A : Ensemble ℝ) (y : ℝ) :=
+  exists x, critical_point f A x /\ y = f x.
+
+Theorem theorem_3 : forall f a b,
+  a < b -> continuous_on f [a, b] -> differentiable_on f ⦅a, b⦆ -> f a = f b -> exists x, critical_point f ⦅a, b⦆ x.
+Proof.
+  intros f a b H1 H2 H3 H4. pose proof continuous_exists_min_max f a b H1 H2 as [y1 [y2 [[x1 [[H5 H6] H7]] [x2 [[H8 H9] H10]]]]].
+  assert (x1 ∈ ⦅a, b⦆ \/ x2 ∈ ⦅a, b⦆ \/ (x1 = a \/ x1 = b \/ x2 = a \/ x2 = b)) as [H11 | [H11 | [H11 | H11]]] by (unfold In in *; lra).
+  - exists x1. split; auto. apply theorem_11_1_a with (a := a) (b := b); auto. unfold maximum_point. split; auto. intros y H12. apply H6. unfold In in *. lra.
+  - exists x2. split; auto. apply theorem_11_1_b with (a := a) (b := b); auto. unfold minimum_point. split; auto. intros y H12. apply H9. unfold In in *. lra.
+  - exists ((a + b) / 2). split. unfold In. lra. apply limit_to_0_equiv' with (f1 := (fun x => 0)); try solve_lim.
+    assert (minimum_value f [a, b] (f x2)) as H12. { unfold minimum_value. exists x2. split; auto. unfold minimum_point. split; auto. }
+    assert (maximum_value f [a, b] (f x1)) as H13. { unfold maximum_value. exists x1. split; auto. unfold maximum_point. split; auto. }
+    assert (f )
+    exists ((b - a)/2); split; try lra. intros h H12 H13. replace (f ((a + b) / 2 + h)) with (f ((a + b) / 2)).
+    2 : { apply min_max_val_eq' with (f := f) (a := a) (b := b) (y1 := y1) (y2 := y2); auto. unfold maximum_value, minimum_value. exists x1. unfold maximum_point. split; auto. unfold minimum_value. exists x2. unfold minimum_point. split; auto.  }
+    { pose proof min_max_val_eq f a b y1 y2. 
+    replace ((a + b) / 2) with x1 by lra. apply theorem_11_1_a with (a := a) (b := b). unfold maximum_point. split; unfold In in *; try lra.
+    unfold differentiable_on in H3. apply H3; unfold In in *; lra.
+  - exists ((a + b) / 2). split. unfold In. lra. assert ((a + b) / 2 = a) as H12 by admit.
+    replace ((a + b) / 2) with x2 by lra. apply theorem_11_1_b with (a := a) (b := b). unfold minimum_point. split; unfold In in *; try lra.
+    unfold differentiable_on in H3. apply H3; unfold In in *; lra.
+Admitted.

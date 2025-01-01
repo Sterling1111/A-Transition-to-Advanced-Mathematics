@@ -19,7 +19,7 @@ Section section_37_3.
 
   Let A : Ensemble ℝ := ℝ − ⦃0, 1⦄.
 
-  Lemma lemma_37_3_a' : continuous_on A f.
+  Lemma lemma_37_3_a' : continuous_on f A.
   Proof.
     intros a H1. unfold continuous_at. assert (a <> 0 /\ a <> 1) as [H2 H3].
     { apply In_Setminus_def in H1 as [_ H1]. split; intros H2; apply H1; autoset. } unfold limit.

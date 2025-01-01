@@ -6,14 +6,14 @@ Open Scope interval_scope.
 Definition continuous_at (f : ℝ -> ℝ) (a : ℝ) : Prop :=
   ⟦ lim a ⟧ f = f a.
 
-Definition continuous_on (D : Ensemble ℝ) (f : ℝ -> ℝ) : Prop :=
+Definition continuous_on (f : ℝ -> ℝ) (D : Ensemble ℝ) : Prop :=
   ∀ a : ℝ, a ∈ D -> continuous_at f a.
 
 Definition continuous (f : ℝ -> ℝ) : Prop :=
-  continuous_on (Full_set ℝ) f.
+  continuous_on f (Full_set ℝ).
 
 Example example_37_2 : forall c d,
-  continuous_on ℝ (fun x => c * x + d).
+  continuous_on (fun x => c * x + d) ℝ.
 Proof.
   intros c d a H1. unfold continuous_at. solve_lim.
 Qed.
@@ -87,7 +87,7 @@ Proof.
     2 : { extensionality x. rewrite poly_cons. reflexivity. } unfold continuous_at. solve_lim. 
 Qed.
 
-Lemma poly_c_example : continuous_on ℝ (fun x => 5*x^5 + 4*x^4 + 3*x^3 + 2*x^2 + x + 1).
+Lemma poly_c_example : continuous_on (fun x => 5*x^5 + 4*x^4 + 3*x^3 + 2*x^2 + x + 1) ℝ.
 Proof.
   replace (fun x : ℝ => 5 * x ^ 5 + 4 * x ^ 4 + 3 * x ^ 3 + 2 * x ^ 2 + x + 1) with (polynomial [5; 4; 3; 2; 1; 1]).
   2 : { extensionality x. compute; lra. } unfold continuous_on. intros a H1. apply theorem_37_14.
@@ -192,7 +192,7 @@ Proof.
 Qed.
 
 Theorem theorem_7_1 : forall f a b,
-  a < b -> continuous_on [a, b] f -> f a < 0 < f b -> ∃ x, x ∈ [a, b] /\ f x = 0.
+  a < b -> continuous_on f [a, b] -> f a < 0 < f b -> ∃ x, x ∈ [a, b] /\ f x = 0.
 Proof.
   intros f a b H1 H2 H3.
   set (A := (fun x1 => x1 ∈ [a, b] /\ ∀ x2, x2 ∈ [a, x1] -> f x2 < 0)).
@@ -308,7 +308,7 @@ Proof.
 Qed.
 
 Theorem theorem_7_2 : forall f a b,
-  a < b -> continuous_on [a, b] f -> ∃ c, ∀ x, x ∈ [a, b] -> f x < c.
+  a < b -> continuous_on f [a, b] -> ∃ c, ∀ x, x ∈ [a, b] -> f x < c.
 Proof.
   intros f a b H1 H2. set (A := fun x => a <= x <= b /\ ∃ c, ∀ x2, x2 ∈ [a, x] -> f x2 < c).
   assert (H3 : a ∈ A). { unfold A, In. split; try lra. exists (f a + 1). intros x H3. replace x with a; lra. }
@@ -376,7 +376,7 @@ Proof.
 Qed.
 
 Theorem theorem_7_3 : forall f a b,
-  a < b -> continuous_on [a, b] f -> exists y, y ∈ [a, b] /\ (forall x, x ∈ [a, b] -> f y >= f x).
+  a < b -> continuous_on f [a, b] -> exists x1, x1 ∈ [a, b] /\ (forall x2, x2 ∈ [a, b] -> f x1 >= f x2).
 Proof.
   intros f a b H1 H2. set (A := fun x => exists y, y ∈ [a, b] /\ x = f y).
   assert (H3 : A ≠ ∅). { apply not_Empty_In. exists (f a). exists a. split; unfold In; solve_R. }
@@ -387,7 +387,7 @@ Proof.
    pose proof classic (exists y, y ∈ [a, b] /\ α = f y) as [[y [H8 H9]] | H8].
   - exists y. split. solve_R. intros x H10. subst. destruct H7 as [H7 _]. specialize (H7 (f x) ltac:(exists x; split; auto)). lra.
   - exfalso. assert (H9 : forall y, y ∈ [a, b] -> f y <> α). { intros y H9 H10. apply H8. exists y. split; auto. }
-    set (g := fun x => 1 / (α - f x)). assert (H10 : continuous_on [a, b] g).
+    set (g := fun x => 1 / (α - f x)). assert (H10 : continuous_on g [a, b]).
     {
       unfold continuous_on. intros x H10. unfold continuous_at, g. apply limit_div.
       - apply limit_const.
@@ -428,16 +428,16 @@ Proof.
 Qed.
 
 Lemma f_continuous_neg_f_continuous : forall f a b,
-  a < b -> continuous_on [a, b] f -> continuous_on [a, b] (fun x => -1 * f x).
+  a < b -> continuous_on f [a, b] -> continuous_on (fun x => -1 * f x) [a, b].
 Proof.
   intros f a b H1 H2. replace (fun x => -f x) with (fun x => -1 * f x). 2 : { extensionality x. lra. }
   unfold continuous_on. intros x H3. unfold continuous_at. apply limit_mult. apply limit_const. apply H2; auto.
 Qed.
 
 Theorem theorem_7_4 : forall f a b c,
-  a < b -> continuous_on [a, b] f -> f a < c < f b -> ∃ x, x ∈ [a, b] /\ f x = c.
+  a < b -> continuous_on f [a, b] -> f a < c < f b -> ∃ x, x ∈ [a, b] /\ f x = c.
 Proof.
-  intros f a b c H1 H2 H3. (set (g := fun x => f x - c)). assert (H4 : continuous_on [a, b] g).
+  intros f a b c H1 H2 H3. (set (g := fun x => f x - c)). assert (H4 : continuous_on g [a, b]).
   {
     unfold continuous_on. intros x H4. unfold continuous_at, g. apply limit_minus. apply H2; auto.
     apply limit_const.
@@ -446,21 +446,21 @@ Proof.
 Qed.
 
 Theorem theorem_7_5 : forall f a b c,
-  a < b -> continuous_on [a, b] f -> f b < c < f a -> ∃ x, x ∈ [a, b] /\ f x = c.
+  a < b -> continuous_on f [a, b] -> f b < c < f a -> ∃ x, x ∈ [a, b] /\ f x = c.
 Proof.
   intros f a b c H1 H2 H3. pose proof f_continuous_neg_f_continuous f a b H1 H2 as H4.
   pose proof theorem_7_4 (fun x => -1 * f x) a b (-c) H1 H4 ltac:(solve_R) as [x [H5 H6]]. exists x; split; solve_R.
 Qed.
 
 Theorem theorem_7_6 : forall f a b,
-  a < b -> continuous_on [a, b] f -> exists N, forall x, x ∈ [a, b] -> f x >= N.
+  a < b -> continuous_on f [a, b] -> exists N, forall x, x ∈ [a, b] -> f x >= N.
 Proof.
   intros f a b H1 H2. pose proof f_continuous_neg_f_continuous f a b H1 H2 as H3.
   pose proof theorem_7_2 (fun x => -1 * f x) a b H1 H3 as [M H4]. exists (-M). intros x H5. specialize (H4 x H5). lra.
 Qed.
 
 Theorem theorem_7_7 : forall f a b,
-  a < b -> continuous_on [a, b] f -> exists y, y ∈ [a, b] /\ (forall x, x ∈ [a, b] -> f y <= f x).
+  a < b -> continuous_on f [a, b] -> exists x1, x1 ∈ [a, b] /\ (forall x2, x2 ∈ [a, b] -> f x1 <= f x2).
 Proof.
   intros f a b H1 H2. pose proof f_continuous_neg_f_continuous f a b H1 H2 as H3.
   pose proof theorem_7_3 (fun x => -1 * f x) a b H1 H3 as [y [H4 H5]]. exists y. split. solve_R.
@@ -468,7 +468,7 @@ Proof.
 Qed.
 
 Lemma continuous_imp_continuous_on : forall f a b,
-  continuous f -> continuous_on [a, b] f.
+  continuous f -> continuous_on f [a, b].
 Proof.
   intros f a b H1. unfold continuous_on. intros x H2. unfold continuous_at. apply H1. apply Full_intro.
 Qed.
