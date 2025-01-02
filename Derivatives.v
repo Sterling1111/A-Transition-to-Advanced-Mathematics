@@ -318,8 +318,10 @@ Proof.
   intros f a b H1 H2 H3 H4. pose proof continuous_exists_min_max f a b H1 H2 as [y1 [y2 [H5 H6]]].
   pose proof H5 as H5'. pose proof H6 as H6'. destruct H5' as [x1 [[H7 H8] H9]]. destruct H6' as [x2 [[H10 H11] H12]].
   assert (x1 ∈ ⦅a, b⦆ \/ x2 ∈ ⦅a, b⦆ \/ ((x1 = a \/ x1 = b) /\ (x2 = a \/ x2 = b))) as [H13 | [H13 | [H13 H14]]] by (unfold In in *; lra).
-  - exists x1. split; auto. apply theorem_11_1_a with (a := a) (b := b); auto. unfold maximum_value in H5. unfold maximum_point. split; auto. intros y H14. apply H8. unfold In in *. lra.
-  - exists x2. split; auto. apply theorem_11_1_b with (a := a) (b := b); auto. unfold minimum_point. split; auto. intros y H14. apply H11. unfold In in *. lra.
+  - exists x1. split; auto. apply theorem_11_1_a with (a := a) (b := b); auto. unfold maximum_value in H5. 
+    unfold maximum_point. split; auto. intros y H14. apply H8. unfold In in *. lra.
+  - exists x2. split; auto. apply theorem_11_1_b with (a := a) (b := b); auto. unfold minimum_point.
+    split; auto. intros y H14. apply H11. unfold In in *. lra.
   - assert (y1 = y2) as H15. { destruct H13 as [H13 | H13], H14 as [H14 | H14]; subst; auto. }
     pose proof min_max_val_eq' f a b y1 y2 H5 H6 H15 as H16. 
     exists ((a + b) / 2). split. unfold In. lra. apply limit_to_0_equiv' with (f1 := (fun x => 0)); try solve_lim.
@@ -328,16 +330,22 @@ Proof.
 Qed.
 
 Theorem theorem_11_4 : forall f a b,
-  a < b -> continuous_on f [a, b] -> exists x, x ∈ ⦅a, b⦆ /\ ⟦ der x ⟧ f = (λ _, (f b - f a) / (b - a)).
+  a < b -> continuous_on f [a, b] -> differentiable_on f ⦅a, b⦆ -> exists x, x ∈ ⦅a, b⦆ /\ ⟦ der x ⟧ f = (λ _, (f b - f a) / (b - a)).
 Proof.
-  intros f a b H1 H2. set (h := fun x => f x - ((f b - f a) / (b - a)) * (x - a)).
-  assert (continuous_on h [a, b]) as H3 by admit.
-  assert (differentiable_on h ⦅a, b⦆) as H4 by admit.
-  assert (h a = f a) as H5 by (unfold h; lra).
-  assert (h b = f a) as H6 by (unfold h; solve_R).
-  pose proof theorem_11_3 h a b H1 H3 H4 ltac:(lra) as [x [H7 H8]].
-  exists x; split; auto. pose proof H8 as H9.
-  unfold h in H8. rewrite <- H5. unfold h.
-  apply theorem_11_3 with (a := a) (b := b) in H3 as [x [H7 H8]]; solve_R.
-  - exists x; split; auto. unfold derivative_at in *. unfold h in H8.
-Admitted.
+  intros f a b H1 H2 H3. set (h := fun x => f x - ((f b - f a) / (b - a)) * (x - a)).
+  assert (continuous_on h [a, b]) as H4. 
+  { unfold continuous_on, continuous_at, h. intros x H5. specialize (H2 x H5). apply limit_minus; auto. solve_lim. }
+  assert (differentiable_on h ⦅a, b⦆) as H5.
+  {
+    unfold differentiable_on, differentiable_at, h. intros x H5. specialize (H3 x H5) as [L H6]. exists (L - (f b - f a) / (b - a)).
+    apply limit_to_0_equiv with (f1 := (fun h => (f (x + h) - f x) / h - (f b - f a) / (b - a))); solve_R.
+    apply limit_minus; auto. solve_lim.
+  }
+  assert (h a = f a) as H6 by (unfold h; lra).
+  assert (h b = f a) as H7 by (unfold h; solve_R).
+  pose proof theorem_11_3 h a b H1 H4 H5 ltac:(lra) as [x [H8 H9]].
+  exists x; split; auto. assert (H10 : ⟦ lim 0 ⟧ (λ h : ℝ, (f (x + h) - f x) / h - (f b - f a) / (b - a)) = 0).
+  { apply limit_to_0_equiv with (f1 := (λ h : ℝ, (f (x + h) - (f b - f a) / (b - a) * (x + h - a) - (f x - (f b - f a) / (b - a) * (x - a))) / h)); solve_R. }
+  intros ε H11. specialize (H10 ε H11) as [δ [H12 H13]]. exists δ; split; auto.
+  intros x0 H14. specialize (H13 x0 H14). solve_R.
+Qed.
