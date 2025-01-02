@@ -304,6 +304,7 @@ Proof.
     unfold In in *. admit.
   }
   apply theorem_11_1_a with (a := a) (b := b); auto.
+Admitted.
 
 Definition critical_point (f: ℝ -> ℝ) (A : Ensemble ℝ) (x : ℝ) :=
   x ∈ A /\ ⟦ der x ⟧ f = (λ _, 0).
@@ -326,7 +327,17 @@ Proof.
     2 : { apply H16; unfold In in *; solve_R. } nra.
 Qed.
 
-Theorem theorem_ : .
+Theorem theorem_11_4 : forall f a b,
+  a < b -> continuous_on f [a, b] -> exists x, x ∈ ⦅a, b⦆ /\ ⟦ der x ⟧ f = (λ _, (f b - f a) / (b - a)).
 Proof.
-  
-Qed.
+  intros f a b H1 H2. set (h := fun x => f x - ((f b - f a) / (b - a)) * (x - a)).
+  assert (continuous_on h [a, b]) as H3 by admit.
+  assert (differentiable_on h ⦅a, b⦆) as H4 by admit.
+  assert (h a = f a) as H5 by (unfold h; lra).
+  assert (h b = f a) as H6 by (unfold h; solve_R).
+  pose proof theorem_11_3 h a b H1 H3 H4 ltac:(lra) as [x [H7 H8]].
+  exists x; split; auto. pose proof H8 as H9.
+  unfold h in H8. rewrite <- H5. unfold h.
+  apply theorem_11_3 with (a := a) (b := b) in H3 as [x [H7 H8]]; solve_R.
+  - exists x; split; auto. unfold derivative_at in *. unfold h in H8.
+Admitted.
