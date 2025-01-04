@@ -445,12 +445,32 @@ Definition decreasing (f: ℝ -> ℝ) :=
   decreasing_on f ℝ.
 
 Corollary corollary_11_3_a : forall f f' a b, 
-  a < b -> ⟦ der ⟧ f [a, b] = f' -> (forall x, x ∈ [a, b] -> f' x >= 0) -> increasing_on f [a, b].
+  a < b -> ⟦ der ⟧ f [a, b] = f' -> (forall x, x ∈ [a, b] -> f' x > 0) -> increasing_on f [a, b].
 Proof.
-  intros f f' a b H1 H2 H3 x y H4 H5 H6. assert (⟦ der ⟧ f [x, y] = f') as H7.
-  { apply replace_der_f_on with (f1' := f'); auto. intros x0 H7. apply H3. unfold In in *. lra. }
-  assert (f' x >= 0) as H8 by (apply H3; unfold In in *; lra). assert (f' y >= 0) as H9 by (apply H3; unfold In in *; lra).
-  assert (f y - f x = f' c * (y - x)) as H10.
-  { apply MVT; auto. intros x0 H10. apply H3. unfold In in *. lra. }
-  assert (f y - f x >= 0) as H11 by (rewrite H10; apply Rmult_ge_0; lra).
-  lra.
+  intros f f' a b H1 H2 H3 x1 x2 H4 H5 H6. assert (H7 : continuous_on f [x1, x2]).
+  { intros x H7. apply theorem_9_1_a. exists (f' x). apply H2. unfold In in *. lra. }
+  assert (H8 : differentiable_on f ⦅x1, x2⦆).
+  { intros x H8. exists (f' x). apply H2. unfold In in *. lra. }
+  pose proof theorem_11_4 f x1 x2 H6 H7 H8 as [x [H9 H10]]. 
+  set (h := λ _ : ℝ, (f x2 - f x1) / (x2 - x1)). assert (h x = f' x) as H11.
+  { apply derivative_of_function_at_x_unique with (f := f); auto. apply H2. unfold In in *. lra. }
+  specialize (H3 x ltac:(unfold In in *; lra)). unfold h in H11. 
+  unfold h in H11. assert (H12 : (f x2 - f x1) / (x2 - x1) > 0) by lra.
+  apply Rmult_gt_compat_r with (r := (x2 - x1)) in H12; field_simplify in H12; lra.
+Qed.
+
+Corollary corollary_11_3_b : forall f f' a b, 
+  a < b -> ⟦ der ⟧ f [a, b] = f' -> (forall x, x ∈ [a, b] -> f' x < 0) -> decreasing_on f [a, b].
+Proof.
+  intros f f' a b H1 H2 H3 x1 x2 H4 H5 H6. assert (H7 : continuous_on f [x1, x2]).
+  { intros x H7. apply theorem_9_1_a. exists (f' x). apply H2. unfold In in *. lra. }
+  assert (H8 : differentiable_on f ⦅x1, x2⦆).
+  { intros x H8. exists (f' x). apply H2. unfold In in *. lra. }
+  pose proof theorem_11_4 f x1 x2 H6 H7 H8 as [x [H9 H10]]. 
+  set (h := λ _ : ℝ, (f x2 - f x1) / (x2 - x1)). assert (h x = f' x) as H11.
+  { apply derivative_of_function_at_x_unique with (f := f); auto. apply H2. unfold In in *. lra. }
+  specialize (H3 x ltac:(unfold In in *; lra)). unfold h in H11. 
+  unfold h in H11. assert (H12 : (f x2 - f x1) / (x2 - x1) < 0) by lra.
+  apply Rmult_lt_compat_r with (r := (x2 - x1)) in H12; field_simplify in H12; lra.
+Qed.
+
