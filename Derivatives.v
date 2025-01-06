@@ -372,6 +372,7 @@ Definition critical_point (f: ℝ -> ℝ) (A : Ensemble ℝ) (x : ℝ) :=
 Definition critical_value (f: ℝ -> ℝ) (A : Ensemble ℝ) (y : ℝ) :=
   exists x, critical_point f A x /\ y = f x.
 
+(*Rolles Theorem*)
 Theorem theorem_11_3 : forall f a b,
   a < b -> continuous_on f [a, b] -> differentiable_on f ⦅a, b⦆ -> f a = f b -> exists x, critical_point f ⦅a, b⦆ x.
 Proof.
@@ -474,3 +475,42 @@ Proof.
   apply Rmult_lt_compat_r with (r := (x2 - x1)) in H12; field_simplify in H12; lra.
 Qed.
 
+Theorem theorem_11_8 : forall f f' g g' a b,
+  a < b -> continuous_on f [a, b] -> continuous_on g [a, b] -> ⟦ der ⟧ f ⦅a, b⦆ = f' -> ⟦ der ⟧ g ⦅a, b⦆ = g' ->
+    exists x, x ∈ ⦅a, b⦆ /\ (f b - f a) * g' x = (g b - g a) * f' x.
+Proof.
+  intros f f' g g' a b H1 H2 H3 H4 H5. set (h := λ x, (g b - g a) * f x - (f b - f a) * g x).
+  assert (continuous_on h [a, b]) as H6.
+  { intros x H6. specialize (H2 x H6). specialize (H3 x H6). unfold continuous_at, h in *. apply limit_minus; solve_lim. }
+  assert (differentiable_on h ⦅a, b⦆) as H7.
+  {
+    intros x H7. specialize (H4 x H7). specialize (H5 x H7). unfold derivative_at in H4, H5. 
+    unfold h, differentiable_at. exists ((g b - g a) * f' x - (f b - f a) * g' x).
+    apply limit_to_0_equiv with (f1 := (λ h, ((g b - g a) * ((f (x + h) - f x)/h)) - ((f b - f a) * ((g (x + h) - g x)/h)))).
+    - intros h0 H8. solve_R.
+    - apply limit_minus; apply limit_mult; auto; solve_lim.
+  }
+  assert (h a = f a * g b - g a * f b) as H8. { unfold h. lra. }
+  assert (h b = f a * g b - g a * f b) as H9. { unfold h. lra. }
+  assert (h a = h b) as H10 by lra. pose proof theorem_11_3 h a b H1 H6 H7 H10 as [x [H11 H12]].
+  assert (⟦ der x ⟧ h = (λ x, (g b - g a) * f' x - (f b - f a) * g' x)) as H13.
+  { apply theorem_10_3_c; apply theorem_10_5; auto. }
+  exists x; split; auto. set (h1' := (λ x, (g b - g a) * f' x - (f b - f a) * g' x)). set (h2' := (λ _ : R, 0)).
+  assert (h1' x = h2' x) as H14. { apply derivative_of_function_at_x_unique with (f := h); auto. }
+  unfold h1', h2' in H14. lra.
+Qed.
+
+Theorem cauchy_mvt : forall f f' g g' a b,
+  a < b -> continuous_on f [a, b] -> continuous_on g [a, b] -> ⟦ der ⟧ f ⦅a, b⦆ = f' -> ⟦ der ⟧ g ⦅a, b⦆ = g' -> 
+    (forall x, x ∈ ⦅a, b⦆ -> g' x <> 0) -> g b <> g a -> exists x, x ∈ ⦅a, b⦆ /\ (f b - f a) / (g b - g a) = f' x / g' x.
+Proof.
+  intros f f' g g' a b H1 H2 H3 H4 H5 H6 H7. pose proof theorem_11_8 f f' g g' a b H1 H2 H3 H4 H5 as [x [H8 H9]].
+  exists x; split; auto. solve_R; split; solve_R.
+Qed.
+
+Theorem theorem_11_9 : forall f f' g g' a L,
+  ⟦ lim a ⟧ f = 0 -> ⟦ lim a ⟧ g = 0 -> ⟦ der a ⟧ f = f' -> ⟦ der a ⟧ g = g' -> ⟦ lim a ⟧ (f' ∕ g') = L ->
+    ⟦ lim a ⟧ (f ∕ g) = L.
+Proof.
+  
+Admitted.

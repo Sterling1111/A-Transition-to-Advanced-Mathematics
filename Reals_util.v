@@ -146,3 +146,28 @@ Lemma sqrt_2_gt_1 : (1 < sqrt 2)%R.
 Proof.
     apply Rlt_pow_base with (n := 2%nat); try lra; try lia. apply sqrt_lt_R0; lra. rewrite pow2_sqrt; lra.
 Qed.
+
+Ltac compare_elems e1 e2 := 
+  let e1' := eval simpl in e1 in
+  let e2' := eval simpl in e2 in 
+  field_simplify; try nra; try nia.
+
+(* Compare two lists recursively element by element *)
+Ltac compare_lists_step :=
+  match goal with
+  | [ |- [] = [] ] => reflexivity
+  | [ |- (?x :: ?xs) = (?y :: ?ys) ] => 
+      first [
+        assert (x = y) by compare_elems x y;
+        apply f_equal2; [assumption | compare_lists_step]
+        |
+        fail "Elements" x "and" y "cannot be proven equal"
+      ]
+  | [ |- ?l1 = ?l2 ] =>
+      fail "Lists" l1 "and" l2 "have different lengths or structures"
+  end.
+
+Ltac auto_list :=
+  intros; compute;
+  try solve [reflexivity];
+  compare_lists_step.
