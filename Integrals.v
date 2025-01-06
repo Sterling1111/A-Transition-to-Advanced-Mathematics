@@ -101,19 +101,27 @@ Proof.
   apply completeness_upper_bound; auto.
 Qed.
 
-Lemma Sorted_Rlt_nth_implies_lt : forall (l : list ℝ),
-  Sorted Rlt l -> 
-  forall i1 i2, 
-    (i1 < i2 < length l)%nat ->
-    nth i1 l 0 < nth i2 l 0.
+Lemma Sorted_Rlt_nth_implies_lt : forall (l : list ℝ) (i1 i2 : ℕ),
+  Sorted Rlt l -> (i1 < i2 < length l)%nat -> nth i1 l 0 < nth i2 l 0.
 Proof.
-  intros l H1 i1 i2 H2. generalize dependent i2. generalize dependent i1. induction l as [| h t IH].
+  intros l i1 i2 H1 H2. generalize dependent i2. generalize dependent i1. induction l as [| h t IH].
   - intros i1 i2 H2. simpl in H2. lia.
   - intros i1 i2 H2. inversion H1. specialize (IH H3). assert (i1 = 0 \/ i1 > 0)%nat as [H5 | H5];
     assert (i2 = 0 \/ i2 > 0)%nat as [H6 | H6]; try lia.
     -- rewrite H5. replace (nth 0 (h :: t) 0) with h by auto. replace (nth i2 (h :: t) 0) with (nth (i2-1) t 0).
-       2 : { destruct i2; simpl; try lia. rewrite Nat.sub_0_r. reflexivity. } assert (h < nth 0 t 0) as H7.
-Admitted.
+       2 : { destruct i2; simpl; try lia. rewrite Nat.sub_0_r. reflexivity. } destruct t as [| h' t'].
+       * simpl in H2. lia.
+       * assert (h < h') as H7. { apply HdRel_inv in H4. auto. } simpl in H2. assert (i2-1 = 0 \/ i2-1 > 0)%nat as [H8 | H8]; try lia.
+         { rewrite H8. simpl. auto. } specialize (IH 0%nat (i2-1)%nat ltac:(simpl; lia)). replace (nth 0 (h' :: t') 0) with h' in IH by auto. lra.
+    -- replace (nth i1 (h :: t) 0) with (nth (i1-1) t 0). 2 : { destruct i1; simpl; try lia. rewrite Nat.sub_0_r. reflexivity. }
+       replace (nth i2 (h :: t) 0) with (nth (i2-1) t 0). 2 : { destruct i2; simpl; try lia. rewrite Nat.sub_0_r. reflexivity. }
+       destruct t as [| h' t'].
+       * simpl in H2. lia.
+       * assert (h < h') as H7. { apply HdRel_inv in H4. auto. } assert (i1-1 = 0 \/ i1-1 > 0)%nat as [H8 | H8];
+         assert (i2-1 = 0 \/ i2-1 > 0)%nat as [H9 | H9]; try lia.
+         + rewrite H8. specialize (IH 0%nat (i2-1)%nat ltac:(simpl in *; lia)). auto.
+         + specialize (IH (i1-1)%nat (i2 -1)%nat ltac:(simpl in *; lia)). auto.
+Qed.
 
 Fixpoint make_pairs (l : list ℝ) : list (ℝ * ℝ) :=
   match l with
@@ -151,7 +159,7 @@ Proof.
        2 : { simpl. lia. } rewrite IH. simpl. lia.
 Qed.
 
-Lemma grestt : forall (l : list (ℝ * ℝ)) (f : ℝ -> ℝ),
+Lemma grestt : forall (l : list ℝ) (f : ℝ -> ℝ),
   Forall 
 Proof.
 Qed.
