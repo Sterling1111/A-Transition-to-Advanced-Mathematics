@@ -12,6 +12,12 @@ Notation "√ x" := (sqrt x) (format "√ x", at level 20).
 
 Open Scope R_scope.
 
+Notation "a <= b <= c <= d" := (a <= b /\ b <= c /\ c <= d) : R_scope.
+Notation "a < b < c < d" := (a < b /\ b < c /\ c < d) : R_scope.
+Notation "a >= b >= c >= d" := (a >= b /\ b >= c /\ c >= d) : R_scope.
+Notation "a > b > c > d" := (a > b /\ b > c /\ c > d) : R_scope.
+Notation "a = b = c" := (a = b /\ b = c) : R_scope.
+
 Declare Scope interval_scope.
 Delimit Scope interval_scope with interval.
 

@@ -28,7 +28,7 @@ Proof.
 Qed.
 
 Definition bounded_On (f : ℝ -> ℝ) (a b : ℝ) :=
-  a < b /\ has_lower_bound (fun y => exists x, x ∈ [a, b] /\ y = f x) /\
+  a <= b /\ has_lower_bound (fun y => exists x, x ∈ [a, b] /\ y = f x) /\
   has_upper_bound (fun y => exists x, x ∈ [a, b] /\ y = f x).
 
 Record bounded_function_R (a b : ℝ) : Type := mkRbounded_function
@@ -37,12 +37,12 @@ Record bounded_function_R (a b : ℝ) : Type := mkRbounded_function
   bounded_function_R_P1 : bounded_On f a b
 }.
 
-Lemma bounded_On_sub_interval : forall (f : ℝ -> ℝ) (a b : ℝ),
-  bounded_On f a b -> forall a' b', (a < a' < b') -> (b' < b) -> bounded_On f a' b'.
+Lemma bounded_On_sub_interval : forall (f : ℝ -> ℝ) (a a' b b' : ℝ),
+  bounded_On f a b -> (a <= a' <= b' <= b) -> bounded_On f a' b'.
 Proof.
-  intros f a b [_ [[lb H1] [ub H2]]] a' b' [H3 H4] H5. split; auto. split.
-  - exists lb. intros y [x [H6 H7]]. specialize (H1 y). apply H1. exists x. unfold In in *; split; lra.
-  - exists ub. intros y [x [H6 H7]]. specialize (H2 y). apply H2. exists x. unfold In in *; split; lra.
+  intros f a b a' b' [_ [[lb H1] [ub H2]]] H3. repeat split; try lra.
+  - exists lb. intros y [x [H4 H5]]. specialize (H1 y). apply H1. exists x. unfold In in *; split; lra.
+  - exists ub. intros y [x [H4 H5]]. specialize (H2 y). apply H2. exists x. unfold In in *; split; lra.
 Qed.
 
 Lemma Finite_R_set_upper_bound : forall (A : Ensemble ℝ),
@@ -159,12 +159,55 @@ Proof.
        2 : { simpl. lia. } rewrite IH. simpl. lia.
 Qed.
 
-Lemma grestt : forall (l : list ℝ) (f : ℝ -> ℝ),
-  Forall 
+Close Scope nat_scope.
+
+Lemma make_pairs_nth_elements : forall (l1 : list ℝ) (l2 : list (ℝ * ℝ)) (i : ℕ),
+  l2 = make_pairs l1 -> (i < length l2)%nat -> nth i l2 (0, 0) = (nth i l1 0, nth (i+1) l1 0).
 Proof.
+  intros l1 l2 i H1 H2. generalize dependent l2. generalize dependent i. induction l1 as [| h t IH].
+  - intros i l2 H1 H2. simpl in H1. rewrite H1 in H2. simpl in H2. lia.
+  - intros i l2 H1 H2. destruct l2 as [| h' t']; try (simpl in H2; lia).
+    destruct t as [| h'' t''].
+    -- simpl in H1. inversion H1.
+    -- rewrite make_pairs_cons in H1. injection H1 as H3 H4. rewrite H3. assert (i = 0 \/ i > 0)%nat as [H5 | H5] by lia.
+       + rewrite H5. simpl. reflexivity.
+       + replace (nth i ((h, h'') :: t') (0, 0)) with 
+         (nth (i-1)%nat t' (0, 0)). 2 : { destruct i. lia. simpl. rewrite Nat.sub_0_r. reflexivity. }
+         replace (nth i (h :: h'' :: t'') 0) with (nth (i-1)%nat (h'' :: t'') 0). 
+         2 : { destruct i. lia. replace (S i - 1)%nat with i by lia. reflexivity. }
+         replace (nth (i + 1) (h :: h'' :: t'') 0) with (nth i (h'' :: t'') 0). 
+         2 : { destruct i. lia. replace (S i + 1)%nat with (S (S i)) by lia. reflexivity. }
+         specialize (IH (i-1)%nat t'). replace (i-1+1)%nat with i in IH by lia. apply IH.
+         2 : { simpl in H2. lia. } rewrite H4. destruct t''. simpl. reflexivity. rewrite make_pairs_cons. reflexivity.
+Qed.  
+
+Lemma make_pairs_sorted : forall (a b : ℝ) (p : partition_R a b) (i : ℕ),
+  let l1 := p.(points a b) in
+  let l2 := make_pairs l1 in
+  let p1 := nth i l2 (0, 0) in
+  (i < length l2)%nat -> fst p1 < snd p1.
+Proof.
+  intros a b [p] i l1 l2 p1 H1; simpl in *. 
+  pose proof make_pairs_nth_elements l1 l2 i ltac:(auto) H1 as H2.
+  pose proof make_pairs_length l1 as H3.
+  pose proof Sorted_Rlt_nth_implies_lt l1 i (i+1) ltac:(auto) ltac:(fold l2 in H3; lia) as H4.
+  unfold p1. rewrite H2. simpl. apply H4.
+Qed.
+
+Lemma gtrest : forall (a b : ℝ) (p : partition_R a b) (f : ℝ -> ℝ),
+  let l1 := p.(points a b) in
+  let l2 := make_pairs l1 in
+  bounded_On f a b -> Forall (fun p => bounded_On f (fst p) (snd p)) l2.
+Proof.
+  intros a b p f l1 l2 H1. apply Forall_forall. intros x H2.
+  pose proof make_pairs_sorted a b p as H3. pose proof In_nth l2 x (0, 0) H2 as [i [H4 H5]].
+  specialize (H3 i ltac:(auto)). unfold l2, l1 in H5. rewrite H5 in H3.
+  pose proof bounded_On_sub_interval f a (fst x) b (snd x) ltac:(auto) as H6. apply H6.
+  destruct p as [p]; simpl in *. pose proof Sorted_Rlt_nth_implies_lt p. p i (i+1) p.(partiton_R_P2) ltac:(auto) ltac:(auto).
 Qed.
 
 Lemma partition_list_of_infimums : forall (a b : ℝ) (p : partition_R a b),
+  
   exists l : list ℝ, forall i, (i < length l)%nat -> nth i l 0 = proj1_sig ()
 Proof.
   intros l. exists (map (fun i => (nth i l 0, nth (i+1) l 0)) (seq 0 (length l - 1))). split.
