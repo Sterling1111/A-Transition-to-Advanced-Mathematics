@@ -42,3 +42,13 @@ Proof.
     2 : { apply EquivThenEqual. lra. } apply H6. intros x H8. specialize (H7 (-x)). specialize (H3 (-x)).
     rewrite Ropp_involutive in H3. apply H3 in H8. specialize (H7 H8). lra.
 Qed.
+
+Lemma lub_unique : forall (E:Ensemble ℝ) a b, is_lub E a -> is_lub E b -> a = b.
+Proof.
+  intros E a b [H1 H2] [H3 H4]. specialize (H4 a H1). specialize (H2 b H3). lra.
+Qed.
+
+Lemma glb_unique : forall (E:Ensemble ℝ) a b, is_glb E a -> is_glb E b -> a = b.
+Proof.
+  intros E a b [H1 H2] [H3 H4]. specialize (H4 a H1). specialize (H2 b H3). lra.
+Qed.
