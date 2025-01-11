@@ -283,6 +283,16 @@ match l with
   | h :: t => if Rlt_dec r h then r :: l else h :: insert_Sorted_Rlt r t
 end.
 
+Lemma insert_Sorted_Rlt_length : forall (r : ℝ) (l : list ℝ),
+  length (insert_Sorted_Rlt r l) = S (length l).
+Proof.
+  intros r l. induction l as [| h t IH].
+  - simpl; auto.
+  - simpl. destruct (Rlt_dec r h) as [H1 | H1].
+    -- simpl. lia.
+    -- simpl. lia.
+Qed.
+
 Lemma insert_Sorted_Rlt_in : forall (r : ℝ) (l : list ℝ),
   List.In r (insert_Sorted_Rlt r l).
 Proof.
@@ -303,13 +313,27 @@ Proof.
     -- right. simpl. auto.
 Qed.
 
-Lemma insert_Sorted_Rlt_sorted : forall (r : ℝ) (l : list ℝ),
-  NoDup l -> Sorted Rlt l -> ~List.In r l -> Sorted Rlt (insert_Sorted_Rlt r l).
+Lemma Sorted_Rlt_NoDup : forall (l : list ℝ),
+  Sorted Rlt l -> NoDup l.
 Proof.
-  intros r l H1 H2 H3. induction l as [| h t IH].
+  intros l H1. induction l as [| h t IH].
+  - constructor.
+  - apply Sorted_inv in H1 as [H1 H2]. constructor; auto. intros H3. specialize (IH H1).
+    pose proof In_nth t h 0 H3 as [n [H4 H5]].
+    pose proof Sorted_Rlt_nth t as H6. destruct t as [| h' t'].
+    -- inversion H3.
+    -- specialize (H6 0%nat n H1). assert (n = 0 \/ n > 0)%nat as [H7 | H7] by lia.
+       * subst. simpl in H2. apply HdRel_inv in H2. lra.
+       * specialize (H6 ltac:(lia)). rewrite H5 in H6. simpl in H6. apply HdRel_inv in H2. lra.
+Qed.
+
+Lemma insert_Sorted_Rlt_sorted : forall (r : ℝ) (l : list ℝ),
+  Sorted Rlt l -> ~List.In r l -> Sorted Rlt (insert_Sorted_Rlt r l).
+Proof.
+  intros r l H2 H3. pose proof Sorted_Rlt_NoDup l H2 as H1. induction l as [| h t IH].
   - simpl; auto.
   - apply NoDup_cons_iff in H1 as [_ H1]. apply Sorted_inv in H2 as [H2 H4].
-    assert (~List.In r t) as H5. { intros H5. apply H3. right. auto. } specialize (IH H1 H2 H5). simpl.
+    assert (~List.In r t) as H5. { intros H5. apply H3. right. auto. } specialize (IH H2 H5). simpl.
     destruct (Rlt_dec r h) as [H6 | H6]. 
     -- repeat constructor; auto.
     -- repeat constructor; auto. assert (H7 : r <> h). { intros H7. apply H3. left; auto. }
@@ -317,7 +341,79 @@ Proof.
        + destruct (insert_Sorted_Rlt r t). constructor. apply HdRel_cons. simpl in H9; lra.
        + destruct t. simpl. apply HdRel_cons. lra. apply HdRel_inv in H4.
          destruct (insert_Sorted_Rlt r (r0 :: t)). apply HdRel_nil. apply HdRel_cons. simpl in H9. lra.
-Qed.  
+Qed.
+
+Lemma In_l_In_insert_Sorted_Rlt : forall (l : list ℝ) (r a : ℝ),
+  List.In a l -> List.In a (insert_Sorted_Rlt r l).
+Proof.
+  intros l r a H1. induction l as [| h t IH].
+  - simpl; auto.
+  - simpl. destruct (Rlt_dec r h) as [H2 | H2].
+    -- destruct H1 as [H1 | H1]; subst. right; left; auto. right; right; auto.
+    -- destruct H1 as [H1 | H1]; subst. left; auto. right; auto.
+Qed.
+
+Lemma Sorted_Rlt_eq : forall l1 l2,
+  Sorted Rlt l1 -> Sorted Rlt l2 -> (forall x, List.In x l1 <-> List.In x l2) -> l1 = l2.
+Proof.
+  intros l1 l2 H1 H2 H3. generalize dependent l2. induction l1 as [| h t IH].
+  - intros l2 H2 H3. destruct l2 as [| h t]; auto. specialize (H3 h). destruct H3 as [_ H3]. specialize (H3 ltac:(left; auto)). inversion H3.
+  - intros l2 H2 H3. destruct l2 as [| h2 t2].
+    * specialize (H3 h) as [H3 _]. specialize (H3 ltac:(left; auto)). inversion H3.
+    * pose proof Sorted_Rlt_NoDup (h :: t) H1 as H4. pose proof (Sorted_Rlt_NoDup (h2 :: t2) H2) as H5.
+      specialize (IH ltac:(apply Sorted_inv in H1; tauto) t2 ltac:(apply Sorted_inv in H2; tauto)).
+      assert (h = h2) as H6.
+      {
+        pose proof Rtotal_order h h2 as [H6 | [H6 | H6]]; auto.
+        - assert (h2 < h) as H7.
+          {
+            specialize (H3 h) as [H3 _]. specialize (H3 ltac:(left; auto)).
+            pose proof In_nth (h2 :: t2) h 0 H3 as [n [H7 H8]]. 
+            assert (n = 0 \/ n > 0)%nat as [H9 | H9] by lia; subst. simpl in H6. lra.
+            pose proof Sorted_Rlt_nth (h2 :: t2) 0 n H2 ltac:(lia) as H10. 
+            replace (nth 0 (h2 :: t2) 0) with h2 in H10 by reflexivity. lra.
+          } lra.
+        - assert (h < h2) as H7.
+          {
+            specialize (H3 h2) as [_ H3]. specialize (H3 ltac:(left; auto)).
+            pose proof In_nth (h :: t) h2 0 H3 as [n [H7 H8]]. 
+            assert (n = 0 \/ n > 0)%nat as [H9 | H9] by lia; subst. simpl in H6. lra.
+            pose proof Sorted_Rlt_nth (h :: t) 0 n H1 ltac:(lia) as H10. 
+            replace (nth 0 (h :: t) 0) with h in H10 by reflexivity. lra.
+          } lra.
+      }
+      f_equal; auto. apply IH. intros x; split; intros H7.
+      + assert (x <> h) as H8. { intros H8. subst. apply NoDup_cons_iff in H4 as [H8 _]. apply H8. apply H7. }
+        specialize (H3 x) as [H3 _]. specialize (H3 ltac:(right; auto)). destruct H3 as [H3 | H3]; auto. lra.
+      + assert (x <> h2) as H8. { intros H8. subst. apply NoDup_cons_iff in H5 as [H8 _]. apply H8. apply H7. }
+        specialize (H3 x) as [_ H3]. specialize (H3 ltac:(right; auto)). destruct H3 as [H3 | H3]; auto. lra.
+Qed.
+
+Lemma insert_Sorted_Rlt_nth : forall (l1 l2 : list ℝ) (r : ℝ),
+  Sorted Rlt l1 -> ~List.In r l1 -> l2 = insert_Sorted_Rlt r l1 -> 
+    exists (i : ℕ), (i < length l2)%nat /\ nth i l2 0 = r /\ 
+      forall (j k : ℕ), (j < i < k)%nat -> nth j l2 0 = nth j l1 0 /\ nth (k+1) l2 0 = nth k l1 0.
+Proof.
+  intros l1 l2 r H1 H2 H3. pose proof insert_Sorted_Rlt_in r l1 as H4. pose proof In_nth l2 r 0 ltac:(subst; auto) as [n [H5 H6]].
+  exists n; do 2 (split; auto). intros j k H7. split.
+  - subst. pose proof insert_Sorted_Rlt_sorted r l1 H1 H2 as H8.
+   pose proof In_l_In_insert_Sorted_Rlt l1 r as H9. pose proof insert_Sorted_Rlt_length r l1 as H10.
+   specialize (H9 (nth j l1 0) ltac:(apply nth_In; lia)). pose proof Sorted_Rlt_nth (insert_Sorted_Rlt r l1) j n H8 ltac:(lia) as H11.
+   rewrite H6 in H11. pose proof Sorted_Rlt_nth l1 j n H1.
+Admitted.
+
+
+Lemma insert_Parition_R_lower_sum : forall (a b r : ℝ) (bf : bounded_function_R a b) (P Q : partition_R a b),
+  let l1 := P.(points a b) in
+  let l2 := Q.(points a b) in
+  let l3 := insert_Sorted_Rlt r l1 in
+  ~List.In r l1 -> l2 = l3 -> L(bf, P(a, b)) <= L(bf, Q(a, b)).
+Proof.
+  intros a b r [f H1] P Q. unfold lower_sum, proj1_sig; simpl.
+  destruct (partition_sublist_elem_has_inf f a b P H1) as [l3 [H2 H3]].
+  destruct (partition_sublist_elem_has_inf f a b Q H1) as [l4 [H4 H5]];
+  destruct P as [l1]; destruct Q as [l2]; simpl in *. intros H6 H7.  
+Qed.
 
 Lemma lemma_13_1_a : forall (a b : ℝ) (bf : bounded_function_R a b) (Q P : partition_R a b),
   List.incl (P.(points a b)) (Q.(points a b)) -> L(bf, P(a, b)) <= L(bf, Q(a, b)).
@@ -351,8 +447,11 @@ Notation "∫ a b f1 - ∫ c d f2 = r" :=
   (integral_minus f1 f2 a b c d r)
     (at level 70, f1, f2, a, b, c, d, r at level 0, no associativity, format "∫  a  b  f1  -  ∫  c  d  f2  =  r").
 
-Theorem FTC1 : forall f F a b,
-  (forall x, x ∈ [a, b] -> ∫ a x f = (F x)) -> continuous_on f [a, b] -> ⟦ der ⟧ F ⦅a, b⦆ = f.
+Example small_bulls : forall x, x = 3.21 -> x^2 - 1.1 = 9.2041.
+Proof. intros x H1. subst. lra. compute. field_simplify. lra. Qed.
+
+Theorem FTC1 : ∀ f F a b,
+  (∀ x, x ∈ [a, b] -> ∫ a x f = (F x)) -> continuous_on f [a, b] -> ⟦ der ⟧ F ⦅a, b⦆ = f.
 Proof.
   intros f F a b H1 H2 c H3. unfold derivative_at.
   assert (H4 : forall h, h ∈ ⦅0, (b - c)⦆ -> ∫ a (c + h) f - ∫ a c f = (F (c + h) - F c)).
@@ -360,5 +459,4 @@ Proof.
     intros h H4. specialize (H1 (c + h) ltac:(unfold Ensembles.In in *; lra)) as H5. 
     specialize (H1 c ltac:(unfold Ensembles.In in *; lra)) as H6. exists (F (c + h)), (F c). split; auto.
   }
-  specialize (H1 c H3) as H4.
-Qed.
+Admitted.
