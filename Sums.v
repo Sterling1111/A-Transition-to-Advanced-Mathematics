@@ -374,6 +374,18 @@ Proof.
     -- repeat rewrite sum_f_i_Sn_f; try lia. rewrite <- IH; try lia. lra.
 Qed.
 
+Lemma sum_f_split : forall i j n (f : nat -> R),
+  (i < j < n)%nat -> sum_f i n f = sum_f i j f + sum_f (S j) n f.
+Proof.
+  intros i j n f H1. induction n as [| k IH].
+  - lia.
+  - assert ((i = k)%nat \/ (i < k)%nat) as [H2 | H2] by lia.
+    -- rewrite H2. rewrite sum_f_i_Sn_f; try lia.
+    -- assert ((j = k)%nat \/ (j < k)%nat) as [H3 | H3] by lia.
+       --- rewrite H3. repeat rewrite sum_f_n_n. rewrite sum_f_i_Sn_f; try lia. reflexivity.
+       --- repeat rewrite sum_f_i_Sn_f; try lia. rewrite IH; try lia. lra.
+Qed.
+
 Lemma sum_swap : forall l1 l2 n1 n2 (f : nat -> nat -> R),
   (l1 <= n1)%nat -> (l2 <= n2)%nat ->
   sum_f l1 n1 (fun i => sum_f l2 n2 (fun j => f i j)) = sum_f l2 n2 (fun j => sum_f l1 n1 (fun i => f i j)).

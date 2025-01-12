@@ -11,6 +11,12 @@ Record partition_R (a b : ℝ) : Type := mkRpartition
   partiton_R_P5 : forall x, List.In x points -> a <= x <= b
 }.
 
+Lemma partition_length : forall a b (P : partition_R a b),
+  (length (P.(points a b)) >= 2)%nat.
+Proof.
+
+Admitted.
+
 Lemma Sorted_Rlt_nth : forall (l : list ℝ) (i1 i2 : ℕ),
   Sorted Rlt l -> (i1 < i2 < length l)%nat -> nth i1 l 0 < nth i2 l 0.
 Proof.
@@ -412,7 +418,10 @@ Proof.
   intros a b r [f H1] P Q. unfold lower_sum, proj1_sig; simpl.
   destruct (partition_sublist_elem_has_inf f a b P H1) as [l3 [H2 H3]].
   destruct (partition_sublist_elem_has_inf f a b Q H1) as [l4 [H4 H5]];
-  destruct P as [l1]; destruct Q as [l2]; simpl in *. intros H6 H7.  
+  destruct P as [l1]; destruct Q as [l2]; simpl in *. intros H6 H7. pose proof insert_Sorted_Rlt_nth l1 l2 r ltac:(auto) H6 H7 as [i [H8 [H9 H10]]].
+  assert (i = 0 \/ i > 0)%nat as [H11 | H11] by lia.
+  - subst. rewrite sum_f_Si with (n := (length l4 - 1)%nat). 2 : { assert (length l1 >= 2)%nat by admit. 
+  rewrite sum_f_split with (i := 0%nat) (j := i). 2 : { assert (i > 0)%nat by admit. lia. }
 Qed.
 
 Lemma lemma_13_1_a : forall (a b : ℝ) (bf : bounded_function_R a b) (Q P : partition_R a b),
