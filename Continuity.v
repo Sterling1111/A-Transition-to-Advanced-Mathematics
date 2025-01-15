@@ -488,3 +488,11 @@ Proof.
     exists x. apply H5.
 Qed.
 
+Lemma lemma_8_A_1 : forall f a b c ε,
+  a < b < c -> continuous_on f [a, c] -> ε > 0 -> 
+  (exists δ1, δ1 > 0 /\ forall x y, x ∈ [a, b] -> y ∈ [a, b] -> |x - y| < δ1 -> |f x - f y| < ε) ->
+  (exists δ2, δ2 > 0 /\ forall x y, x ∈ [b, c] -> y ∈ [b, c] -> |x - y| < δ2 -> |f x - f y| < ε) ->
+  exists δ, δ > 0 /\ forall x y, x ∈ [a, c] -> y ∈ [a, c] -> |x - y| < δ -> |f x - f y| < ε.
+Proof.
+  intros f a b c ε H1 H2 H3 [δ1 [H4 H5]] [δ2 [H6 H7]].
+Admitted.
