@@ -9,6 +9,9 @@ Definition continuous_at (f : ℝ -> ℝ) (a : ℝ) : Prop :=
 Definition continuous_on (f : ℝ -> ℝ) (D : Ensemble ℝ) : Prop :=
   ∀ a : ℝ, a ∈ D -> continuous_at f a.
 
+Definition uniformly_continuous_on (f : ℝ -> ℝ) (a b : ℝ) : Prop :=
+  ∀ ε, ε > 0 -> ∃ δ, δ > 0 /\ ∀ x y, x ∈ [a, b] -> y ∈ [a, b] -> |x - y| < δ -> |f x - f y| < ε.
+
 Definition continuous (f : ℝ -> ℝ) : Prop :=
   continuous_on f (Full_set ℝ).
 
@@ -484,3 +487,4 @@ Proof.
   - pose proof theorem_7_4 f 0 α α H1  ltac:(apply continuous_imp_continuous_on; auto) ltac:(unfold f; split; solve_R) as [x [H4 H5]].
     exists x. apply H5.
 Qed.
+

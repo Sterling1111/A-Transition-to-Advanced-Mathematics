@@ -375,12 +375,14 @@ Proof.
 Qed.
 
 Lemma sum_f_split : forall i j n (f : nat -> R),
-  (i < j < n)%nat -> sum_f i n f = sum_f i j f + sum_f (S j) n f.
+  (i <= j < n)%nat -> sum_f i n f = sum_f i j f + sum_f (S j) n f.
 Proof.
   intros i j n f H1. induction n as [| k IH].
   - lia.
   - assert ((i = k)%nat \/ (i < k)%nat) as [H2 | H2] by lia.
-    -- rewrite H2. rewrite sum_f_i_Sn_f; try lia.
+    -- rewrite H2. rewrite sum_f_i_Sn_f; try lia. assert (j = k \/ j < k)%nat as [H3 | H3] by lia.
+       * subst. repeat rewrite sum_f_n_n. lra.
+       * repeat rewrite sum_f_i_Sn_f; try lia.
     -- assert ((j = k)%nat \/ (j < k)%nat) as [H3 | H3] by lia.
        --- rewrite H3. repeat rewrite sum_f_n_n. rewrite sum_f_i_Sn_f; try lia. reflexivity.
        --- repeat rewrite sum_f_i_Sn_f; try lia. rewrite IH; try lia. lra.
