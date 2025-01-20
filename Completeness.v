@@ -53,14 +53,24 @@ Proof.
   intros E a b [H1 H2] [H3 H4]. specialize (H4 a H1). specialize (H2 b H3). lra.
 Qed.
 
-Lemma lub_gt_In : forall E a x, is_lub E a -> x ∈ E -> x <= a.
+Lemma lub_ge_all_In : forall E a x, is_lub E a -> x ∈ E -> x <= a.
 Proof.
   intros E a x [H1 H2] H3. specialize (H1 x H3). lra.
 Qed.
 
-Lemma glb_lt_In : forall E a x, is_glb E a -> x ∈ E -> x >= a.
+Lemma lub_lt_not_In : forall E a x, is_lub E a -> x > a -> x ∉ E.
+Proof.
+  intros E a x H1 H2 H3. pose proof lub_ge_all_In E a x H1 H3 as H4. lra.
+Qed.
+
+Lemma glb_le_all_In : forall E a x, is_glb E a -> x ∈ E -> a <= x.
 Proof.
   intros E a x [H1 H2] H3. specialize (H1 x H3). lra.
+Qed.
+
+Lemma glb_gt_not_In : forall E a x, is_glb E a -> x < a -> x ∉ E.
+Proof.
+  intros E a x H1 H2 H3. pose proof glb_le_all_In E a x H1 H3 as H4. lra.
 Qed.
 
 Lemma exists_lub_set_not_empty : forall (E:Ensemble ℝ) (a:R), is_lub E a -> E ≠ ∅.
@@ -86,7 +96,7 @@ Proof.
     -- assert (is_lower_bound E2 (a + ε)) as H7.
        {
          intros x H7. assert (x >= a + ε \/ x < a + ε) as [H8 | H8] by lra; auto. pose proof Rtotal_order x a as [H9 | [H9 | H9]].
-         - pose proof glb_lt_In E2 a x H2 H7 as H10. lra.
+         - pose proof glb_le_all_In E2 a x H2 H7 as H10. lra.
          - subst. tauto.
          - specialize (H6 (x - a) ltac:(lra)). replace (x - a + a) with x in H6 by lra. tauto.
        }
@@ -99,7 +109,7 @@ Proof.
          intros x H7. assert (x <= a - ε \/ x > a - ε) as [H8 | H8] by lra; auto. pose proof Rtotal_order x a as [H9 | [H9 | H9]].
          - specialize (H6 (a - x) ltac:(lra)). replace (a - (a - x)) with x in H6 by lra. tauto.
          - subst. tauto.
-         - pose proof lub_gt_In E1 a x H1 H7 as H10. assert (x = a) as H11 by lra. subst. tauto.
+         - pose proof lub_ge_all_In E1 a x H1 H7 as H10. assert (x = a) as H11 by lra. subst. tauto.
        }
        destruct H1 as [_ H1]. specialize (H1 (a - ε) H7). lra.
     -- apply not_all_ex_not in H6 as [x H6]. apply imply_to_and in H6 as [H6 H7]. assert ((a - x) ∈ E1) as H8 by tauto.
@@ -110,7 +120,7 @@ Proof.
          intros x H8. assert (x <= a - ε/2 \/ x > a - ε/2) as [H9 | H9] by lra; auto. pose proof Rtotal_order x a as [H10 | [H10 | H10]].
          - specialize (H6 (a - x) ltac:(lra)). replace (a - (a - x)) with x in H6 by lra. tauto.
          - subst. tauto.
-         - pose proof lub_gt_In E1 a x H1 H8 as H11. assert (x = a) as H12 by lra. subst. tauto.
+         - pose proof lub_ge_all_In E1 a x H1 H8 as H11. assert (x = a) as H12 by lra. subst. tauto.
        }
        destruct H1 as [_ H1]. specialize (H1 (a - ε/2) H8) as H9. lra.
     -- assert (is_upper_bound E1 (a - ε/2)) as H8.
@@ -118,13 +128,13 @@ Proof.
          intros x H8. assert (x <= a - ε/2 \/ x > a - ε/2) as [H9 | H9] by lra; auto. pose proof Rtotal_order x a as [H10 | [H10 | H10]].
          - specialize (H6 (a - x) ltac:(lra)). replace (a - (a - x)) with x in H6 by lra. tauto.
          - subst. tauto.
-         - pose proof lub_gt_In E1 a x H1 H8 as H11. assert (x = a) as H12 by lra. subst. tauto.
+         - pose proof lub_ge_all_In E1 a x H1 H8 as H11. assert (x = a) as H12 by lra. subst. tauto.
        }
        destruct H1 as [_ H1]. specialize (H1 (a - ε/2) H8) as H9. lra.
     -- assert (is_lower_bound E2 (a + ε/2)) as H8.
        {
          intros x H8. assert (x >= a + ε/2 \/ x < a + ε/2) as [H9 | H9] by lra; auto. pose proof Rtotal_order x a as [H10 | [H10 | H10]].
-         - pose proof glb_lt_In E2 a x H2 H8 as H11. lra.
+         - pose proof glb_le_all_In E2 a x H2 H8 as H11. lra.
          - subst. tauto.
          - specialize (H7 (x - a) ltac:(lra)). replace (x - a + a) with x in H7 by lra. tauto.
        }
@@ -144,7 +154,7 @@ Proof.
     -- assert (is_lower_bound E2 a) as H8.
        {
          intros x H8. assert (x >= a \/ x < a) as [H9 | H9] by lra; auto. pose proof Rtotal_order x b as [H10 | [H10 | H10]].
-         - pose proof glb_lt_In E2 b x H2 H8 as H11. lra.
+         - pose proof glb_le_all_In E2 b x H2 H8 as H11. lra.
          - subst. tauto.
          - specialize (H7 (x - b) ltac:(lra)). replace (b + (x - b)) with x in H7 by lra. tauto.
        }
@@ -163,7 +173,7 @@ Proof.
           intros x H9. assert (x <= (a + b) / 2 \/ x > (a + b) / 2) as [H10 | H10] by lra; auto. pose proof Rtotal_order x a as [H11 | [H11 | H11]].
           - specialize (H7 (a - x) ltac:(lra)). replace (a - (a - x)) with x in H7 by lra. tauto.
           - subst. tauto.
-          - pose proof lub_gt_In E1 a x H1 H9 as H12. lra.
+          - pose proof lub_ge_all_In E1 a x H1 H9 as H12. lra.
        }
        destruct H1 as [_ H1]. specialize (H1 ((a + b) / 2) H9). lra.
     -- assert (is_upper_bound E1 ((a + b) / 2)) as H9.
@@ -171,13 +181,13 @@ Proof.
           intros x H9. assert (x <= (a + b) / 2 \/ x > (a + b) / 2) as [H10 | H10] by lra; auto. pose proof Rtotal_order x a as [H11 | [H11 | H11]].
           - specialize (H7 (a - x) ltac:(lra)). replace (a - (a - x)) with x in H7 by lra. tauto.
           - subst. tauto.
-          - pose proof lub_gt_In E1 a x H1 H9 as H12. lra.
+          - pose proof lub_ge_all_In E1 a x H1 H9 as H12. lra.
        }
        destruct H1 as [_ H1]. specialize (H1 ((a + b) / 2) H9). lra.
     -- assert (is_lower_bound E2 ((a + b) / 2)) as H9.
        {
           intros x H9. assert (x >= (a + b) / 2 \/ x < (a + b) / 2) as [H10 | H10] by lra; auto. pose proof Rtotal_order x b as [H11 | [H11 | H11]].
-          - pose proof glb_lt_In E2 b x H2 H9 as H12. lra.
+          - pose proof glb_le_all_In E2 b x H2 H9 as H12. lra.
           - subst. tauto.
           - specialize (H8 (x - b) ltac:(lra)). replace (b + (x - b)) with x in H8 by lra. tauto.
        }
@@ -185,4 +195,21 @@ Proof.
     -- apply not_all_ex_not in H7 as [x H7]. apply imply_to_and in H7 as [H7 H9]. assert ((a - x) ∈ E1) as H10 by tauto.
        apply not_all_ex_not in H8 as [y H8]. apply imply_to_and in H8 as [H8 H11]. assert ((b + y) ∈ E2) as H12 by tauto.
        specialize (H3 (a - x) (b + y) H10 H12). lra.
+Qed.
+
+Lemma exists_point_within_delta : forall A a δ, is_lub A a -> δ > 0 -> exists x, x ∈ A /\ a - δ < x <= a.
+Proof.
+  intros A a δ H1 H2. pose proof classic (a ∈ A) as [H3 | H3].
+  - exists a. repeat split; try lra; auto.
+  - pose proof classic (∃ x, x ∈ A /\ a - δ < x <= a) as [H4 | H4]; auto.
+    exfalso. apply H3. assert (H5 : forall x, x ∈ A -> a - δ >= x).
+    {
+      intros x H5. pose proof classic (a - δ >= x) as [H6 | H6]; auto. exfalso. apply H4. exists x. repeat split; auto; try lra.
+      apply lub_ge_all_In with (E := A); auto.
+    }
+    assert (H6 : is_upper_bound A (a - (δ/2))).
+    {
+      intros x H6. specialize (H5 x H6). lra.
+    }
+    destruct H1 as [_ H1]. specialize (H1 (a - δ/2) H6). lra.
 Qed.

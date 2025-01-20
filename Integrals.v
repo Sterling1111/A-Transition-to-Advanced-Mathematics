@@ -73,7 +73,7 @@ Proof.
         specialize (H3 x) as [_ H3]. specialize (H3 ltac:(right; auto)). destruct H3 as [H3 | H3]; auto. lra.
 Qed.
 
-Record partition_R (a b : ℝ) : Type := mkRpartition
+Record partition_R (a b : ℝ) : Type := mkpartition_R
 {
   points : list ℝ; 
   partition_R_P1 : a < b;
@@ -92,45 +92,43 @@ Proof.
   - simpl; lia.
 Qed.
 
-Definition bounded_On (f : ℝ -> ℝ) (a b : ℝ) :=
-  a <= b /\ has_lower_bound (fun y => exists x, x ∈ [a, b] /\ y = f x) /\
-  has_upper_bound (fun y => exists x, x ∈ [a, b] /\ y = f x).
-
-Record bounded_function_R (a b : ℝ) : Type := mkRbounded_function
+Record bounded_function_R (a b : ℝ) : Type := mkbounded_function_R
 {
   f : ℝ -> ℝ;
-  bounded_function_R_P1 : bounded_On f a b
+  bounded_function_R_P1 : bounded_On f [a, b]
 }.
 
 Lemma bounded_On_sub_interval : forall (f : ℝ -> ℝ) (a a' b b' : ℝ),
-  bounded_On f a b -> (a <= a' <= b' <= b) -> bounded_On f a' b'.
+  bounded_On f [a, b] -> (a <= a' <= b' <= b) -> bounded_On f [a', b'].
 Proof.
-  intros f a b a' b' [_ [[lb H1] [ub H2]]] H3. repeat split; try lra.
+  intros f a b a' b' [[lb H1] [ub H2]] H3. split.
   - exists lb. intros y [x [H4 H5]]. specialize (H1 y). apply H1. exists x. unfold Ensembles.In in *; split; lra.
   - exists ub. intros y [x [H4 H5]]. specialize (H2 y). apply H2. exists x. unfold Ensembles.In in *; split; lra.
 Qed.
 
 Lemma interval_has_inf : forall (a b : ℝ) (f : ℝ -> ℝ),
-  bounded_On f a b ->
+  a <= b ->
+  bounded_On f [a, b] ->
   { inf | is_glb (fun y => exists x, x ∈ [a, b] /\ y = f x) inf }.
 Proof.
-  intros a b f [H1 [H2 H3]]. set (A := fun y => exists x, x ∈ [a, b] /\ y = f x).
+  intros a b f H1 [H2 H3]. set (A := fun y => exists x, x ∈ [a, b] /\ y = f x).
   assert (H4 : A ≠ ∅). { apply not_Empty_In. exists (f a). exists a; auto. split; auto. unfold Ensembles.In. lra. }
   apply completeness_lower_bound; auto. 
 Qed. 
 
 Lemma interval_has_sup : forall (a b : ℝ) (f : ℝ -> ℝ),
-  bounded_On f a b ->
+  a <= b ->
+  bounded_On f [a, b] ->
   { sup | is_lub (fun y => exists x, x ∈ [a, b] /\ y = f x) sup }.
 Proof.
-  intros a b f [H1 [H2 H3]]. set (A := fun y => exists x, x ∈ [a, b] /\ y = f x).
+  intros a b f H1 [H2 H3]. set (A := fun y => exists x, x ∈ [a, b] /\ y = f x).
   assert (H4 : A ≠ ∅). { apply not_Empty_In. exists (f a). exists a; auto. split; auto. unfold Ensembles.In. lra. }
   apply completeness_upper_bound; auto.
 Qed.
 
 Lemma partition_sublist_elem_has_inf :  forall (f : ℝ -> ℝ) (a b : ℝ) (p : partition_R a b),
   let l1 := p.(points a b) in
-  bounded_On f a b ->
+  bounded_On f [a, b] ->
   { l2 : list ℝ | (length l2 = length l1 - 1)%nat /\ forall (i : ℕ), (i < length l2)%nat -> is_glb (fun y => exists x, x ∈ [nth i l1 0, nth (i+1)%nat l1 0] /\ y = f x) (nth i l2 0) }. 
 Proof.
   intros f a b p l1 H1. assert (Sorted Rlt l1) as H2 by (destruct p; auto).
@@ -142,8 +140,8 @@ Proof.
     -- intros x H4. apply H3. right. auto.
     -- destruct t as [| h' t']. exists []. split; simpl; lia. assert (h <= h') as H4. { apply Sorted_inv in H2 as [_ H2]. apply HdRel_inv in H2. lra. }
        assert (a <= h) as H5. { apply H3. left. auto. } assert (h' <= b) as H6. { apply H3. right. left. auto. }
-       assert (bounded_On f h h') as H7. { apply bounded_On_sub_interval with (a := a) (b := b); auto. }
-       pose proof interval_has_inf h h' f H7 as [inf H8]. exists (inf :: l2). split. simpl. rewrite IH1. simpl. lia. intros i H9.
+       assert (bounded_On f [h, h']) as H7. { apply bounded_On_sub_interval with (a := a) (b := b); auto. }
+       pose proof interval_has_inf h h' f H4 H7 as [inf H8]. exists (inf :: l2). split. simpl. rewrite IH1. simpl. lia. intros i H9.
        assert (i = 0 \/ i > 0)%nat as [H10 | H10] by lia.
        * subst. simpl. auto.
        * specialize (IH2 (i-1)%nat). assert (i - 1 < length l2)%nat as H11 by (simpl in *; lia).
@@ -155,7 +153,7 @@ Qed.
 
 Lemma partition_sublist_elem_has_sup : forall (f : ℝ -> ℝ) (a b : ℝ) (p : partition_R a b),
   let l1 := p.(points a b) in
-  bounded_On f a b ->
+  bounded_On f [a, b] ->
   { l2 : list ℝ | (length l2 = length l1 - 1)%nat /\ forall (i : ℕ), (i < length l2)%nat -> is_lub (fun y => exists x, x ∈ [nth i l1 0, nth (i+1)%nat l1 0] /\ y = f x) (nth i l2 0) }.
 Proof.
   intros f a b p l1 H1. assert (Sorted Rlt l1) as H2 by (destruct p; auto).
@@ -167,8 +165,8 @@ Proof.
     -- intros x H4. apply H3. right. auto.
     -- destruct t as [| h' t']. exists []. split; simpl; lia. assert (h <= h') as H4. { apply Sorted_inv in H2 as [_ H2]. apply HdRel_inv in H2. lra. }
        assert (a <= h) as H5. { apply H3. left. auto. } assert (h' <= b) as H6. { apply H3. right. left. auto. }
-       assert (bounded_On f h h') as H7. { apply bounded_On_sub_interval with (a := a) (b := b); auto. }
-       pose proof interval_has_sup h h' f H7 as [sup H8]. exists (sup :: l2). split. simpl. rewrite IH1. simpl. lia.
+       assert (bounded_On f [h, h']) as H7. { apply bounded_On_sub_interval with (a := a) (b := b); auto. }
+       pose proof interval_has_sup h h' f H4 H7 as [sup H8]. exists (sup :: l2). split. simpl. rewrite IH1. simpl. lia.
        intros i H9. assert (i = 0 \/ i > 0)%nat as [H10 | H10] by lia.
        * subst. simpl. auto.
        * specialize (IH2 (i-1)%nat). assert (i - 1 < length l2)%nat as H11 by (simpl in *; lia).
@@ -219,18 +217,18 @@ Section lower_upper_sum_test.
   Lemma x_In_l1 : forall x, List.In x l1 -> a <= x <= b.
   Proof. unfold l1, a, b. intros x H1. destruct H1 as [H1 | [H1 | [H1 | H1]]]; inversion H1; lra. Qed.
 
-  Let P : partition_R a b := mkRpartition a b l1 a_lt_b l1_sorted a_In_l1 b_In_l1 x_In_l1.
+  Let P : partition_R a b := mkpartition_R a b l1 a_lt_b l1_sorted a_In_l1 b_In_l1 x_In_l1.
 
   Print P.
 
-  Lemma f_bounded_On : bounded_On f a b.
+  Lemma f_bounded_On : bounded_On f [a, b].
   Proof.
     unfold bounded_On, f, a, b. repeat split; try lra.
     - exists 1. intros y [x [H1 H2]]. subst. unfold Ensembles.In in *. lra.
     - exists 3. intros y [x [H1 H2]]. subst. unfold Ensembles.In in *. lra.
   Qed.
 
-  Let bf : bounded_function_R a b := mkRbounded_function a b f f_bounded_On.
+  Let bf : bounded_function_R a b := mkbounded_function_R a b f f_bounded_On.
 
   Print bf.
 
@@ -718,7 +716,7 @@ Proof.
     assert (H7 : List.In a l). { admit. }
     assert (H8 : List.In b l). { admit. }
     assert (H9 : forall x, List.In x l -> a <= x <= b). { admit. }
-    set (P' := mkRpartition a b l H5 H6 H7 H8 H9). specialize (IH P').
+    set (P' := mkpartition_R a b l H5 H6 H7 H8 H9). specialize (IH P').
     assert (H10 : incl (points a b P') (points a b Q)). { admit. }
     assert (H11 : add_points_Sorted_Rlt (points a b P') t = points a b Q). { admit. }
     assert (H12 : (∀ r : ℝ, List.In r t → ¬ List.In r (points a b P'))). { intros r H12. admit. }
@@ -743,7 +741,7 @@ Proof.
   assert (H4 : List.In a l6). { admit. }
   assert (H5 : List.In b l6). { admit. }
   assert (H6 : forall x, List.In x l6 -> a <= x <= b). { admit. }
-  set (R := mkRpartition a b l6 H1 H3 H4 H5 H6). exists R. split.
+  set (R := mkpartition_R a b l6 H1 H3 H4 H5 H6). exists R. split.
   - simpl. intros r H7. admit.
   - simpl. intros r H7. admit.
 Admitted.
@@ -764,20 +762,38 @@ Proof.
   specialize (lower_sum_le_upper_sum a b f R) as H5. lra.
 Qed.
 
-Definition Integrable_On (f : ℝ -> ℝ) (a b : ℝ) :=
+Definition Integrable_On_helper (f : ℝ -> ℝ) (a b : ℝ) :=
   exists (bf : bounded_function_R a b) (sup inf : ℝ), bf.(Integrals.f a b) = f /\
     let LS := (fun x : ℝ => exists p : partition_R a b, x = L(bf, p(a, b))) in
     let US := (fun x : ℝ => exists p : partition_R a b, x = U(bf, p(a, b))) in
     is_lub LS sup /\ is_glb US inf /\ sup = inf.
 
-Definition integral (f : ℝ -> ℝ) (a b r : ℝ) : Prop :=  
+Definition Integrable_On (f : ℝ -> ℝ) (a b : ℝ) : Prop :=
+  Integrable_On_helper f a b \/ Integrable_On_helper f b a \/ a = b.
+
+Definition integral_helper (f : ℝ -> ℝ) (a b r : ℝ) : Prop :=
   exists (bf : bounded_function_R a b), bf.(Integrals.f a b) = f /\
     let LS := (fun x : ℝ => exists p : partition_R a b, x = L(bf, p(a, b))) in
     let US := (fun x : ℝ => exists p : partition_R a b, x = U(bf, p(a, b))) in
     is_lub LS r /\ is_glb US r.
 
+Definition integral (f : ℝ -> ℝ) (a b r : ℝ) : Prop :=  
+  match Rlt_dec a b with 
+  | left _ => integral_helper f a b r
+  | right _ => match Req_dec a b with
+               | left _ => r = 0
+               | right _ => integral_helper (–f) b a r
+               end
+  end.
+
 Definition integral_minus (f1 f2 : ℝ -> ℝ) (a b c d r : ℝ) : Prop :=
   exists r1 r2, integral f1 a b r1 /\ integral f2 c d r2 /\ r = r1 - r2.
+
+Definition integral_plus (f1 f2 : ℝ -> ℝ) (a b c d r : ℝ) : Prop :=
+  exists r1 r2, integral f1 a b r1 /\ integral f2 c d r2 /\ r = r1 + r2.
+
+Definition integral_mult_const (f1 : ℝ -> ℝ) (a b c r : ℝ) : Prop :=
+  exists r1, integral f1 a b r1 /\ r = c * r1.
 
 Notation "∫ a b f '=' r" := 
  (integral f a b r)
@@ -797,11 +813,14 @@ Proof.
   specialize (H2 (b - a) ltac:(lra)). lra.
 Qed.
 
-Theorem theorem_13_2 : forall (a b : ℝ) (f : bounded_function_R a b),
-  Integrable_On f.(Integrals.f a b) a b <-> (forall ε, ε > 0 -> exists P : partition_R a b, (U(f, P(a, b)) - L(f, P(a, b))) < ε).
+Theorem theorem_13_2_a : forall (a b : ℝ) (f : bounded_function_R a b),
+  a < b -> Integrable_On f.(Integrals.f a b) a b <-> (forall ε, ε > 0 -> exists P : partition_R a b, (U(f, P(a, b)) - L(f, P(a, b))) < ε).
 Proof.
-  intros a b f. split.
-  - intros [bf [sup [inf [H1 [H2 [H3 H4]]]]]] ε H5. replace bf with f in *.
+  intros a b f H0. split.
+  - intros H1. unfold Integrable_On in H1. destruct H1 as [H1 | [ H1 | H1]]; try lra.
+    2 : { destruct H1 as [bf [sup [inf [H1 [H2 [H3 H4]]]]]]. apply exists_lub_set_not_empty in H2. apply not_Empty_In in H2. destruct H2 as [x H2].
+    destruct H2 as [P H2]. pose proof partition_spec b a P as H5. lra. }
+    destruct H1 as [bf [sup [inf [H1 [H2 [H3 H4]]]]]]. intros ε H5. replace bf with f in *.
     2 : { destruct bf, f. simpl in *. subst. f_equal; apply proof_irrelevance. } clear H1.
     set (α := sup). replace inf with α in *. replace sup with α in *. clear H4.
     set (E1 := λ x : ℝ, ∃ p : partition_R a b, x = (L(f, p(a, b)))). set (E2 := λ x : ℝ, ∃ p : partition_R a b, x = (U(f, p(a, b)))).
@@ -825,20 +844,22 @@ Proof.
     { unfold has_lower_bound. specialize (H6) as [x1 [P H6]]. exists (L(f, P(a, b))). intros x2 [P' H7]. subst. apply theorem_13_1_b. }
     assert (H8 : E2 ≠ ∅). { apply not_Empty_In; auto. } pose proof completeness_lower_bound E2 H7 H8 as [inf H9].
     assert (H10 : forall ε, ε > 0 -> inf - sup < ε).
-    { intros ε H10. specialize (H1 ε H10) as [P H1]. pose proof glb_lt_In E2 inf (U(f, P(a, b))) H9 ltac:(exists P; auto) as H11.
-      pose proof lub_gt_In E1 sup (L(f, P(a, b))) H5 ltac:(exists P; auto) as H12. lra.
+    { intros ε H10. specialize (H1 ε H10) as [P H1]. pose proof glb_le_all_In E2 inf (U(f, P(a, b))) H9 ltac:(exists P; auto) as H11.
+      pose proof lub_ge_all_In E1 sup (L(f, P(a, b))) H5 ltac:(exists P; auto) as H12. lra.
     }
     assert (H11 : sup <= inf). { apply (sup_le_inf E1 E2); auto. intros x y [P H11] [P' H12]. subst. apply theorem_13_1_a. }
-    pose proof lt_eps_same_number sup inf ltac:(lra) H10 as H12.
+    pose proof lt_eps_same_number sup inf ltac:(lra) H10 as H12. left.
     exists f, sup, inf; repeat (split; auto).
 Qed.
 
 Theorem theorem_13_3 : forall f a b,
-  continuous_on f [a, b] -> Integrable_On f a b.
+  a < b -> continuous_on f [a, b] -> Integrable_On f a b.
 Proof.
-  
-Qed.
-
+  intros f a b H1 H2. assert (H3 : bounded_On f [a, b]). { apply continuous_imp_bounded; auto. }
+  pose proof theorem_8_A_1 f a b H1 H2 as H4. set (bf := mkbounded_function_R a b f H3).
+  apply (theorem_13_2_a a b bf); auto. 
+  intros ε H5. specialize (H4 (ε / (2 * (b - a))) ltac:(apply Rdiv_pos_pos; lra)) as [δ [H4 H6]].
+Admitted.
 
 Theorem FTC1 : ∀ f F a b,
   (∀ x, x ∈ [a, b] -> ∫ a x f = (F x)) -> continuous_on f [a, b] -> ⟦ der ⟧ F ⦅a, b⦆ = f.
@@ -849,4 +870,5 @@ Proof.
     intros h H4. specialize (H1 (c + h) ltac:(unfold Ensembles.In in *; lra)) as H5. 
     specialize (H1 c ltac:(unfold Ensembles.In in *; lra)) as H6. exists (F (c + h)), (F c). split; auto.
   }
+  
 Admitted.

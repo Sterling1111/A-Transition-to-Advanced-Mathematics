@@ -9,8 +9,8 @@ Definition continuous_at (f : ℝ -> ℝ) (a : ℝ) : Prop :=
 Definition continuous_on (f : ℝ -> ℝ) (D : Ensemble ℝ) : Prop :=
   ∀ a : ℝ, a ∈ D -> continuous_at f a.
 
-Definition uniformly_continuous_on (f : ℝ -> ℝ) (a b : ℝ) : Prop :=
-  ∀ ε, ε > 0 -> ∃ δ, δ > 0 /\ ∀ x y, x ∈ [a, b] -> y ∈ [a, b] -> |x - y| < δ -> |f x - f y| < ε.
+Definition uniformly_continuous_on (f : ℝ -> ℝ) (D : Ensemble ℝ) : Prop :=
+  ∀ ε, ε > 0 -> ∃ δ, δ > 0 /\ ∀ x y, x ∈ D -> y ∈ D -> |x - y| < δ -> |f x - f y| < ε.
 
 Definition continuous (f : ℝ -> ℝ) : Prop :=
   continuous_on f (Full_set ℝ).
@@ -455,11 +455,17 @@ Proof.
   pose proof theorem_7_4 (fun x => -1 * f x) a b (-c) H1 H4 ltac:(solve_R) as [x [H5 H6]]. exists x; split; solve_R.
 Qed.
 
-Theorem theorem_7_6 : forall f a b,
+Theorem theorem_7_6_a : forall f a b,
   a < b -> continuous_on f [a, b] -> exists N, forall x, x ∈ [a, b] -> f x >= N.
 Proof.
   intros f a b H1 H2. pose proof f_continuous_neg_f_continuous f a b H1 H2 as H3.
   pose proof theorem_7_2 (fun x => -1 * f x) a b H1 H3 as [M H4]. exists (-M). intros x H5. specialize (H4 x H5). lra.
+Qed.
+
+Theorem theorem_7_6_b : forall f a b,
+  a < b -> continuous_on f [a, b] -> exists N, forall x, x ∈ [a, b] -> f x <= N. 
+Proof.
+  intros f a b H1 H2. pose proof theorem_7_3 f a b H1 H2 as [x [H3 H4]]. exists (f x). intros x2 H5. specialize (H4 x2 H5). lra.
 Qed.
 
 Theorem theorem_7_7 : forall f a b,
@@ -488,11 +494,116 @@ Proof.
     exists x. apply H5.
 Qed.
 
+Lemma continuous_on_subset : forall A1 A2 f,
+  A1 ⊆ A2 -> continuous_on f A2 -> continuous_on f A1.
+Proof.
+  intros A1 A2 f H1 H2. unfold continuous_on. intros x H3. apply H2. apply H1. auto.
+Qed.
+
 Lemma lemma_8_A_1 : forall f a b c ε,
   a < b < c -> continuous_on f [a, c] -> ε > 0 -> 
   (exists δ1, δ1 > 0 /\ forall x y, x ∈ [a, b] -> y ∈ [a, b] -> |x - y| < δ1 -> |f x - f y| < ε) ->
   (exists δ2, δ2 > 0 /\ forall x y, x ∈ [b, c] -> y ∈ [b, c] -> |x - y| < δ2 -> |f x - f y| < ε) ->
   exists δ, δ > 0 /\ forall x y, x ∈ [a, c] -> y ∈ [a, c] -> |x - y| < δ -> |f x - f y| < ε.
 Proof.
-  intros f a b c ε H1 H2 H3 [δ1 [H4 H5]] [δ2 [H6 H7]].
-Admitted.
+  intros f a b c ε H1 H2 H3 [δ1 [H4 H5]] [δ2 [H6 H7]]. specialize (H2 b ltac:(unfold In; lra)) as H2.
+  specialize (H2 (ε/2) ltac:(lra)) as [δ3 [H8 H9]]. set (δ := Rmin δ1 (Rmin δ2 δ3)). exists δ. split; [solve_R|].
+  intros x y H10 H11 H12. unfold In, δ in *.
+  assert ((a <= x <= b /\ a <= y <= b) \/ (b <= x <= c /\ b <= y <= c) \/ (x < b < y) \/ (y < b < x)) as [H13 | [H13 | [H13 | H13]]] by solve_R.
+  - apply H5; solve_R.
+  - apply H7; solve_R.
+  - specialize (H9 x ltac:(solve_R)) as H14. specialize (H9 y ltac:(solve_R)) as H15. solve_R.
+  - specialize (H9 y ltac:(solve_R)) as H14. specialize (H9 x ltac:(solve_R)) as H15. solve_R.
+Qed.
+
+Theorem theorem_8_A_1 : forall f a b,
+  a < b -> continuous_on f [a, b] -> uniformly_continuous_on f [a, b].
+Proof.
+  intros f a b H1 H2. intros ε H3.
+  set (A := fun x => a <= x <= b /\ exists δ, δ > 0 /\ forall y z, a <= y <= x -> a <= z <= x -> |y - z| < δ -> |f y - f z| < ε).
+  assert (H4 : A ≠ ∅).
+  { apply not_Empty_In. exists a. split. lra. exists 1. split; [lra|]. intros y z H4 H5 H6. replace y with a by lra. replace z with a by lra. solve_R. }
+  assert (H5 : is_upper_bound A b). { intros x H5. unfold A, In in H5. lra. } assert (H6 : has_upper_bound A). { exists b. auto. }
+  destruct (completeness_upper_bound A H6 H4) as [α H7]. assert (α < b \/ α = b) as [H8 | H8]. { destruct H7 as [_ H7]. specialize (H7 b H5). lra. }
+  - assert (H9 : a <= α).
+    {
+      assert (forall x, x ∈ A -> a <= x) as H9. { intros x H9. unfold A, In in H9. lra. }
+      pose proof not_Empty_In ℝ A as H10. apply H10 in H4 as [x H4]. specialize (H9 x H4). pose proof lub_ge_all_In A α x H7 H4 as H11. lra.
+    }
+    clear H4 H5 H6.
+    assert (a = α \/ a < α) as [H10 | H10] by lra.
+    -- subst. specialize (H2 α ltac:(unfold In in *; lra) (ε/2) ltac:(lra)) as [δ [H10 H11]]. exists (Rmin δ (b - α)). split; [solve_R|].
+       intros x y H12 H13 H14. pose proof lub_lt_not_In A α (α + (Rmin δ (b - α))/2) H7 ltac:(solve_R) as H15. exfalso. apply H15. unfold A, In.
+       split. solve_R. exists δ. split; [solve_R|]. intros y1 z1 H16 H17 H18.
+       assert (H11' : forall x, |x - α| < δ -> |f x - f α| < ε/2).
+       { intros x0 H11'. assert (x0 = α \/ x0 ≠ α) as [H19 | H19] by lra.
+          - subst. solve_R. 
+          - specialize (H11 x0 ltac:(solve_R)). solve_R. 
+       }
+       clear H11. rename H11' into H11. specialize (H11 z1 ltac:(solve_R)) as H19. specialize (H11 y1 ltac:(solve_R)) as H20. solve_R.
+    -- clear H1 H9. pose proof H2 as H2'. specialize (H2 α ltac:(unfold In in *; lra) (ε/2) ltac:(lra)) as [δ [H11 H12]]. set (δ' := Rmin δ (Rmin (b - α) (α - a))).
+       exists (Rmin δ (α - a)). unfold δ' in *; split; [solve_R|]. intros x y H13 H14 H15. 
+
+       assert (H16 : exists δ1, δ1 > 0 /\ forall x y, x ∈ [α - δ'/2, α + δ'/2] -> y ∈ [α - δ'/2, α + δ'/2] -> |x - y| < δ1 -> |f x - f y| < ε).
+       {
+          clear H7 H13 H14 H10 H2'.
+          exists δ'. unfold δ' in *; split; [solve_R|].  intros x1 y1 H17 H18 H19. specialize (H12 x1) as H20. specialize (H12 y1) as H21.
+          clear H12.
+          assert (x1 = α \/ x1 ≠ α) as [H22 | H22] by lra; assert (y1 = α \/ y1 ≠ α) as [H23 | H23] by lra.
+          - subst. solve_R.
+          - specialize (H21 ltac:(unfold In; solve_R)). subst. solve_R.
+          - specialize (H20 ltac:(solve_R)). subst. solve_R.
+          - specialize (H20 ltac:(unfold In in *; solve_R)). specialize (H21 ltac:(unfold In in *; solve_R)). solve_R.
+       }
+       assert (H17 : exists δ2, δ2 > 0 /\ forall x y, x ∈ [a, α - δ'/2] -> y ∈ [a, α - δ'/2] -> |x - y| < δ2 -> |f x - f y| < ε).
+       {
+          pose proof classic (α ∈ A) as [H17 | H17].
+          - destruct H17 as [H17 [δ2 [H18 H19]]]. exists δ2.  split; auto. intros x1 y1 H20 H21 H22. unfold In, δ' in *. apply H19; solve_R.
+          - pose proof exists_point_within_delta A α (δ'/2) H7 ltac:(unfold δ'; solve_R) as [x1 [H18 H19]].
+            destruct H18 as [H18 [δ2 [H20 H21]]]. exists (Rmin δ2 (δ'/2)). split; [solve_R|].
+            intros x2 y2 H22 H23 H24. apply H21; unfold In in *; solve_R.
+       }
+       assert (H19 : continuous_on f (λ x : ℝ, a <= x <= α + δ' / 2)).
+       { apply continuous_on_subset with (A2 := [a, b]). intros x2 H18. unfold In, δ' in *. solve_R. auto. }
+       assert (H18 : a < α - δ' / 2 < α + δ' / 2) by (unfold δ' in *; solve_R). 
+       pose proof lemma_8_A_1 f a (α - δ'/2) (α + δ'/2) ε ltac:(solve_R) H19 H3 H17 H16 as [δ3 [H20 H21]].
+       assert (H22 : (α + δ' / 2) ∈ A). { unfold A. split. unfold δ' in *. solve_R. exists δ3. split; auto. }
+       pose proof lub_ge_all_In A α (α + δ' / 2) H7 H22 as H23. lra.
+  - subst. pose proof H2 as H2'. specialize (H2 b ltac:(unfold In; lra) (ε/2) ltac:(lra)) as [δ [H10 H11]]. set (δ' := Rmin δ (b - a)).
+    assert (H11' : forall x, |x - b| < δ' -> |f x - f b| < ε/2).
+    {
+      intros x H11'. assert (x = b \/ x ≠ b) as [H12 | H12] by lra.
+      - subst. solve_R.
+      - apply H11. unfold δ' in *; solve_R.
+    }
+    clear H11. rename H11' into H11.
+    assert (H12 : exists δ1, δ1 > 0 /\ forall x y, x ∈ [b - δ'/2, b] -> y ∈ [b - δ'/2, b] -> |x - y| < δ1 -> |f x - f y| < ε).
+    {
+      exists δ'. split. unfold δ'. solve_R. intros x1 y1 H12 H13 H14. specialize (H11 x1 ltac:(unfold In, δ' in *; solve_R)) as H15.
+      specialize (H11 y1 ltac:(unfold In, δ' in *; solve_R)). solve_R.
+    }
+    assert (H13 : exists δ2, δ2 > 0 /\ forall x y, x ∈ [a, b - δ'/2] -> y ∈ [a, b - δ'/2] -> |x - y| < δ2 -> |f x - f y| < ε).
+    {
+      pose proof classic (b ∈ A) as [H13 | H13].
+      - destruct H13 as [H13 [δ2 [H14 H15]]]. exists δ2. split; auto. intros x1 y1 H16 H17 H18. unfold In, δ' in *; apply H15; solve_R.
+      - pose proof exists_point_within_delta A b (δ'/2) H7 ltac:(unfold δ'; solve_R) as [x1 [H14 H15]].
+        destruct H14 as [H14 [δ2 [H16 H17]]]. exists (Rmin δ2 (δ'/2)). split; [solve_R|].
+        intros x2 y2 H18 H19 H20. apply H17; unfold In in *; solve_R.
+    }
+    assert (H14 : continuous_on f (λ x : ℝ, b - δ' / 2 <= x <= b)).
+    { apply continuous_on_subset with (A2 := [a, b]). intros x H14. unfold In, δ' in *. solve_R. auto. }
+    assert (H15 : a < b - δ' / 2 < b) by (unfold δ' in *; solve_R).
+    pose proof lemma_8_A_1 f a (b - δ'/2) b ε H15 H2' H3 H13 H12 as [δ3 [H16 H17]]. exists δ3. split; auto.
+Qed.
+
+Definition bounded_On (f : ℝ -> ℝ) (A : Ensemble ℝ) :=
+  has_lower_bound (fun y => exists x, x ∈ A /\ y = f x) /\
+  has_upper_bound (fun y => exists x, x ∈ A /\ y = f x).
+
+Lemma continuous_imp_bounded : forall f a b,
+  a < b -> continuous_on f [a, b] -> bounded_On f [a, b].
+Proof.
+  intros f a b H1 H2. split.
+  - pose proof theorem_7_6_a f a b H1 H2 as [N H3]. exists N. intros y [x [H4 H5]]. subst. apply H3. solve_R.
+  - pose proof theorem_7_6_b f a b H1 H2 as [N H3]. exists N. intros y [x [H4 H5]]. subst. apply H3. solve_R.
+Qed.
